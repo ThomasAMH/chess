@@ -1,0 +1,43 @@
+2024-01-13
+
+## Careful To...
+* Use naming conventions
+
+## Tasks
+_And debug statements along the way via toString()_
+1. In order for the tests to pass, you are required to override the equals() and hashCode() methods in your class implementations as necessary. This includes the ChessPosition, ChessPiece, ChessMove, and ChessBoard classes in particular
+2. Ensure that the pieces have the color, piece_id, possible_moves properties set up (Used to calculate the pieces move correctly)
+   1. Possible moves are NOT stored, but are calculated by looping the dictionary (Simplifies keeping the data structure updated) 
+3. Implement chessboard piece storage structure
+   1. Ensure that the chessboard stores these pieces in an accessible hashtable (Break down pieces by color)
+
+4. Implement the piece possible piece movement functions
+
+! Consider implementing a Debug class
+
+## Piece Movement Notes
+* Piece movement provided by static helper class PieceMoveCalculator(piece)
+* Every piece has a function that is called on a switch
+* There are two types of moves:
+  * **Iterator Moves** are moves that must check every square in a direction until an enemy or friendly piece is encountered
+  * **Fixed Move** are moves that must only check a small quantity of fixed moved opportunities if they are possible or not
+* Each piece has a linear (unless knight) range of what is possible:
+  * Diagonal for bishops is every (+1, +1)...
+  * Knights is a hardcoded number of possible positions to check if valid moves exist
+* The movement function takes the type of piece, the alliance, then cycles through all the moves in the array
+  * Any location occupied by an unfriendly piece in range is OK, but any beyond it in that direction are NOT
+    * (iterate direction cutoff)
+  * Any location occupied by a friendly piece in range is NOT OK
+    * (iterate direction cutoff)
+  * Iterator pieces include:
+    * Rook, bishop, queen
+  * Hardcode positions include
+    * King, pawn, knight
+
+### Moving a piece entails...
+1. Selecting the piece
+2. Passing the board and the piece to the helper class
+
+## Outstanding Questions
+1. Is this going to play well with future assignments? The server?
+2. Does this follow best OOP practices?
