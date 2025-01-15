@@ -2,21 +2,29 @@
 
 ## Careful To...
 * Use naming conventions
+* You have to justify why a more simple solution would not work better!
 
 ## Tasks
 _And debug statements along the way via toString()_
-1. In order for the tests to pass, you are required to override the equals() and hashCode() methods in your class implementations as necessary. This includes the ChessPosition, ChessPiece, ChessMove, and ChessBoard classes in particular
-2. Ensure that the pieces have the color, piece_id, possible_moves properties set up (Used to calculate the pieces move correctly)
-   1. Possible moves are NOT stored, but are calculated by looping the dictionary (Simplifies keeping the data structure updated) 
+1. In order for the tests to pass, you are required to override the equals() and hashCode() methods in your class implementations as necessary. This includes the...
+   - [x] ChessPosition
+   - [x] ChessPiece
+   - [x] ChessMove
+   - [x] Chess Board
+2. Ensure that the pieces have the following properties set up (Used to calculate the pieces move correctly)
+   - [x] color
+   - [ ] possible_moves
+      1. Possible moves are NOT stored, but are calculated by looping the dictionary (Simplifies keeping the data structure updated) 
 3. Implement chessboard piece storage structure
-   1. Ensure that the chessboard stores these pieces in an accessible hashtable (Break down pieces by color)
+   1. ~~Ensure that the chessboard stores these pieces in an accessible hashtable (Break down pieces by color)~~
+   2. Instead, 
 
 4. Implement the piece possible piece movement functions
+5. Ensure that the generated equals() and hashCode() functions work!
 
 ! Consider implementing a Debug class
 
 ## Piece Movement Notes
-* Piece movement provided by static helper class PieceMoveCalculator(piece)
 * Every piece has a function that is called on a switch
 * There are two types of moves:
   * **Iterator Moves** are moves that must check every square in a direction until an enemy or friendly piece is encountered
@@ -41,3 +49,6 @@ _And debug statements along the way via toString()_
 ## Outstanding Questions
 1. Is this going to play well with future assignments? The server?
 2. Does this follow best OOP practices?
+
+
+## Completed Tasks mert ügyes vagy

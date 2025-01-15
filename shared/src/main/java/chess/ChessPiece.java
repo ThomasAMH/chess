@@ -10,7 +10,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
+    private ChessGame.TeamColor teamColor;
+    private PieceType pieceType;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
     }
 
@@ -26,18 +27,18 @@ public class ChessPiece {
         PAWN
     }
 
-    /**
+     /**
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return teamColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return pieceType;
     }
 
     /**
@@ -48,6 +49,41 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        ArrayList<ChessMove>possibleMoves =  new ArrayList<ChessMove>();
+
+        switch(pieceType) {
+            case PieceType.KING:
+                pieceMoves
+                break;
+            case PieceType.QUEEN:
+                break;
+            case PieceType.BISHOP:
+                break;
+            case PieceType.KNIGHT:
+                break;
+            case PieceType.ROOK:
+                break;
+            case PieceType.PAWN:
+                break;
+            case default:
+                break;
+        }
+
+    }
+    private Collection<ChessMove> getChessMoves(PieceType pieceType) {
+        ArrayList<chess.ChessMove> possibleMoves =  new ArrayList<chess.ChessMove>();
+        String[] kingMoves = {"0,1","0,-1","1,0","-1,0","1,1","-1,-1","-1,1","1,-1"};
+        String[] pawnMoves = {"0,1"};
+
+        return possibleMoves;
+    }
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }
