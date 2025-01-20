@@ -41,6 +41,31 @@ public class ChessBoard {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * Partial check if move is legal or not
+     * Assumes that the caller will not propose illegal piece moves (ex. knight forward 3)
+     * @param proposedMove is the move in question. Only end position is examined.
+     * @param proposedPiece is the piece attempting to move. Only team color is examined.
+     * @return Returns true if the proposed space is not occupied by a friendly piece, and is on the board
+     */
+    public boolean isValidMove(ChessMove proposedMove, ChessPiece proposedPiece) {
+        int row, column;
+        row = proposedMove.getEndPosition().getRow();
+        column = proposedMove.getEndPosition().getColumn();
+
+        if (row < 0 || row >= 8 || column < 0 || column >= 8) {
+            return false;
+        }
+
+        ChessPiece piece = board[row][column];
+        ChessGame.TeamColor proposedPieceTeamColor = proposedPiece.getTeamColor();
+
+        if (piece == null) {
+            return true;
+        }
+        return piece.getTeamColor() != proposedPieceTeamColor;
+    }
+
     @Override
     public int hashCode() {
         return super.hashCode();

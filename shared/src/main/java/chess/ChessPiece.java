@@ -15,6 +15,10 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
     }
 
+    private final String[] kingMoves = {"0,1","0,-1","1,0","-1,0","1,1","-1,-1","-1,1","1,-1"};
+    private final String[] pawnMoves = {"0,1"};
+    private final String[] knightMoves = {"2,1","-2,1","2,-1","-2,-1","1,2","1,-2","-1,2","-1,-2"};
+
     /**
      * The various different chess piece options
      */
@@ -53,7 +57,6 @@ public class ChessPiece {
 
         switch(pieceType) {
             case PieceType.KING:
-                pieceMoves
                 break;
             case PieceType.QUEEN:
                 break;
@@ -65,18 +68,11 @@ public class ChessPiece {
                 break;
             case PieceType.PAWN:
                 break;
-            case default:
+            default:
                 break;
         }
-
     }
-    private Collection<ChessMove> getChessMoves(PieceType pieceType) {
-        ArrayList<chess.ChessMove> possibleMoves =  new ArrayList<chess.ChessMove>();
-        String[] kingMoves = {"0,1","0,-1","1,0","-1,0","1,1","-1,-1","-1,1","1,-1"};
-        String[] pawnMoves = {"0,1"};
 
-        return possibleMoves;
-    }
     @Override
     public int hashCode() {
         return super.hashCode();
