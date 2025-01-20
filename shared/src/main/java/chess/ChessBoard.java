@@ -44,26 +44,36 @@ public class ChessBoard {
     /**
      * Partial check if move is legal or not
      * Assumes that the caller will not propose illegal piece moves (ex. knight forward 3)
-     * @param proposedMove is the move in question. Only end position is examined.
+     * @param proposedMove is the move in question.
      * @param proposedPiece is the piece attempting to move. Only team color is examined.
      * @return Returns true if the proposed space is not occupied by a friendly piece, and is on the board
      */
-    public boolean isValidMove(ChessMove proposedMove, ChessPiece proposedPiece) {
-        int row, column;
-        row = proposedMove.getEndPosition().getRow();
-        column = proposedMove.getEndPosition().getColumn();
+    public boolean isValidMove(ChessMove proposedMove) {
+        int startRow, startColumn;
+        startRow = proposedMove.getStartPosition().getRow();
+        startColumn = proposedMove.getStartPosition().getColumn();
 
-        if (row < 0 || row >= 8 || column < 0 || column >= 8) {
+        if (board[startRow][startColumn] == null) {
+            throw new RuntimeException("No piece at specified position");
+        }
+        ChessPiece movingPiece = board[startRow][startColumn];
+
+        int endRow, endColumn;
+        endRow = proposedMove.getEndPosition().getRow();
+        endColumn = proposedMove.getEndPosition().getColumn();
+
+        if (endRow < 0 || endRow >= 8 || endColumn < 0 || endColumn >= 8) {
             return false;
         }
 
-        ChessPiece piece = board[row][column];
-        ChessGame.TeamColor proposedPieceTeamColor = proposedPiece.getTeamColor();
+        ChessPiece pieceAtEndLocation = board[endRow][endColumn];
 
-        if (piece == null) {
+        ChessGame.TeamColor movingPieceTeamColor = movingPiece.getTeamColor();
+
+        if (pieceAtEndLocation == null) {
             return true;
         }
-        return piece.getTeamColor() != proposedPieceTeamColor;
+        return pieceAtEndLocation.getTeamColor() != movingPieceTeamColor;
     }
 
     @Override

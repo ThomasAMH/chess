@@ -13,14 +13,13 @@ _And debug statements along the way via toString()_
    - [x] Chess Board
 2. Ensure that the pieces have the following properties set up (Used to calculate the pieces move correctly)
    - [x] color
-   - [ ] possible_moves
-      1. Possible moves are NOT stored, but are calculated by looping the dictionary (Simplifies keeping the data structure updated) 
-3. Implement chessboard piece storage structure
-   1. ~~Ensure that the chessboard stores these pieces in an accessible hashtable (Break down pieces by color)~~
-   2. Instead, 
-
+   - [x] possible_moves
+3. Create the isValidMove function, which Checks to see if a move goes off the board or on a friendly class
+   - [x] function
 4. Implement the piece possible piece movement functions
-5. Ensure that the generated equals() and hashCode() functions work!
+   - [x] function
+5. Debug the chess moves!
+   - [ ] Debugged moves
 
 ! Consider implementing a Debug class
 

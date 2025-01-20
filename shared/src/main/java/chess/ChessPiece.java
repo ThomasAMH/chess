@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Represents a single chess piece
@@ -10,14 +11,20 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor teamColor;
-    private PieceType pieceType;
+    private final ChessGame.TeamColor teamColor;
+    private final PieceType pieceType;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        teamColor = pieceColor;
+        pieceType = type;
     }
 
     private final String[] kingMoves = {"0,1","0,-1","1,0","-1,0","1,1","-1,-1","-1,1","1,-1"};
     private final String[] pawnMoves = {"0,1"};
     private final String[] knightMoves = {"2,1","-2,1","2,-1","-2,-1","1,2","1,-2","-1,2","-1,-2"};
+    private final String[] bishopMoves = {"1,1","-1,-1","1,-1","-1,1"};
+    private final String[] rookMoves = {"1,0","-1,0","0,-1","0,1"};
+    private final String[] queenMoves = {"1,1","-1,-1","1,-1","-1,1","1,0","-1,0","0,-1","0,1"};
+
 
     /**
      * The various different chess piece options
@@ -52,25 +59,76 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove>possibleMoves =  new ArrayList<ChessMove>();
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition startPosition) {
+        return switch (pieceType) {
+            case PieceType.KING -> getLegalFixedMoves(board, startPosition, kingMoves);
+            case PieceType.KNIGHT -> getLegalFixedMoves(board, startPosition, knightMoves);
+            case PieceType.PAWN -> getLegalFixedMoves(board, startPosition, pawnMoves);
+            case PieceType.ROOK -> getLegalVariableMoves(board, startPosition, rookMoves);
+            case PieceType.BISHOP -> getLegalVariableMoves(board, startPosition, bishopMoves);
+            case PieceType.QUEEN -> getLegalVariableMoves(board, startPosition, queenMoves);
+        };
+    }
+    private Collection<ChessMove> getLegalFixedMoves(ChessBoard board, ChessPosition startPosition, String[] moveDeltas) {
+        Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
+        int xStart, yStart;
+        xStart = startPosition.getRow();
+        yStart = startPosition.getColumn();
 
-        switch(pieceType) {
-            case PieceType.KING:
-                break;
-            case PieceType.QUEEN:
-                break;
-            case PieceType.BISHOP:
-                break;
-            case PieceType.KNIGHT:
-                break;
-            case PieceType.ROOK:
-                break;
-            case PieceType.PAWN:
-                break;
-            default:
-                break;
+        int xDelta, yDelta;
+        String[] deltas;
+
+        for (String move : moveDeltas) {
+            deltas = move.split(",");
+            xDelta = Integer.parseInt(deltas[0]);
+            yDelta = Integer.parseInt(deltas[1]);
+            ChessPosition initialPosition = new ChessPosition(xStart , yStart);
+            ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
+            ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
+
+            if (board.isValidMove(proposedMove)) {
+                legalMoves.add(proposedMove);
+            }
         }
+        return legalMoves;
+    }
+
+    private Collection<ChessMove> getLegalVariableMoves(ChessBoard board, ChessPosition startPosition, String[] moveDeltas) {
+        Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
+        int xStart, yStart;
+        xStart = startPosition.getRow();
+        yStart = startPosition.getColumn();
+
+        int xDelta, yDelta;
+        int xDeltaInit, yDeltaInit;
+        String[] deltas;
+
+        boolean validMoveFlag = true;
+
+        for (String move: moveDeltas) {
+            ChessPosition initialPosition = new ChessPosition(xStart, yStart);
+
+            deltas = move.split(",");
+
+            xDeltaInit = Integer.parseInt(deltas[0]);
+            xDelta = xDeltaInit;
+
+            yDeltaInit = Integer.parseInt(deltas[1]);
+            yDelta = yDeltaInit;
+
+            while(validMoveFlag) {
+                ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
+                ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
+                if (board.isValidMove(proposedMove)) {
+                    legalMoves.add(proposedMove);
+                    xDelta = xDelta + xDeltaInit;
+                    yDelta = yDelta + yDeltaInit;
+                } else {
+                    validMoveFlag = false;
+                }
+            }
+        }
+        return legalMoves;
     }
 
     @Override
