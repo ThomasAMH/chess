@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Represents a single chess piece
@@ -86,7 +84,8 @@ public class ChessPiece {
             ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
             ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
 
-            if (board.isValidMove(proposedMove)) {
+            ChessBoard.moveResult moveState = board.isValidMove(proposedMove);
+            if (moveState != ChessBoard.moveResult.ILLEGAL) {
                 legalMoves.add(proposedMove);
             }
         }
@@ -103,9 +102,10 @@ public class ChessPiece {
         int xDeltaInit, yDeltaInit;
         String[] deltas;
 
-        boolean validMoveFlag = true;
+        boolean validMoveFlag;
 
         for (String move: moveDeltas) {
+            System.out.println("Now examining delta: " + move);
             ChessPosition initialPosition = new ChessPosition(xStart, yStart);
 
             deltas = move.split(",");
@@ -116,28 +116,46 @@ public class ChessPiece {
             yDeltaInit = Integer.parseInt(deltas[1]);
             yDelta = yDeltaInit;
 
+            validMoveFlag = true;
+
             while(validMoveFlag) {
                 ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
                 ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
-                if (board.isValidMove(proposedMove)) {
+                ChessBoard.moveResult moveState = board.isValidMove(proposedMove);
+                if (moveState == ChessBoard.moveResult.LEGAL) {
+                    System.out.println("Move " + proposedMove.toString());
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
-                } else {
+                } else if (moveState == ChessBoard.moveResult.CAPTURE) {
+                    System.out.println("Move " + proposedMove.toString());
+                    legalMoves.add(proposedMove);
+                    xDelta = xDelta + xDeltaInit;
+                    yDelta = yDelta + yDeltaInit;
+                    validMoveFlag = false;
+                } else if (moveState == ChessBoard.moveResult.ILLEGAL) {
                     validMoveFlag = false;
                 }
             }
+        }
+        System.out.println("Legal moves are:");
+        for (ChessMove move: legalMoves) {
+            System.out.println("Move " + move.toString());
         }
         return legalMoves;
     }
 
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return teamColor == that.teamColor && pieceType == that.pieceType && Objects.deepEquals(kingMoves, that.kingMoves) && Objects.deepEquals(pawnMoves, that.pawnMoves) && Objects.deepEquals(knightMoves, that.knightMoves) && Objects.deepEquals(bishopMoves, that.bishopMoves) && Objects.deepEquals(rookMoves, that.rookMoves) && Objects.deepEquals(queenMoves, that.queenMoves);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public int hashCode() {
+        return Objects.hash(teamColor, pieceType, Arrays.hashCode(kingMoves), Arrays.hashCode(pawnMoves), Arrays.hashCode(knightMoves), Arrays.hashCode(bishopMoves), Arrays.hashCode(rookMoves), Arrays.hashCode(queenMoves));
     }
 }

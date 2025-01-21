@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -12,6 +15,13 @@ public class ChessBoard {
         
     }
 
+    public enum moveResult {
+        CAPTURE,
+        LEGAL,
+        ILLEGAL,
+        PROMOTE
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -19,7 +29,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()][position.getColumn()] = piece;
+        board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -30,7 +40,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()][position.getColumn()];
+        return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -45,44 +55,55 @@ public class ChessBoard {
      * Partial check if move is legal or not
      * Assumes that the caller will not propose illegal piece moves (ex. knight forward 3)
      * @param proposedMove is the move in question.
-     * @param proposedPiece is the piece attempting to move. Only team color is examined.
      * @return Returns true if the proposed space is not occupied by a friendly piece, and is on the board
      */
-    public boolean isValidMove(ChessMove proposedMove) {
+    public moveResult isValidMove(ChessMove proposedMove) {
         int startRow, startColumn;
         startRow = proposedMove.getStartPosition().getRow();
         startColumn = proposedMove.getStartPosition().getColumn();
 
-        if (board[startRow][startColumn] == null) {
-            throw new RuntimeException("No piece at specified position");
+        ChessPiece movingPiece = getPiece(proposedMove.getStartPosition());
+
+        if (movingPiece == null) {
+            throw new RuntimeException("No piece at " + startRow + "," + startColumn);
         }
-        ChessPiece movingPiece = board[startRow][startColumn];
+
 
         int endRow, endColumn;
         endRow = proposedMove.getEndPosition().getRow();
         endColumn = proposedMove.getEndPosition().getColumn();
 
-        if (endRow < 0 || endRow >= 8 || endColumn < 0 || endColumn >= 8) {
-            return false;
+        if (endRow < 1 || endRow > 8 || endColumn < 1 || endColumn > 8) {
+            return moveResult.ILLEGAL;
         }
 
-        ChessPiece pieceAtEndLocation = board[endRow][endColumn];
+        ChessPiece pieceAtEndLocation = getPiece(proposedMove.getEndPosition());
 
         ChessGame.TeamColor movingPieceTeamColor = movingPiece.getTeamColor();
 
         if (pieceAtEndLocation == null) {
-            return true;
+            return moveResult.LEGAL;
         }
-        return pieceAtEndLocation.getTeamColor() != movingPieceTeamColor;
+//        Debug line: System.out.println("Moving piece color: " + movingPieceTeamColor + ", occupying piece color: " + pieceAtEndLocation.getTeamColor());
+        if(pieceAtEndLocation.getTeamColor() == movingPieceTeamColor) {
+            return moveResult.ILLEGAL;
+        } else {
+            return moveResult.CAPTURE;
+        }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+        return Arrays.deepHashCode(board);
     }
 }

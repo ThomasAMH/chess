@@ -19,7 +19,7 @@ _And debug statements along the way via toString()_
 4. Implement the piece possible piece movement functions
    - [x] function
 5. Debug the chess moves!
-   - [ ] Debugged moves
+   - [x] Debugged moves
 
 ! Consider implementing a Debug class
 
@@ -48,6 +48,3 @@ _And debug statements along the way via toString()_
 ## Outstanding Questions
 1. Is this going to play well with future assignments? The server?
 2. Does this follow best OOP practices?
-
-
-## Completed Tasks mert ügyes vagy
