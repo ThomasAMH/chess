@@ -15,7 +15,7 @@ public class ChessBoard {
         
     }
 
-    public enum moveResult {
+    public enum MoveResult {
         CAPTURE,
         LEGAL,
         ILLEGAL,
@@ -57,7 +57,7 @@ public class ChessBoard {
      * @param proposedMove is the move in question.
      * @return Returns true if the proposed space is not occupied by a friendly piece, and is on the board
      */
-    public moveResult isValidMove(ChessMove proposedMove) {
+    public MoveResult isValidMove(ChessMove proposedMove) {
         int startRow, startColumn;
         startRow = proposedMove.getStartPosition().getRow();
         startColumn = proposedMove.getStartPosition().getColumn();
@@ -74,7 +74,7 @@ public class ChessBoard {
         endColumn = proposedMove.getEndPosition().getColumn();
 
         if (endRow < 1 || endRow > 8 || endColumn < 1 || endColumn > 8) {
-            return moveResult.ILLEGAL;
+            return MoveResult.ILLEGAL;
         }
 
         ChessPiece pieceAtEndLocation = getPiece(proposedMove.getEndPosition());
@@ -82,13 +82,14 @@ public class ChessBoard {
         ChessGame.TeamColor movingPieceTeamColor = movingPiece.getTeamColor();
 
         if (pieceAtEndLocation == null) {
-            return moveResult.LEGAL;
+            return MoveResult.LEGAL;
         }
-//        Debug line: System.out.println("Moving piece color: " + movingPieceTeamColor + ", occupying piece color: " + pieceAtEndLocation.getTeamColor());
+//        Debug line: System.out.println("Moving piece color: " + movingPieceTeamColor + ",
+//        occupying piece color: " + pieceAtEndLocation.getTeamColor());
         if(pieceAtEndLocation.getTeamColor() == movingPieceTeamColor) {
-            return moveResult.ILLEGAL;
+            return MoveResult.ILLEGAL;
         } else {
-            return moveResult.CAPTURE;
+            return MoveResult.CAPTURE;
         }
     }
 

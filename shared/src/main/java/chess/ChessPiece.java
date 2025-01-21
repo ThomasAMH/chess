@@ -67,7 +67,8 @@ public class ChessPiece {
             case PieceType.QUEEN -> getLegalVariableMoves(board, startPosition, queenMoves);
         };
     }
-    private Collection<ChessMove> getLegalFixedMoves(ChessBoard board, ChessPosition startPosition, String[] moveDeltas) {
+    private Collection<ChessMove> getLegalFixedMoves(ChessBoard board,
+                                                     ChessPosition startPosition, String[] moveDeltas) {
         Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
         int xStart, yStart;
         xStart = startPosition.getRow();
@@ -84,15 +85,16 @@ public class ChessPiece {
             ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
             ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
 
-            ChessBoard.moveResult moveState = board.isValidMove(proposedMove);
-            if (moveState != ChessBoard.moveResult.ILLEGAL) {
+            ChessBoard.MoveResult moveState = board.isValidMove(proposedMove);
+            if (moveState != ChessBoard.MoveResult.ILLEGAL) {
                 legalMoves.add(proposedMove);
             }
         }
         return legalMoves;
     }
 
-    private Collection<ChessMove> getLegalVariableMoves(ChessBoard board, ChessPosition startPosition, String[] moveDeltas) {
+    private Collection<ChessMove> getLegalVariableMoves(ChessBoard board,
+                                                        ChessPosition startPosition, String[] moveDeltas) {
         Collection<ChessMove> legalMoves = new ArrayList<ChessMove>();
         int xStart, yStart;
         xStart = startPosition.getRow();
@@ -121,19 +123,19 @@ public class ChessPiece {
             while(validMoveFlag) {
                 ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
                 ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
-                ChessBoard.moveResult moveState = board.isValidMove(proposedMove);
-                if (moveState == ChessBoard.moveResult.LEGAL) {
+                ChessBoard.MoveResult moveState = board.isValidMove(proposedMove);
+                if (moveState == ChessBoard.MoveResult.LEGAL) {
                     System.out.println("Move " + proposedMove.toString());
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
-                } else if (moveState == ChessBoard.moveResult.CAPTURE) {
+                } else if (moveState == ChessBoard.MoveResult.CAPTURE) {
                     System.out.println("Move " + proposedMove.toString());
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
                     validMoveFlag = false;
-                } else if (moveState == ChessBoard.moveResult.ILLEGAL) {
+                } else if (moveState == ChessBoard.MoveResult.ILLEGAL) {
                     validMoveFlag = false;
                 }
             }
@@ -151,11 +153,23 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return teamColor == that.teamColor && pieceType == that.pieceType && Objects.deepEquals(kingMoves, that.kingMoves) && Objects.deepEquals(pawnMoves, that.pawnMoves) && Objects.deepEquals(knightMoves, that.knightMoves) && Objects.deepEquals(bishopMoves, that.bishopMoves) && Objects.deepEquals(rookMoves, that.rookMoves) && Objects.deepEquals(queenMoves, that.queenMoves);
+        return teamColor == that.teamColor && pieceType == that.pieceType &&
+                Objects.deepEquals(kingMoves, that.kingMoves) &&
+                Objects.deepEquals(pawnMoves, that.pawnMoves) &&
+                Objects.deepEquals(knightMoves, that.knightMoves) &&
+                Objects.deepEquals(bishopMoves, that.bishopMoves) &&
+                Objects.deepEquals(rookMoves, that.rookMoves) &&
+                Objects.deepEquals(queenMoves, that.queenMoves);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamColor, pieceType, Arrays.hashCode(kingMoves), Arrays.hashCode(pawnMoves), Arrays.hashCode(knightMoves), Arrays.hashCode(bishopMoves), Arrays.hashCode(rookMoves), Arrays.hashCode(queenMoves));
+        return Objects.hash(teamColor, pieceType,
+                Arrays.hashCode(kingMoves),
+                Arrays.hashCode(pawnMoves),
+                Arrays.hashCode(knightMoves),
+                Arrays.hashCode(bishopMoves),
+                Arrays.hashCode(rookMoves),
+                Arrays.hashCode(queenMoves));
     }
 }
