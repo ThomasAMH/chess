@@ -68,13 +68,17 @@ public class ChessBoard {
             throw new RuntimeException("No piece at " + startRow + "," + startColumn);
         }
 
-
         int endRow, endColumn;
         endRow = proposedMove.getEndPosition().getRow();
         endColumn = proposedMove.getEndPosition().getColumn();
 
         if (endRow < 1 || endRow > 8 || endColumn < 1 || endColumn > 8) {
             return MoveResult.ILLEGAL;
+        }
+
+        // Due to the complexity of pawn moves, call the helper function
+        if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            return checkPawnMoves(proposedMove);
         }
 
         ChessPiece pieceAtEndLocation = getPiece(proposedMove.getEndPosition());
@@ -93,6 +97,71 @@ public class ChessBoard {
         }
     }
 
+    /**
+     *
+     * @param proposedMove: one of the pawn's possible moves
+     * @return If the pawn's move is legal
+     */
+    private MoveResult checkPawnMoves(ChessMove proposedMove) {
+//        Debug: System.out.println("check pawn moves " + proposedMove);
+        ChessPiece movingPiece = getPiece(proposedMove.getStartPosition());
+        ChessGame.TeamColor movingPieceTeamColor = movingPiece.getTeamColor();
+
+        //Direction of travel multiplier helps determine the "forward" direction
+        int dirOfTravelMult = 1;
+        if (movingPieceTeamColor == ChessGame.TeamColor.BLACK) {
+            dirOfTravelMult = -1;
+        }
+        int startRow, startColumn;
+        startRow = proposedMove.getStartPosition().getRow();
+        startColumn = proposedMove.getStartPosition().getColumn();
+
+        int endRow, endColumn;
+        endRow = proposedMove.getEndPosition().getRow();
+        endColumn = proposedMove.getEndPosition().getColumn();
+
+        ChessPosition pieceOneAheadPos = new ChessPosition(startRow + (1 * dirOfTravelMult), startColumn);
+        ChessPiece pieceOneAheadPiece = getPiece(pieceOneAheadPos);
+
+        //Initial moves
+
+        if (Math.abs(startRow - endRow) == 2) {
+            if((!(startRow == 2 && movingPieceTeamColor == ChessGame.TeamColor.WHITE) &&
+               !(startRow == 7 && movingPieceTeamColor == ChessGame.TeamColor.BLACK))) {
+                return MoveResult.ILLEGAL;
+            }
+
+            ChessPosition pieceTwoAheadPos = new ChessPosition(startRow + (2 * dirOfTravelMult), startColumn);
+            ChessPiece pieceTwoAheadPiece = getPiece(pieceTwoAheadPos);
+
+            if(pieceOneAheadPiece == null && pieceTwoAheadPiece == null) {
+                return MoveResult.LEGAL;
+            }
+            return MoveResult.ILLEGAL;
+        }
+
+        //Captures
+        ChessPiece pieceAtEndLocation = getPiece(proposedMove.getEndPosition());
+        if (endColumn != startColumn) {
+            if (pieceAtEndLocation == null) {
+                return MoveResult.ILLEGAL;
+            } else {
+                if (movingPieceTeamColor == pieceAtEndLocation.getTeamColor()) {
+                    return MoveResult.ILLEGAL;
+                } else {
+                    return MoveResult.CAPTURE;
+                }
+            }
+        }
+
+        //Forward moves
+        if (pieceAtEndLocation == null) {
+            return MoveResult.LEGAL;
+        } else {
+            return MoveResult.ILLEGAL;
+        }
+
+    }
 
     @Override
     public boolean equals(Object o) {

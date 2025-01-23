@@ -17,7 +17,7 @@ public class ChessPiece {
     }
 
     private final String[] kingMoves = {"0,1","0,-1","1,0","-1,0","1,1","-1,-1","-1,1","1,-1"};
-    private final String[] pawnMoves = {"0,1"};
+    private final String[] pawnMoves = {"1,0", "1,1","1,-1", "2,0"};
     private final String[] knightMoves = {"2,1","-2,1","2,-1","-2,-1","1,2","1,-2","-1,2","-1,-2"};
     private final String[] bishopMoves = {"1,1","-1,-1","1,-1","-1,1"};
     private final String[] rookMoves = {"1,0","-1,0","0,-1","0,1"};
@@ -58,6 +58,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition startPosition) {
+
         return switch (pieceType) {
             case PieceType.KING -> getLegalFixedMoves(board, startPosition, kingMoves);
             case PieceType.KNIGHT -> getLegalFixedMoves(board, startPosition, knightMoves);
@@ -81,6 +82,11 @@ public class ChessPiece {
             deltas = move.split(",");
             xDelta = Integer.parseInt(deltas[0]);
             yDelta = Integer.parseInt(deltas[1]);
+            if (pieceType == PieceType.PAWN && teamColor == ChessGame.TeamColor.BLACK) {
+                xDelta *= -1;
+                yDelta *= -1;
+            }
+
             ChessPosition initialPosition = new ChessPosition(xStart , yStart);
             ChessPosition proposedPosition = new ChessPosition(xStart + xDelta, yStart + yDelta);
             ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);

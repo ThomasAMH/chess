@@ -18,8 +18,15 @@ _And debug statements along the way via toString()_
    - [x] function
 4. Implement the piece possible piece movement functions
    - [x] function
-5. Debug the chess moves!
+5. Debug the bishop moves!
    - [x] Debugged moves
+6. Looks like pawn moves are all messed up
+   - [x] Prepare initial move mechanic
+   - [x] Prepare capture move mechanic
+   - [ ] Prepare promote move mechanic
+   - [ ] Prepare promote capture
+7. Implement reset board
+8. 
 
 ! Consider implementing a Debug class
 
@@ -44,6 +51,9 @@ _And debug statements along the way via toString()_
 ### Moving a piece entails...
 1. Selecting the piece
 2. Passing the board and the piece to the helper class
+
+## Notes
+ROADMAP EVERY FUNCTION!
 
 ## Outstanding Questions
 1. Is this going to play well with future assignments? The server?
