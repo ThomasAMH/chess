@@ -23,8 +23,8 @@ _And debug statements along the way via toString()_
 6. Looks like pawn moves are all messed up
    - [x] Prepare initial move mechanic
    - [x] Prepare capture move mechanic
-   - [ ] Prepare promote move mechanic
-   - [ ] Prepare promote capture
+   - [x] Prepare promote move mechanic
+   - [x] Prepare promote capture
 7. Implement reset board
 8. 
 

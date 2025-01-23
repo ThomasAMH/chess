@@ -92,9 +92,19 @@ public class ChessPiece {
             ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
 
             ChessBoard.MoveResult moveState = board.isValidMove(proposedMove);
-            if (moveState != ChessBoard.MoveResult.ILLEGAL) {
+            if (moveState == ChessBoard.MoveResult.CAPTURE || moveState == ChessBoard.MoveResult.LEGAL) {
                 legalMoves.add(proposedMove);
+            } else if (moveState == ChessBoard.MoveResult.PROMOTE) {
+                ChessMove bishopMove = new ChessMove(initialPosition, proposedPosition, PieceType.BISHOP);
+                legalMoves.add(bishopMove);
+                ChessMove queenMove = new ChessMove(initialPosition, proposedPosition, PieceType.QUEEN);
+                legalMoves.add(queenMove);
+                ChessMove rookMove = new ChessMove(initialPosition, proposedPosition, PieceType.ROOK);
+                legalMoves.add(rookMove);
+                ChessMove knightMove = new ChessMove(initialPosition, proposedPosition, PieceType.KNIGHT);
+                legalMoves.add(knightMove);
             }
+
         }
         return legalMoves;
     }

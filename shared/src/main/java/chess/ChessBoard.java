@@ -124,7 +124,6 @@ public class ChessBoard {
         ChessPiece pieceOneAheadPiece = getPiece(pieceOneAheadPos);
 
         //Initial moves
-
         if (Math.abs(startRow - endRow) == 2) {
             if((!(startRow == 2 && movingPieceTeamColor == ChessGame.TeamColor.WHITE) &&
                !(startRow == 7 && movingPieceTeamColor == ChessGame.TeamColor.BLACK))) {
@@ -149,6 +148,9 @@ public class ChessBoard {
                 if (movingPieceTeamColor == pieceAtEndLocation.getTeamColor()) {
                     return MoveResult.ILLEGAL;
                 } else {
+                    if (isPawnMovePromotion(proposedMove)) {
+                        return MoveResult.PROMOTE;
+                    }
                     return MoveResult.CAPTURE;
                 }
             }
@@ -156,11 +158,23 @@ public class ChessBoard {
 
         //Forward moves
         if (pieceAtEndLocation == null) {
+            if (isPawnMovePromotion(proposedMove)) {
+                return MoveResult.PROMOTE;
+            }
             return MoveResult.LEGAL;
         } else {
             return MoveResult.ILLEGAL;
         }
 
+    }
+
+    private boolean isPawnMovePromotion(ChessMove proposedMove) {
+        ChessPiece movingPiece = getPiece(proposedMove.getStartPosition());
+        ChessGame.TeamColor movingPieceTeamColor = movingPiece.getTeamColor();
+        int endRow = proposedMove.getEndPosition().getRow();
+
+        return (movingPieceTeamColor == ChessGame.TeamColor.WHITE && endRow == 8) ||
+                (movingPieceTeamColor == ChessGame.TeamColor.BLACK && endRow == 1);
     }
 
     @Override
