@@ -26,7 +26,8 @@ _And debug statements along the way via toString()_
    - [x] Prepare promote move mechanic
    - [x] Prepare promote capture
 7. Implement reset board
-8. 
+   - [x] Done
+8. Implement piece move function
 
 ! Consider implementing a Debug class
 
