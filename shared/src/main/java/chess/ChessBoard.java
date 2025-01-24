@@ -10,9 +10,9 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    private ChessPiece[][] board = new ChessPiece[8][8];
+    private ChessPiece[][] board;
     public ChessBoard() {
-        resetBoard();
+        board = new ChessPiece[8][8];
     }
 
     public enum MoveResult {
