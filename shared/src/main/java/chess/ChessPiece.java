@@ -123,7 +123,7 @@ public class ChessPiece {
         boolean validMoveFlag;
 
         for (String move: moveDeltas) {
-            System.out.println("Now examining delta: " + move);
+            // Debug: System.out.println("Now examining delta: " + move);
             ChessPosition initialPosition = new ChessPosition(xStart, yStart);
 
             deltas = move.split(",");
@@ -141,12 +141,12 @@ public class ChessPiece {
                 ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
                 ChessBoard.MoveResult moveState = board.isValidMove(proposedMove);
                 if (moveState == ChessBoard.MoveResult.LEGAL) {
-                    System.out.println("Move " + proposedMove.toString());
+                    // Debug: System.out.println("Move " + proposedMove.toString());
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
                 } else if (moveState == ChessBoard.MoveResult.CAPTURE) {
-                    System.out.println("Move " + proposedMove.toString());
+                    // Debug: System.out.println("Move " + proposedMove.toString());
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
@@ -156,10 +156,10 @@ public class ChessPiece {
                 }
             }
         }
-        System.out.println("Legal moves are:");
-        for (ChessMove move: legalMoves) {
-            System.out.println("Move " + move.toString());
-        }
+        // Debug: System.out.println("Legal moves are:");
+//        for (ChessMove move: legalMoves) {
+//            System.out.println("Move " + move.toString());
+//        }
         return legalMoves;
     }
 
