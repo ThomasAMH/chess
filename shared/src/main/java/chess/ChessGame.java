@@ -9,10 +9,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    ChessBoard board;
 
     public ChessGame() {
-        board = new ChessBoard();
 
     }
 
@@ -48,8 +46,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece pieceAtLocation = getBoard().getPiece(startPosition);
-        return pieceAtLocation.pieceMoves(board, startPosition);
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -107,6 +104,7 @@ public class ChessGame {
      *
      * @return the chessboard
      */
-    public ChessBoard getBoard() {return board;}
-
+    public ChessBoard getBoard() {
+        throw new RuntimeException("Not implemented");
+    }
 }
