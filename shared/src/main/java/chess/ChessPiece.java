@@ -141,12 +141,16 @@ public class ChessPiece {
                 ChessMove proposedMove = new ChessMove(initialPosition, proposedPosition, null);
                 ChessBoard.MoveResult moveState = board.isValidMove(proposedMove);
                 if (moveState == ChessBoard.MoveResult.LEGAL) {
+
                     // Debug: System.out.println("Move " + proposedMove.toString());
+
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
                 } else if (moveState == ChessBoard.MoveResult.CAPTURE) {
+
                     // Debug: System.out.println("Move " + proposedMove.toString());
+
                     legalMoves.add(proposedMove);
                     xDelta = xDelta + xDeltaInit;
                     yDelta = yDelta + yDeltaInit;
@@ -156,9 +160,11 @@ public class ChessPiece {
                 }
             }
         }
+
         // Debug: System.out.println("Legal moves are:");
 //        for (ChessMove move: legalMoves) {
 //            System.out.println("Move " + move.toString());
+
 //        }
         return legalMoves;
     }
