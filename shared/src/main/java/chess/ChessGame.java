@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashMap;
+
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -9,9 +11,37 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    private ChessBoard gameBoard;
+    private TeamColor activePlayer;
+    private HashMap<ChessPosition, ChessPiece> whitePieces;
+    private HashMap<ChessPosition, ChessPiece> blackPieces;
+    private GameState gameState;
 
     public ChessGame() {
+        gameBoard = new ChessBoard();
+        activePlayer = TeamColor.WHITE;
+        gameState = GameState.NORMAL;
+        whitePieces = new HashMap<ChessPosition, ChessPiece>();
+        blackPieces = new HashMap<ChessPosition, ChessPiece>();
+        initializePieceHashmaps();
+    }
 
+    private void initializePieceHashmaps() {
+        ChessPosition currPosition;
+        ChessPiece currPiece;
+
+        for(int i = 1; i <= 8; i++) {
+            for(int j = 1; j <= 2; j++) {
+                currPosition = new ChessPosition(j, i);
+                currPiece = gameBoard.getPiece(currPosition);
+                whitePieces.put(currPosition, currPiece);
+            }
+            for(int k = 7; k <= 8; k++) {
+                currPosition = new ChessPosition(k, i);
+                currPiece = gameBoard.getPiece(currPosition);
+                blackPieces.put(currPosition, currPiece);
+            }
+        }
     }
 
     /**
@@ -36,6 +66,13 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public enum GameState {
+        NORMAL,
+        CHECK,
+        CHECKMATE,
+        STALEMATE
     }
 
     /**

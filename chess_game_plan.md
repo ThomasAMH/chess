@@ -1,23 +1,23 @@
 # Chess game logic and organization
 ## Managing Game State
 ### Properties
-activeTurn - TeamColor
+☑ activeTurn - TeamColor
 * Initiated to white, switches after each call to move (use a TeamColor for this)
 
-game stateFlag - Struct
+☑ game stateFlag - Struct
 * A struct with CHECKMATE, STALEMATE, CHECK, NORMAL to indicate if the game should continue.
 * Updated after each move
 
-whitePieces / blackPieces - Map
+☑ whitePieces / blackPieces - Map
 * A map using the position as the key (whitepieces) and an array of ChessMoves as the value
 * Created at initialization and updated after each move
 
-gameBoard - ChessBoard
+☑ gameBoard - ChessBoard
 * Set at initialization or by the setter
 
 ### Functions
 1. Initialization
-   1. Create an empty game board
+   1. ☑ Create an empty game board
    2. Initialize the board property
 
 2. validMoves(somePosition)
