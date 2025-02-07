@@ -18,16 +18,15 @@
 ### Functions
 1. Initialization
    1. ☑ Create an empty game board
-   2. Initialize the board property
+   2. ☑ Initialize the board property
 
 2. validMoves(somePosition)
-   1. Return the piece's move set
+   1. ☑ Return the piece's move set
 
 3. isMoveLegal
-   1. If the game state is in CHECK, only moves that will resolve the game state can be added.
-   2. Check to see if a given move will result in check for the mover with a call to isInCheck(). If so, illegal.
-   3. Check to see if move is not on player's turn. If so, illegal. (??)
-   4. If no piece at location, null
+   1. ☑ Check to see if a given move will result in check for the mover with a call to isInCheck(). If so, illegal.
+   2. ☑ Check to see if move is not on player's turn. If so, illegal. (??)
+   3. ☑ If no piece at location, null
 
 4. makeMove
    1. Check if proposed move is in whitePieces for piece @ start position AND check turn
