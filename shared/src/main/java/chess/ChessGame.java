@@ -97,24 +97,79 @@ public class ChessGame {
     }
 
     /**
-     * Makes a move in a chess game
+     * Makes a move in a chess game and update the game state
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+
+        if(!isMoveLegal(move)) throw new InvalidMoveException();
+        updateBoard(move, gameBoard);
+
+
+
     }
 
-    private boolean isMoveLegal(ChessMove proposedMove, TeamColor activePlayer) {
+    private boolean isMoveLegal(ChessMove proposedMove) {
         ChessPosition startingPosition = proposedMove.getStartPosition();
         ChessPiece movingPiece = gameBoard.getPiece(startingPosition);
 
         // Is the first safeguard needed?
         if(movingPiece == null) return false;
-        else if(movingPiece.getTeamColor() != activePlayer) return false;
-        else if(isInCheck(activePlayer, proposedMove)) return false;
-        else return true;
+        else return movingPiece.getTeamColor() == activePlayer;
+    }
+
+    /**
+     * Update the provided game board with the move, handling captures, promotes and castling
+     *
+     * @param proposedMove is the move to execute
+     */
+    private void updateBoard(ChessMove proposedMove, ChessBoard board) {
+        //Update piece's position
+        ChessPosition startingPosition = proposedMove.getStartPosition();
+        ChessPosition endPosition = proposedMove.getEndPosition();
+        ChessPiece movingPiece = board.getPiece(startingPosition);
+
+        //Address promotions
+        if(proposedMove.getPromotionPiece() != null) {
+            movingPiece = new ChessPiece(activePlayer, proposedMove.getPromotionPiece());
+        }
+
+        board.addPiece(endPosition, movingPiece);
+
+        //Remove old piece
+        board.removePiece(startingPosition);
+
+        //Move Rook, if castle
+        if((movingPiece.getPieceType() == ChessPiece.PieceType.KING) &&
+                (Math.abs(endPosition.getColumn()) - startingPosition.getColumn()) > 1) {
+            ChessMove rookMove = getRookCastleMove(proposedMove);
+            updateBoard(rookMove, board);
+        }
+
+
+    }
+
+    private ChessMove getRookCastleMove(ChessMove proposedMove) {
+        int kingStartRow, kingEndCol;
+        kingStartRow = proposedMove.getStartPosition().getRow();
+        kingEndCol = proposedMove.getEndPosition().getColumn();
+
+        int rStartCol, rStartRow, rEndCol, rEndRow;
+        ChessPosition rookStartPos, rookEndPos;
+
+        rStartRow = kingStartRow;
+        rEndRow = rStartRow;
+
+        if(kingEndCol == 3) rStartCol = 1;
+        else rStartCol = 8;
+        if(rStartCol == 1) rEndCol = 4;
+        else rEndCol = 6;
+
+        rookStartPos = new ChessPosition(rStartRow, rStartCol);
+        rookEndPos = new ChessPosition(rEndRow, rEndCol);
+        return new ChessMove(rookStartPos, rookEndPos, null);
     }
 
     /**
@@ -141,7 +196,7 @@ public class ChessGame {
         }
         else {
             attackingTeamMoves = new HashMap<ChessPosition, Collection<ChessMove>>(whitePieces);
-        }`
+        }
 
 
     }
