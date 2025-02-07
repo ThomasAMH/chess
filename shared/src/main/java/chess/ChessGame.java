@@ -22,14 +22,14 @@ public class ChessGame {
         gameBoard = new ChessBoard();
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
-        whitePieces = new HashMap<ChessPosition, Collection<ChessMove>>();
-        blackPieces = new HashMap<ChessPosition, Collection<ChessMove>>();
         initializePieceHashmaps();
     }
 
     private void initializePieceHashmaps() {
         ChessPosition currPosition;
         ChessPiece currPiece;
+        whitePieces = new HashMap<ChessPosition, Collection<ChessMove>>();
+        blackPieces = new HashMap<ChessPosition, Collection<ChessMove>>();
 
         for(int i = 1; i <= 8; i++) {
             for(int j = 1; j <= 2; j++) {
@@ -103,6 +103,25 @@ public class ChessGame {
         updateBoard(move, gameBoard);
         whitePieces = updateMoveList(gameBoard, TeamColor.WHITE, true);
         blackPieces = updateMoveList(gameBoard, TeamColor.BLACK, true);
+
+        //Update game state: is the next player in check?
+        TeamColor nextPlayer;
+        if(activePlayer == TeamColor.WHITE) nextPlayer = TeamColor.BLACK;
+        else nextPlayer = TeamColor.WHITE;
+
+        if(isInCheck(nextPlayer)) {
+            if(isInCheckmate(nextPlayer)) {
+                gameState = GameState.CHECKMATE;
+            } else {
+                gameState = GameState.CHECK;
+            }
+        } else if (isInStalemate(nextPlayer)) {
+            gameState = GameState.STALEMATE;
+        } else {
+            gameState = GameState.NORMAL;
+        }
+        if(activePlayer == TeamColor.BLACK) activePlayer = TeamColor.WHITE;
+        else activePlayer = TeamColor.BLACK;
     }
 
     /**
@@ -233,7 +252,27 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        return teamColor == activePlayer && gameState == GameState.CHECK;
+        HashMap<ChessPosition, Collection<ChessMove>> attackingTeamMoves;
+        if(teamColor == TeamColor.WHITE) {
+            attackingTeamMoves = blackPieces;
+        }
+        else {
+            attackingTeamMoves = whitePieces;
+        }
+
+        return isKingInDanger(teamColor, attackingTeamMoves, gameBoard);
+    }
+
+    private boolean isKingInDanger(TeamColor teamColor, HashMap<ChessPosition, Collection<ChessMove>> attackingTeamMoves, ChessBoard gameBoard) {
+        ChessPosition defendingKingPos = gameBoard.getKingPos(teamColor);
+        for(ChessPosition chessPos: attackingTeamMoves.keySet()) {
+            for(ChessMove enemyMove: attackingTeamMoves.get(chessPos)) {
+                if(enemyMove.getEndPosition() == defendingKingPos) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -255,15 +294,7 @@ public class ChessGame {
         }
         // Does not matter if they put their own king in danger, so checking "check" flag is not needed.
         attackingTeamMoves = updateMoveList(hypotheticalBoard, attackingTeamColor, false);
-        ChessPosition defendingKingPos = hypotheticalBoard.getKingPos(defendingTeam);
-        for(ChessPosition chessPos: attackingTeamMoves.keySet()) {
-            for(ChessMove enemyMove: attackingTeamMoves.get(chessPos)) {
-                if(enemyMove.getEndPosition() == defendingKingPos) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return isKingInDanger(defendingTeam, attackingTeamMoves, hypotheticalBoard);
     }
 
     /**
@@ -273,7 +304,16 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        HashMap<ChessPosition, Collection<ChessMove>> moveSet;
+        if(teamColor == TeamColor.WHITE) moveSet = whitePieces;
+        else moveSet = blackPieces;
+
+        for(ChessPosition piecePos: moveSet.keySet()) {
+            if(!moveSet.get(piecePos).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -284,7 +324,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheckmate(teamColor);
     }
 
     /**
@@ -296,8 +336,6 @@ public class ChessGame {
         gameBoard = board;
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
-        whitePieces = new HashMap<ChessPosition, ArrayList<ChessMove>>();
-        blackPieces = new HashMap<ChessPosition, ArrayList<ChessMove>>();
         initializePieceHashmaps();
 
     }

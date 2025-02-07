@@ -31,17 +31,17 @@
 4. makeMove
    1. ☑ Check if proposed move is in whitePieces for piece @ start position AND check turn
       * ☑ If not, throw InvalidMoveException
-   2. Move piece on board (updateChessBoard) and in whitePieces (updateMoveList)
-   3. Evaluate if move resulted in stalemate, checkmate or check for new player by updating game state property
-   4. Update move lists for updated game state with call to updateMoveList
+   2. ☑ Move piece on board (updateChessBoard) and in whitePieces (updateMoveList)
+   3. ☑ Update move lists for updated game state with call to updateMoveList
       * Somebody clever could probably assess the possibility of only recalculating effected moves to reduce computing time...
+   4. ☑ Evaluate if move resulted in stalemate, checkmate or check for new player by updating game state property
    5. Switch game turn, if game mode is OK
 
 5. updateMoveList - _Called when game state changes_
-   1. For all pieces in the whitePieces and blackPieces, call their possible move function
-   2. Run all moves through isInCheck(board)
-   3. Update an array list of all legal moves that do not result in check
-   4. Append any special moves at the end based on unit type (En Passant & Castling)
+   1. ☑ For all pieces in the whitePieces and blackPieces, call their possible move function
+   2. ☑ Run all moves through isInCheck(board)
+   3. ☑ Update an array list of all legal moves that do not result in check
+   4. **TO DO: Append any special moves at the end based on unit type (En Passant & Castling)**
 
 6. ☑ updateChessBoard(board, move)
    1. ☑ Move the piece on the board provided
