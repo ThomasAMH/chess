@@ -18,9 +18,6 @@ public class ChessGame {
     private HashMap<ChessPosition, Collection<ChessMove>> blackPieces;
     private GameState gameState;
 
-    private ChessPosition whiteKingPos;
-    private ChessPosition blackKingPos;
-
     public ChessGame() {
         gameBoard = new ChessBoard();
         activePlayer = TeamColor.WHITE;
@@ -28,8 +25,6 @@ public class ChessGame {
         whitePieces = new HashMap<ChessPosition, Collection<ChessMove>>();
         blackPieces = new HashMap<ChessPosition, Collection<ChessMove>>();
         initializePieceHashmaps();
-        whiteKingPos = new ChessPosition(1, 5);
-        blackKingPos = new ChessPosition(8, 5);
     }
 
     private void initializePieceHashmaps() {
@@ -106,15 +101,34 @@ public class ChessGame {
 
         if(!isMoveLegal(move)) throw new InvalidMoveException();
         updateBoard(move, gameBoard);
+        whitePieces = updateMoveList(gameBoard, TeamColor.WHITE, true);
+        blackPieces = updateMoveList(gameBoard, TeamColor.BLACK, true);
     }
 
+    /**
+     *
+     * @param proposedMove: the user-provided move to be evaluated;
+     *                    evaluates legality of moves prior to execution on active game state
+     *
+     * @return boolean value if the move is for the active player AND on a legit piece AND a move from the move list
+     * Assumes that only legit moves will be presented to player for selection from movelist
+     */
     private boolean isMoveLegal(ChessMove proposedMove) {
         ChessPosition startingPosition = proposedMove.getStartPosition();
         ChessPiece movingPiece = gameBoard.getPiece(startingPosition);
 
-        // Is the first safeguard needed?
         if(movingPiece == null) return false;
-        else return movingPiece.getTeamColor() == activePlayer;
+        if(movingPiece.getTeamColor() == activePlayer) return false;
+
+        //Check if move is legal / offered to player
+        HashMap<ChessPosition, Collection<ChessMove>> teamMoveset;
+        if(activePlayer == TeamColor.WHITE) teamMoveset = whitePieces;
+        else teamMoveset = blackPieces;
+
+        if(!teamMoveset.containsKey(startingPosition)) return false;
+        if(!teamMoveset.get(startingPosition).contains(proposedMove)) return false;
+
+        return true;
     }
 
     /**
@@ -122,7 +136,7 @@ public class ChessGame {
      *
      * @param proposedMove is the move to execute
      */
-    private void updateBoard(ChessMove proposedMove, ChessBoard board) {
+    private ChessBoard updateBoard(ChessMove proposedMove, ChessBoard board) {
         //Update piece's position
         ChessPosition startingPosition = proposedMove.getStartPosition();
         ChessPosition endPosition = proposedMove.getEndPosition();
@@ -144,23 +158,49 @@ public class ChessGame {
             ChessMove rookMove = getRookCastleMove(proposedMove);
             updateBoard(rookMove, board);
         }
-
-
+        return board;
     }
+
 
     /**
      *
-     * @param moveList the list of moves to be updated based on current game state
+     * @param board: The board, real or hypothetical, to generate a move list from
+     * @param teamColor: The team whose moves will be evaluated
+     * @param checkForCheck: If true, do NOT add a move to the list that will result in a check for the player.
+     *                     False is used when checking if a king capture is possible (in which case it doesn't matter
+     *                     if the king-capturing team is in check or not as a result of the move, as it's game over)
+     * @return the map of possible moves,
+     * FIXME ADD SPECIAL MOVES
      */
-    private HashMap<ChessPosition, Collection<ChessMove>> updateMoveList(ChessBoard board, TeamColor teamToCheck) {
+    private HashMap<ChessPosition, Collection<ChessMove>> updateMoveList(ChessBoard board, TeamColor teamColor, boolean checkForCheck) {
         HashMap<ChessPosition, Collection<ChessMove>> returnList = new HashMap<ChessPosition, Collection<ChessMove>>();
         ChessPiece currPiece;
-        ArrayList<ChessMove> proposedMoves;
+        Collection<ChessMove> proposedMoves;
         ArrayList<ChessMove> legalMoves;
 
-        for(ChessPosition piecePos: moveList.keySet()) {
+        for(ChessPosition boardSquare: board) {
+            currPiece = board.getPiece(boardSquare);
+            if(currPiece.getTeamColor() != teamColor) continue;
+            proposedMoves = currPiece.pieceMoves(board, boardSquare);
+            legalMoves = new ArrayList<ChessMove>();
 
+            for(ChessMove proposedMove: proposedMoves) {
+                // Note: the proposedMoves will NOT contain moves that move any piece but this one,
+                // And will not contain illegal moves
+                // The only check needed is if the move will result in check or not
+                if(checkForCheck) {
+                    if(!isInCheck(proposedMove)) {
+                        legalMoves.add(proposedMove);
+                    }
+                    else {
+                        legalMoves.add(proposedMove);
+                    }
+                }
+            }
+            if(!legalMoves.isEmpty()) returnList.put(boardSquare, legalMoves);
         }
+
+
 
 
         return returnList;
@@ -192,27 +232,38 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    // FIXME: I suspect this needs review
     public boolean isInCheck(TeamColor teamColor) {
         return teamColor == activePlayer && gameState == GameState.CHECK;
     }
 
     /**
      *
-     * @param defendingTeam the team who you are check if they will be in check after the move
-     * @param proposedMove the move that opponent to defendingTeam will make whose consequences will be evaluated
-     * @return if the move results in a hypothetical game state where an opponent's piece can capture the king
+     * @param proposedMove the move in question
+     * @return return true if the move puts the mover's team in check, false if not
      */
-    private boolean isInCheck(TeamColor defendingTeam, ChessMove proposedMove) {
+    private boolean isInCheck(ChessMove proposedMove) {
+        ChessBoard hypotheticalBoard = updateBoard(proposedMove, gameBoard);
+
         HashMap<ChessPosition, Collection<ChessMove>> attackingTeamMoves;
+        TeamColor attackingTeamColor;
+        TeamColor defendingTeam = gameBoard.getPiece(proposedMove.getStartPosition()).getTeamColor();
         if(defendingTeam == TeamColor.WHITE) {
-            attackingTeamMoves = new HashMap<ChessPosition, Collection<ChessMove>>(blackPieces);
+            attackingTeamColor = TeamColor.BLACK;
         }
         else {
-            attackingTeamMoves = new HashMap<ChessPosition, Collection<ChessMove>>(whitePieces);
+            attackingTeamColor = TeamColor.WHITE;
         }
-
-
+        // Does not matter if they put their own king in danger, so checking "check" flag is not needed.
+        attackingTeamMoves = updateMoveList(hypotheticalBoard, attackingTeamColor, false);
+        ChessPosition defendingKingPos = hypotheticalBoard.getKingPos(defendingTeam);
+        for(ChessPosition chessPos: attackingTeamMoves.keySet()) {
+            for(ChessMove enemyMove: attackingTeamMoves.get(chessPos)) {
+                if(enemyMove.getEndPosition() == defendingKingPos) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

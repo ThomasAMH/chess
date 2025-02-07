@@ -39,8 +39,8 @@
 
 5. updateMoveList - _Called when game state changes_
    1. For all pieces in the whitePieces and blackPieces, call their possible move function
-   2. Run all moves through isMoveLegal
-   3. Update a data structure (hashmap) of all possible legal in the current game state
+   2. Run all moves through isInCheck(board)
+   3. Update an array list of all legal moves that do not result in check
    4. Append any special moves at the end based on unit type (En Passant & Castling)
 
 6. ☑ updateChessBoard(board, move)

@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -9,10 +11,13 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Iterable<ChessPosition>{
     private ChessPiece[][] board;
     public ChessBoard() {
         board = new ChessPiece[8][8];
+    }
+    public ChessBoard(ChessBoard someBoard) {
+        board = someBoard.getBoard();
     }
     public enum MoveResult {
         CAPTURE,
@@ -211,6 +216,25 @@ public class ChessBoard {
                 (movingPieceTeamColor == ChessGame.TeamColor.BLACK && endRow == 1);
     }
 
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
+    public ChessPosition getKingPos(ChessGame.TeamColor teamColor) {
+        ChessPiece currPiece;
+        ChessPosition currPos;
+        for(int i = 1; i < 9; i++) {
+            for(int j = 1; j < 9; j++) {
+                currPos = new ChessPosition(i,j);
+                currPiece = getPiece(currPos);
+                if(currPiece.getTeamColor() == teamColor && currPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return currPos;
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -225,5 +249,40 @@ public class ChessBoard {
         return Arrays.deepHashCode(board);
     }
 
+    @Override
+    public Iterator<ChessPosition> iterator() {
+        return new ChessBoardIterator();
+    }
+
+    private class ChessBoardIterator implements Iterator<ChessPosition> {
+        private int row = 0, column = 0;
+        ChessPosition currPos;
+        ChessPiece pieceAtCurrPos;
+        @Override
+        public boolean hasNext() {
+            while(row <= 8) {
+                while(column <= 8) {
+                    currPos = new ChessPosition(row, column);
+                    pieceAtCurrPos = getPiece(currPos);
+                    if(pieceAtCurrPos != null) {
+                        return true;
+                    }
+                    column++;
+                }
+                column = 0;
+                row++;
+            }
+            return false;
+        }
+
+        @Override
+        public ChessPosition next() {
+            if(!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            column++;
+            return currPos;
+        }
+    }
 
 }
