@@ -35,7 +35,7 @@
    3. ☑ Update move lists for updated game state with call to updateMoveList
       * Somebody clever could probably assess the possibility of only recalculating effected moves to reduce computing time...
    4. ☑ Evaluate if move resulted in stalemate, checkmate or check for new player by updating game state property
-   5. Switch game turn, if game mode is OK
+   5. ☑ Switch game turn, if game mode is OK
 
 5. updateMoveList - _Called when game state changes_
    1. ☑ For all pieces in the whitePieces and blackPieces, call their possible move function
@@ -59,22 +59,23 @@
    2. If so, check all friendly pawn positions
 
 8. isInCheck(TeamColor, default constructor with move = null)
-   1. Evaluate all unfriendly piece's moves, and if any can kill you, return true.
-   2. If there is a move provided, make a local copy of the board after that move is provided
+   1. ☑ Evaluate all unfriendly piece's moves, and if any can kill you, return true.
+   2. ☑ If there is a move provided, make a local copy of the board after that move is provided
       * Then check all possible moves to see if any can capture the king
-   3. If no move is provided, evaluate all opposing piece moves and return true if any can capture the king
+   3. ☑ If no move is provided, evaluate all opposing piece moves and return true if any can capture the king
 
 9. isInCheckmate(TeamColor)
-   1. Define checkMateFlag = True
-   2. Iterate through all possible friendly moves and call the isInCheck on the game state, and if any can return false, flip the flag and return
-      * Otherwise, return true
+   1. ☑ If not in check, return false.
+   2. ☑ Return result of areMovesAvailable(teamColor) function
 
 10. isInStalemate(TeamColor)
-    1. Define isStalemateFlag = False
-    2. Try to flip the flag by checking every next player's move against the isInCheck function
+    1. ☑ Return result of areMovesAvailable(teamColor) function
+11. areMovesAvailable(teamColor)
+    1. ☑ Iterate through all moves for the selected team, and return true if at least one move exists
+    2. ☑ ! Assumes that the movelists (white/blackPieces) are properly updated
+   
+12. setBoard
+    1. ☑ Accept a board, and reset properties.
 
-11. setBoard
-    1. Accept a board, iterate through 
-
-12. initializePieces(board)
-    1. Given a board, clear out the black/white pieces map and correct with new pieces 
+13. initializePieces(board)
+    1. ☑ Given a board, clear out the black/white pieces map and correct with new pieces 

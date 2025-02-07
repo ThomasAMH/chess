@@ -109,17 +109,10 @@ public class ChessGame {
         if(activePlayer == TeamColor.WHITE) nextPlayer = TeamColor.BLACK;
         else nextPlayer = TeamColor.WHITE;
 
-        if(isInCheck(nextPlayer)) {
-            if(isInCheckmate(nextPlayer)) {
-                gameState = GameState.CHECKMATE;
-            } else {
-                gameState = GameState.CHECK;
-            }
-        } else if (isInStalemate(nextPlayer)) {
-            gameState = GameState.STALEMATE;
-        } else {
-            gameState = GameState.NORMAL;
-        }
+        if(isInCheck(nextPlayer)) gameState = GameState.CHECK;
+        if(isInCheckmate(nextPlayer)) gameState = GameState.CHECKMATE;
+        if(isInStalemate(nextPlayer)) gameState = GameState.STALEMATE;
+
         if(activePlayer == TeamColor.BLACK) activePlayer = TeamColor.WHITE;
         else activePlayer = TeamColor.BLACK;
     }
@@ -304,6 +297,22 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        if(!isInCheck(teamColor)) return false;
+        return areMovesAvailable(teamColor);
+    }
+
+    /**
+     * Determines if the given team is in stalemate, which here is defined as having
+     * no valid moves
+     *
+     * @param teamColor which team to check for stalemate
+     * @return True if the specified team is in stalemate, otherwise false
+     */
+    public boolean isInStalemate(TeamColor teamColor) {
+        return areMovesAvailable(teamColor);
+    }
+
+    private boolean areMovesAvailable(TeamColor teamColor) {
         HashMap<ChessPosition, Collection<ChessMove>> moveSet;
         if(teamColor == TeamColor.WHITE) moveSet = whitePieces;
         else moveSet = blackPieces;
@@ -317,17 +326,6 @@ public class ChessGame {
     }
 
     /**
-     * Determines if the given team is in stalemate, which here is defined as having
-     * no valid moves
-     *
-     * @param teamColor which team to check for stalemate
-     * @return True if the specified team is in stalemate, otherwise false
-     */
-    public boolean isInStalemate(TeamColor teamColor) {
-        return isInCheckmate(teamColor);
-    }
-
-    /**
      * Sets this game's chessboard with a given board
      *
      * @param board the new board to use
@@ -337,7 +335,6 @@ public class ChessGame {
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
         initializePieceHashmaps();
-
     }
 
     /**
