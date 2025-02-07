@@ -43,7 +43,7 @@
    3. Update a data structure (hashmap) of all possible legal in the current game state
    4. Append any special moves at the end based on unit type (En Passant & Castling)
 
-6. updateChessBoard(board, move)
+6. ☑ updateChessBoard(board, move)
    1. ☑ Move the piece on the board provided
       1. ☑ Remove old piece, if capture
       2. ☑ Add new piece, if promote

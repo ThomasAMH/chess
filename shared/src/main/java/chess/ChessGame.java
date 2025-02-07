@@ -106,9 +106,6 @@ public class ChessGame {
 
         if(!isMoveLegal(move)) throw new InvalidMoveException();
         updateBoard(move, gameBoard);
-
-
-
     }
 
     private boolean isMoveLegal(ChessMove proposedMove) {
@@ -151,6 +148,23 @@ public class ChessGame {
 
     }
 
+    /**
+     *
+     * @param moveList the list of moves to be updated based on current game state
+     */
+    private HashMap<ChessPosition, Collection<ChessMove>> updateMoveList(ChessBoard board, TeamColor teamToCheck) {
+        HashMap<ChessPosition, Collection<ChessMove>> returnList = new HashMap<ChessPosition, Collection<ChessMove>>();
+        ChessPiece currPiece;
+        ArrayList<ChessMove> proposedMoves;
+        ArrayList<ChessMove> legalMoves;
+
+        for(ChessPosition piecePos: moveList.keySet()) {
+
+        }
+
+
+        return returnList;
+    }
     private ChessMove getRookCastleMove(ChessMove proposedMove) {
         int kingStartRow, kingEndCol;
         kingStartRow = proposedMove.getStartPosition().getRow();
