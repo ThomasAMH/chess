@@ -21,6 +21,7 @@ public class ChessGame {
 
     public ChessGame() {
         gameBoard = new ChessBoard();
+        gameBoard.resetBoard();
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
         initializePieceHashmaps();
@@ -301,6 +302,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if(isInCheck(teamColor)) return false;
         return areMovesAvailable(teamColor);
     }
 
@@ -323,7 +325,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        gameBoard = board;
+        this.gameBoard = board;
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
         initializePieceHashmaps();
