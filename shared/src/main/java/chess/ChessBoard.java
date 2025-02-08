@@ -16,8 +16,13 @@ public class ChessBoard implements Iterable<ChessPosition>{
     public ChessBoard() {
         board = new ChessPiece[8][8];
     }
-    public ChessBoard(ChessBoard someBoard) {
-        board = someBoard.getBoard();
+    public ChessBoard(ChessPiece[][] someBoard) {
+        board = new ChessPiece[8][8];
+        for(int i = 0; i < 8; i++) {
+            for(int j = 0; j < 8; j++) {
+                board[i][j] = someBoard[i][j];
+            }
+        }
     }
     public enum MoveResult {
         CAPTURE,
@@ -227,6 +232,7 @@ public class ChessBoard implements Iterable<ChessPosition>{
             for(int j = 1; j < 9; j++) {
                 currPos = new ChessPosition(i,j);
                 currPiece = getPiece(currPos);
+                if(currPiece == null) continue;
                 if(currPiece.getTeamColor() == teamColor && currPiece.getPieceType() == ChessPiece.PieceType.KING) {
                     return currPos;
                 }
@@ -255,7 +261,7 @@ public class ChessBoard implements Iterable<ChessPosition>{
     }
 
     private class ChessBoardIterator implements Iterator<ChessPosition> {
-        private int row = 0, column = 0;
+        private int row = 1, column = 1;
         ChessPosition currPos;
         ChessPiece pieceAtCurrPos;
         @Override
@@ -269,7 +275,7 @@ public class ChessBoard implements Iterable<ChessPosition>{
                     }
                     column++;
                 }
-                column = 0;
+                column = 1;
                 row++;
             }
             return false;
