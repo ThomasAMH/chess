@@ -7,9 +7,10 @@
 ~~1. Create all parent class files (renaming is OK for later)~~
 
 ~~2. Create basic parent class functionality~~
-3. Construct server
-   1. Return the test page
-   2. Set up dummy endpoints
+
+~~3. Construct server~~
+~~1. Return the test page~~
+   ~~2. Set up dummy endpoints~~
 4. Construct DAC's
 5. Construct endpoints as follows:
 
