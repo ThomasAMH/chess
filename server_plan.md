@@ -5,7 +5,8 @@
 
 ## Roadmap
 ~~1. Create all parent class files (renaming is OK for later)~~
-2. Create basic parent class functionality
+
+~~2. Create basic parent class functionality~~
 3. Construct server
    1. Return the test page
    2. Set up dummy endpoints
