@@ -11,6 +11,7 @@ public class Server {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
         RequestHandler handler = new RequestHandler();
+        Spark.get("/index", handler::testHandler);
 
 //        Spark.post("/user", handler::addNewUser);
 //        Spark.post("/session", handler::loginUser);
@@ -51,6 +52,9 @@ public class Server {
 //        public Object nukeEverything(Request req, Response res) {
 //
 //        };
+        public Object testHandler(Request req, Response res) {
+            return "Success";
+        }
 
         private boolean isUserAuthenticated(String token) {
             return activeAuthTokens.contains(token);

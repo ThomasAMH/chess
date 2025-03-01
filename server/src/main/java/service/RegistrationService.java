@@ -7,17 +7,19 @@ import results.RegisterResult;
 public class RegistrationService extends Service {
 
     RegisterResult registerUser(RegisterRequest request) {
+        RegisterResult result = new RegisterResult();
         //validateUsername()
         //getUsernameValidity
         //createUser
         //getAuthToken
+        return result;
     }
 
-    void validateUsername(String username) throws BadRequestException {
-
-    }
-
-    String getAuthToken(String username) {
-
-    }
+//    void validateUsername(String username) throws BadRequestException {
+//
+//    }
+//
+//    String getAuthToken(String username) {
+//
+//    }
 }
