@@ -1,0 +1,186 @@
+actor Client
+participant Server
+participant Handler
+participant Service
+participant DataAccess
+database db
+
+entryspacing 0.4
+group #navy Registration #white [happy flow]
+  Client -> Server: [POST] /user\n{"username":" ", "password":" ", "email":" "}
+  Server -> Handler: {"username":" ", "password":" ", "email":" "}
+  
+  group #navy Bad Request #white [exception]
+    Handler --> Server: {"error": ...}
+    Server --> Client: 401\n{"message": "..."}
+  end
+
+  Handler -> Service: register(RegisterRequest)
+note right of DataAccess:It is assumed that all DataAccess\nclasses will access the db using\nfunctions called.\nSuch calls are omitted in the\ndiagrams to avoid repetition.
+  Service -> DataAccess: UserDAO:getUser(username)
+#  DataAccess -> db:Find UserData by username
+
+  group #navy Invalid Username #white [exception]
+  DataAccess --> Service: BadRequestError
+  Service --> Handler: RegisterResult
+  Handler --> Server: {"error": ...}
+  Server --> Client: 400\n{"message": "..."}
+  end
+
+  group #navy User Name Taken #white [exception]
+  DataAccess --> Service: UserTakenError
+  Service --> Handler: RegisterResult
+  Handler --> Server: {"error": ...}
+  Server --> Client: 403\n{"message": "..."}
+  end
+  
+  DataAccess --> Service: null
+  Service -> DataAccess:UserDAO:createUser(userData)
+#  DataAccess -> db:Add UserData
+  DataAccess --> Service: DataAccessResponse
+  Service -> DataAccess:AuthDAO:createAuthToken(authData)
+#  DataAccess -> db: Add AuthData
+  DataAccess --> Service: DataAccessResponse
+  Service --> Handler: RegisterResult
+  Handler --> Server: {"username" : " ", "authToken" : " "}
+  Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+
+  group #navy Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+    note over Server:Every application component checks the value from up AND downstream\nprior to processing and throws an error the server returns as a 500 error;\nin other words, each component does checks before and after, and unless\nthe error is a 400 (bad user data) or 403 (good data, won't do it) it's a 500.\nTo save here, these flows are represented with this catch all flow;\nobjects returned will still follow the appropriate patterns and forms (i.e.\nRegisterResult will be returned if the error occurs in the Service, not a\nJSON message as shown here.)
+  end
+end
+
+group #orange Login #white [happy flow]
+  Client -> Server: [POST] /session\n{username, password}
+    Server -> Handler: {"username":" ", "password":" "}
+    Handler -> Service: login(LoginRequest)
+    Service -> DataAccess:UserDAO:getPassword(userName)
+    DataAccess --> Service: DataAccessResponse
+    Service -> Service: validateUser(username, Password)
+    group #orange Authentication Fail #white [exception]
+      Service --> Handler: LoginResult
+      Handler --> Server: {"error": ...}
+      Server --> Client: 401\n{"message": "..."}
+    end
+    Service -> DataAccess:AuthDAO:createAuthToken(authData)
+    DataAccess --> Service: DataAccessResponse
+    Service --> Handler: LoginResult
+    Handler --> Server: {"username" : " ", "authToken" : " "}
+      Server --> Client: 200\n{"username" : " ", "authToken" : " "}
+  group #orange Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end    
+end
+
+group #green Logout #white
+Client -> Server: [DELETE] /session\nauthToken
+    Server -> Handler: {"authorization": authToken}
+    Handler -> Service: logout(LogoutRequest)
+    Service -> DataAccess:UserDAO:deleteAuthToken(username/token)\nAuthDAO:deleteAuthToken(token)
+    DataAccess --> Service: DataAccessResponse
+    group #green Authentication Fail #white [exception]
+      Service --> Handler: LogoutResult
+      Handler --> Server: {"error": ...}
+      Server --> Client: 401\n{"message": "..."}
+    end
+    Service --> Handler: LogoutResult
+    Handler --> Server: {"clear"}
+    Server --> Client: [200]
+    group #green Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end    
+end
+
+group #red List Games #white
+  Client -> Server: [GET] /game\nauthToken
+  Server -> Handler: {"authorization": authToken}
+  Handler -> Service: listGames(ListGamesRequest)
+    Service -> DataAccess: AuthDAO:authenticateUser(authToken)
+  DataAccess --> Service: DataAccessResponse
+    group #red Authentication Fail #white [exception]
+    Service --> Handler: ListGamesResult
+    Handler --> Server: {"error": ...}
+    Server --> Client: 401\n{"message": "..."}
+  end
+  Service -> DataAccess:GameDAO:requestGames(authToken)
+  DataAccess --> Service: DataAccessResponse
+
+
+  Service --> Handler: ListGamesResult
+  Handler --> Server:  "games": [{"gameID": 1234, "whiteUsername":"",\n"blackUsername":"", "gameName:""} ]}
+  Server --> Client: 200\n[{"gameID": 1234, "whiteUsername":"",\n"blackUsername":"", "gameName:""} ]}
+  group #red Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end
+end
+
+group #purple Create Game #white
+Client -> Server: [POST] /game\nauthToken\n{gameName}
+  Server -> Handler: {"authorization": authToken\n"gamename":"..."}
+  group #purple Bad Request #white [exception]
+    Handler --> Server: {"error": ...}
+    Server --> Client: 400\n{"message": "..."}
+  end
+  Handler -> Service: postGame(NewGameRequest)
+  Service -> DataAccess: AuthDAO:authenticateUser(authToken)
+  DataAccess --> Service: DataAccessResponse
+
+  group #purple Authentication Fail #white [exception]
+    Service --> Handler: MakeNewGameResult
+    Handler --> Server: {"error": ...}
+    Server --> Client: 401\n{"message": "..."}
+  end
+  Service -> DataAccess:GameDAO:makeNewGame(gameName)
+ 
+   DataAccess --> Service: DataAccessResponse
+
+  Service --> Handler: MakeNewGameResult
+  Handler --> Server:  "gameID": [{"gameID": 1234"}]
+  Server --> Client: 200\n[[{"gameID": 1234"}]
+  group #purple Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end
+end
+
+group #yellow Join Game #black
+  Client -> Server: [PUT] /game\nauthToken\n{playerColor, gameID}
+    Server -> Handler: {"authorization": authToken\n"gameID":"...","color":"..."}
+  group #yellow Bad Request #black [exception]
+    Handler --> Server: {"error": ...}
+    Server --> Client: 400\n{"message": "..."}
+  end
+  Handler -> Service: joinGame(JoinGameRequest)
+    Service -> DataAccess: AuthDAO:authenticateUser(authToken)
+  DataAccess --> Service: DataAccessResponse
+  group #yellow Authentication Fail #black [exception]
+    Service --> Handler: JoinGameResult
+    Handler --> Server: {"error": ...}
+    Server --> Client: 401\n{"message": "..."}
+  end
+    Service -> DataAccess:GameDAO:checkAvailability(gameID, color)
+  DataAccess --> Service: [ok]
+
+  Service -> DataAccess:GameDAO:joinGame(gameID, color)
+  Service --> Handler: JoinGameResult
+  Handler --> Server:  ["ok"]
+  Server --> Client: 200\n["ok"]
+  group #yellow Server Error #black [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end
+end
+
+group #gray Clear application #white
+  Client -> Server: [DELETE] /db
+  Server -> Handler: {"delete"}
+  Handler -> Service: DeleteRequest
+  Service -> DataAccess:DataAccess:Resetdb()
+  DataAccess -> db: Resetdb()
+  DataAccess --> Service: ok
+  Service --> Handler:DeleteRequestResult
+  Handler --> Server: ok
+  Server --> Client: [200]
+    group #gray Server Error #white [catch all exception]
+    db --> Client: 500\n{"message": "..."}
+  end
+end

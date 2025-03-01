@@ -1,4 +1,7 @@
 package dataaccess;
 
-public class AuthDAO extends DAC {
+import results.DataAccessResult;
+
+interface AuthDAO {
+    DataAccessResult authenticateUser(String username, String token);
 }
