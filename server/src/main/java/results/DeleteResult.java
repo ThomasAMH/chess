@@ -1,4 +1,4 @@
 package results;
 
-public record DeleteResult() {
+public record DeleteResult(boolean succeeded) {
 }

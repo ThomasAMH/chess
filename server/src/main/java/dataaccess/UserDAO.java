@@ -1,7 +1,7 @@
 package dataaccess;
 import results.DataAccessResult;
 
-interface UserDAO {
+interface UserDAO{
     // How does the auth token work? Store with user?
     DataAccessResult doesUserExist(String username) throws DataAccessException;
     DataAccessResult isPasswordValid(String username, String password) throws DataAccessException;
