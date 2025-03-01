@@ -1,4 +1,4 @@
 package requests;
 
-public class LogoutRequest extends Request {
+public record LogoutRequest() {
 }

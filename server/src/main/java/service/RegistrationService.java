@@ -17,7 +17,7 @@ public class RegistrationService extends Service {
 
     }
 
-    string getAuthToken(String username) {
+    String getAuthToken(String username) {
 
     }
 }

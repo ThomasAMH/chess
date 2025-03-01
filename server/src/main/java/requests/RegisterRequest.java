@@ -1,4 +1,4 @@
 package requests;
 
-public class RegisterRequest extends Request {
+public record RegisterRequest() {
 }

@@ -4,7 +4,7 @@ import requests.CreateGameRequest;
 import results.CreateGameResult;
 
 public class CreateGameService extends Service {
-    CreateGameResult createGame(CreateGameRequest) {
+    CreateGameResult createGame(CreateGameRequest request) {
         //Auth User
         //Make game
     }

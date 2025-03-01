@@ -1,4 +1,4 @@
 package results;
 
-public class ListGamesResult extends Result {
+public record ListGamesResult() {
 }

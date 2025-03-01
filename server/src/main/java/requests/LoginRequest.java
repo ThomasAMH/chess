@@ -1,4 +1,4 @@
 package requests;
 
-public class LoginRequest extends Request {
+public record LoginRequest() {
 }

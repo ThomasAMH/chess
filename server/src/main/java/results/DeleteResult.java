@@ -1,4 +1,4 @@
 package results;
 
-public class DeleteResult extends Result {
+public record DeleteResult() {
 }
