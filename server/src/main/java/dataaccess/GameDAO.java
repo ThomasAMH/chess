@@ -3,8 +3,11 @@ package dataaccess;
 import results.DataAccessResult;
 
 interface GameDAO {
-    DataAccessResult requestGames(String username);
+    DataAccessResult requestGames();
     DataAccessResult createGame(String gameName);
-    DataAccessResult checkGameAvailability(String gameID, String color);
-    DataAccessResult joinGame(String gameID, String color);
+    DataAccessResult checkGameAvailability(String gameID, String color) throws DataAccessException;
+    DataAccessResult joinGame(String gameID, String color, String username);
+    private int getNewGameID() {
+        return 0;
+    }
 }

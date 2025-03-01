@@ -3,5 +3,6 @@ package dataaccess;
 import results.DataAccessResult;
 
 interface AuthDAO {
-    DataAccessResult authenticateUser(String username, String token);
+    DataAccessResult getAuthToken(String username);
+    DataAccessResult deleteAuthToken(String username) throws DataAccessException;
 }

@@ -1,13 +1,18 @@
 package server;
+import dataaccess.MemoryDAO;
 import spark.Response;
 import spark.Spark;
 import spark.Request;
+import dataaccess.DataAccessDAO;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class Server {
     public int run(int desiredPort) {
+
+        //Change this to DB later implementation
+        DataAccessDAO dataService = new MemoryDAO();
+
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
         RequestHandler handler = new RequestHandler();
@@ -31,27 +36,27 @@ public class Server {
 
     public static class RequestHandler {
         private HashSet<String> activeAuthTokens = new HashSet<String>();
-//        public Object addNewUser(Request req, Response res) {
-//
-//        };
-//        public Object loginUser(Request req, Response res) {
-//
-//        };
-//        public Object logoutUser(Request req, Response res) {
-//            String token = req.headers("authorization");
-//        };
-//        public Object getGame(Request req, Response res) {
-//
-//        };
-//        public Object createGame(Request req, Response res) {
-//
-//        };
-//        public Object joinGame(Request req, Response res) {
-//
-//        };
-//        public Object nukeEverything(Request req, Response res) {
-//
-//        };
+        public Object addNewUser(Request req, Response res) {
+
+        };
+        public Object loginUser(Request req, Response res) {
+
+        };
+        public Object logoutUser(Request req, Response res) {
+            String token = req.headers("authorization");
+        };
+        public Object getGame(Request req, Response res) {
+
+        };
+        public Object createGame(Request req, Response res) {
+
+        };
+        public Object joinGame(Request req, Response res) {
+
+        };
+        public Object nukeEverything(Request req, Response res) {
+
+        };
         public Object testHandler(Request req, Response res) {
             return "Success";
         }
