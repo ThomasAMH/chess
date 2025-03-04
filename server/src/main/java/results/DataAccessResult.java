@@ -1,4 +1,4 @@
 package results;
 
-public record DataAccessResult(boolean success, String data) {
+public record DataAccessResult(String data) {
 }

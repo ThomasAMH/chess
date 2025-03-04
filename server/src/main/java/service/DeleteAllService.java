@@ -1,4 +1,4 @@
 package service;
 
-public class DeleteAllService extends Service {
+public class DeleteAllService {
 }

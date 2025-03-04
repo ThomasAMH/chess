@@ -11,17 +11,18 @@
 ~~3. Construct server~~
 ~~1. Return the test page~~
    ~~2. Set up dummy endpoints~~
-4. Construct DAC's
+~~ 4. Construct DAC's~~
 5. Construct endpoints as follows:
 
 ### For each endpoint
-1. Plan out each class
-2. Create empty classes, handlers, and functions
-3. Create JTests
+1. Endpoint?
+2. Plan out each class
+3. Create empty classes, handlers, and functions
+4. Create JTests
    - What data is needed?
-4. Write happy flow
-5. Write exception flows
-6. Try to break it
+5. Write happy flow
+6. Write exception flows
+7. Try to break it
 
 ## Notes on Testing
 _server/src/test/java/service_r

@@ -2,5 +2,5 @@ package results;
 import chess.ChessGame;
 import java.util.ArrayList;
 
-public record ListGamesResult(ArrayList<ChessGame> games) {
+public record ListGamesResult(int responseCode, String responseMessage, ArrayList<ChessGame> games) {
 }

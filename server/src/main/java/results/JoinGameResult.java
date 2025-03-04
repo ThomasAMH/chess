@@ -1,4 +1,4 @@
 package results;
 
-public record JoinGameResult() {
+public record JoinGameResult(int responseCode, String responseMessage) {
 }

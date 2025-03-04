@@ -1,11 +1,13 @@
 package service;
 
-import requests.ListGamesRequest;
+import chess.ChessGame;
 import results.ListGamesResult;
 
-public class ListGamesService extends Service{
+import java.util.ArrayList;
+
+public class ListGamesService {
     ListGamesResult listGames(ListGamesService request) {
-        ListGamesResult result = new ListGamesResult();
+        ListGamesResult result = new ListGamesResult(200, "test message", new ArrayList<ChessGame>());
         //authenticateUser
 
         return result;

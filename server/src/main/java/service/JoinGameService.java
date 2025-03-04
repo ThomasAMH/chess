@@ -3,9 +3,9 @@ package service;
 import requests.JoinGameRequest;
 import results.JoinGameResult;
 
-public class JoinGameService extends Service {
+public class JoinGameService {
     JoinGameResult joinGame(JoinGameRequest request) {
-        JoinGameResult result = new JoinGameResult();
+        JoinGameResult result = new JoinGameResult(200, "test");
         //auth user
         //Check availability
         return result;

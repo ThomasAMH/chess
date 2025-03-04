@@ -1,4 +1,4 @@
 package service;
 
-public class LogoutService extends Service {
+public class LogoutService {
 }

@@ -1,11 +1,69 @@
 package dataaccess;
 
-public interface DataAccessDAO {
-    // Interface left empty because methods in this class are dependent on the AuthDAO, GameDAO, and UserDAO.
-    // Interfaces provide no way require these subclasses to be implemented. If there was a way to do so, I would
-    // include them here.
+import model.UserData;
+import model.AuthData;
+import requests.RegisterRequest;
+import results.DataAccessResult;
 
-    // This interface exists to allow "one line of code" change in the server file to toggle how the app
-    // interacts with data.
-    //DataAccessDAO = memoryDAO or DBDAO
+import java.util.UUID;
+
+public abstract class DataAccessDAO {
+    public UserDataDAO userData;
+    public AuthDataDAO authData;
+
+    public DataAccessDAO() {
+        this.userData = new UserDataDAO();
+        this.authData = new AuthDataDAO();
+    }
+
+    protected abstract boolean daoDoesUserExist(String username);
+    protected abstract UserData daoGetUserData(String username);
+    protected abstract void daoSaveNewUser(UserData userData);
+
+    protected abstract void daoStoreAuthToken(AuthData data);
+    protected abstract boolean daoContainsAuthToken(String username);
+    protected abstract String daoGetAuthToken(String username);
+    protected abstract void daoDeleteAuthToken(String username);
+
+    public class UserDataDAO implements UserDAO {
+        public DataAccessResult doesUserExist(RegisterRequest request) throws DataAccessException {
+            if(daoDoesUserExist(request.username())) {
+                throw new DataAccessException("Error: already taken");
+            }
+            return new DataAccessResult("false");
+        }
+        public DataAccessResult createUser(RegisterRequest request) throws DataAccessException {
+            UserData newUser = new UserData(request.username(), request.password(), request.email());
+            daoSaveNewUser(newUser);
+            return new DataAccessResult("User created. Request data saved.");
+        }
+        public DataAccessResult isPasswordValid(RegisterRequest request) throws DataAccessException {
+            if(daoDoesUserExist(request.username())) {
+                throw new DataAccessException("Error: username does not exist!");
+            }
+            UserData userData = daoGetUserData(request.username());
+            if(userData.password().equals(request.password())) {
+                return new DataAccessResult("Password is valid.");
+            } else {
+                return new DataAccessResult("Password is valid.");
+            }
+        }
+
+
+    }
+    public class AuthDataDAO implements AuthDAO {
+        public DataAccessResult getAuthToken(String username) throws DataAccessException {
+            String token = UUID.randomUUID().toString();
+            AuthData newData = new AuthData(token, username);
+            daoStoreAuthToken(newData);
+            return new DataAccessResult(token);
+        }
+        public DataAccessResult deleteAuthToken(String username) throws DataAccessException {
+            if(daoContainsAuthToken(username)) {
+                throw new DataAccessException("Username does not have associated authentication token!");
+            }
+            daoDeleteAuthToken(username);
+            return new DataAccessResult("Deletion successful");
+        }
+    }
 }

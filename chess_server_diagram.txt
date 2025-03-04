@@ -16,13 +16,7 @@ group #navy Registration #white [happy flow]
   end
 
   Handler -> Service:registerUser(RegisterRequest)
-Service->Service:validateUsername(username)
-  group #navy Invalid Username #white [exception]
 
-  Service --> Handler: RegisterResult
-  Handler --> Server: {"error": ...}
-  Server --> Client: 400\n{"message": "..."}
-  end
   Service -> DataAccess:UserDAO:doesUserExist(username)
 note right of DataAccess:It is assumed that all DataAccess\nclasses will access the db using\nfunctions called.\nSuch calls are omitted in the\ndiagrams to avoid repetition.
 

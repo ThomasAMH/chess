@@ -1,25 +1,32 @@
 package service;
 
-import records.UserData;
+import dataaccess.DataAccessDAO;
+import dataaccess.DataAccessException;
 import requests.RegisterRequest;
+import results.DataAccessResult;
 import results.RegisterResult;
 
-public class RegistrationService extends Service {
+public class RegistrationService {
 
-    RegisterResult registerUser(RegisterRequest request) {
-        RegisterResult result = new RegisterResult();
-        //validateUsername()
-        //getUsernameValidity
-        //createUser
+    public RegisterResult registerUser(RegisterRequest request, DataAccessDAO dataService) {
+        //Validate username
+        try {
+            DataAccessResult daoResult = dataService.userData.doesUserExist(request);
+        } catch (DataAccessException e) {
+            return new RegisterResult(403, e.getMessage(), request.username(), "");
+        }
+        //Attempt to add user data
+        try {
+            DataAccessResult daoResult = dataService.userData.createUser(request);
+        } catch (DataAccessException e) {
+            return new RegisterResult(400, e.getMessage(), request.username(), "");
+        }
         //getAuthToken
-        return result;
+        try {
+            String token = dataService.authData.getAuthToken(request.username()).data();
+            return new RegisterResult(200, "User saved", request.username(), token);
+        } catch (DataAccessException e) {
+            return new RegisterResult(500, e.getMessage(), request.username(), "");
+        }
     }
-
-//    void validateUsername(String username) throws BadRequestException {
-//
-//    }
-//
-//    String getAuthToken(String username) {
-//
-//    }
 }

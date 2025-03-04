@@ -1,4 +1,4 @@
 package results;
 
-public record DeleteResult(boolean succeeded) {
+public record DeleteResult(int responseCode, String responseMessage) {
 }
