@@ -15,17 +15,16 @@ public class LogoutService {
             if (daoResult.data().equals("false")) {
                 return new LogoutResult(401, "Error: unauthorized");
             }
-
         } catch (DataAccessException e) {
             return new LogoutResult(500, "Error: Unknown error detected in token query process.");
         }
 
         //Delete it
         try {
-            DataAccessResult daoResult = dataService.authData.deleteAuthToken(request.authToken());
-            return new LogoutResult(200, "User logged out.");
+            DataAccessResult daoResult = dataService.gameData.getGames();
+            return new LogoutResult(200, daoResult.data());
         } catch (DataAccessException e) {
-            return new LogoutResult(500, "Error: unexpected error in token deletion process");
+            return new LogoutResult(500, "Error: unexpected error in game fetching process");
         }
     }
 }

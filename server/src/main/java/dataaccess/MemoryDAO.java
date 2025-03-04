@@ -1,11 +1,9 @@
 package dataaccess;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import results.DataAccessResult;
 
 import java.util.*;
 
@@ -50,6 +48,36 @@ public class MemoryDAO extends DataAccessDAO {
     @Override
     protected void daoDeleteAuthToken(String username) {
         authDataHashmap.remove(username);
+    }
+
+    @Override
+    protected ArrayList<ChessGame> daoGetGames() {
+        return null;
+    }
+
+    ;
+    @Override
+    protected int daoAddGame(String gameName) {
+        ChessGame newGame = new ChessGame();
+        int gameID = getChessGameIndex();
+        GameData game = new GameData(gameID, "", "", gameName, newGame);
+        gameDataHashMap.put(gameID, game);
+        return gameID;
+    };
+
+    @Override
+    protected int getChessGameIndex() {
+      if(gameDataHashMap.isEmpty()) {
+          return 0;
+      } else {
+          Map.Entry<Integer, GameData> maxEntry = null;
+          for(Map.Entry<Integer, GameData> entry: gameDataHashMap.entrySet()) {
+              if(maxEntry == null || (entry.getValue().gameID()) > maxEntry.getValue().gameID()) {
+                  maxEntry = entry;
+              }
+          }
+          return maxEntry.getKey();
+      }
     };
 }
 

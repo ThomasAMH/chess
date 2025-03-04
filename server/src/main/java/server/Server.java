@@ -1,12 +1,15 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
+import requests.ListGamesRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
+import results.ListGamesResult;
 import results.LoginResult;
 import results.LogoutResult;
 import results.RegisterResult;
+import service.ListGamesService;
 import service.LoginService;
 import service.LogoutService;
 import service.RegistrationService;
@@ -105,9 +108,26 @@ public class Server {
                 return formatErrorString(result.responseMessage());
             }
         };
-//        public Object getGame(Request req, Response res) {
-//
-//        };
+        public Object getGame(Request req, Response res) {
+            ListGamesRequest requestData = new Gson().fromJson(req.body(), ListGamesRequest.class);
+            if(requestData.authToken().isEmpty()) {
+                res.status(500);
+                return formatErrorString("Error: no auth token provided");
+            }
+
+            ListGamesService service = new ListGamesService();
+            ListGamesResult result = service.listGames(new ListGamesRequest(requestData.authToken()), dataService);
+
+            if(result.responseCode() == 200) {
+                activeAuthTokens.remove(requestData.authToken());
+                res.status(200);
+                return new Gson().toJson(result);
+            }
+            else {
+                res.status(result.responseCode());
+                return formatErrorString(result.responseMessage());
+            }
+        };
 //        public Object createGame(Request req, Response res) {
 //
 //        };

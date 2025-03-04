@@ -1,19 +1,24 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.UserData;
 import model.AuthData;
 import requests.RegisterRequest;
 import results.DataAccessResult;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public abstract class DataAccessDAO {
     public UserDataDAO userData;
     public AuthDataDAO authData;
+    public GameDataDAO gameData;
 
     public DataAccessDAO() {
         this.userData = new UserDataDAO();
         this.authData = new AuthDataDAO();
+        this.gameData = new GameDataDAO();
     }
 
     protected abstract boolean daoDoesUserExist(String username);
@@ -24,6 +29,10 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoContainsAuthToken(String username);
     protected abstract String daoGetAuthToken(String username);
     protected abstract void daoDeleteAuthToken(String username);
+
+    protected abstract ArrayList<ChessGame> daoGetGames();
+    protected abstract int daoAddGame(String gameName);
+    protected abstract int getChessGameIndex();
 
     public class UserDataDAO implements UserDAO {
         @Override
@@ -81,6 +90,29 @@ public abstract class DataAccessDAO {
                 return new DataAccessResult("false");
             }
             return new DataAccessResult("true");
+        }
+    }
+    public class GameDataDAO implements GameDAO {
+
+        @Override
+        public DataAccessResult getGames() throws DataAccessException {
+            return new DataAccessResult(new Gson().toJson(daoGetGames()));
+        }
+
+        @Override
+        public DataAccessResult createGame(String gameName) throws DataAccessException {
+            daoAddGame(gameName);
+            return new DataAccessResult("Game created");
+        }
+
+        @Override
+        public DataAccessResult checkGameAvailability(String gameID, String color) throws DataAccessException {
+            return null;
+        }
+
+        @Override
+        public DataAccessResult joinGame(String gameID, String color, String username) throws DataAccessException {
+            return null;
         }
     }
 }
