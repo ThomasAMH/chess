@@ -2,10 +2,13 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
 import requests.LoginRequest;
+import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.LoginResult;
+import results.LogoutResult;
 import results.RegisterResult;
 import service.LoginService;
+import service.LogoutService;
 import service.RegistrationService;
 import spark.Response;
 import spark.Spark;
@@ -52,7 +55,7 @@ public class Server {
             RegistrationService service = new RegistrationService();
             RegisterResult result = service.registerUser(requestData, dataService);
 
-            if(result.responseCode() != 200) {
+            if(result.responseCode() == 200) {
                 activeAuthTokens.add(result.authToken());
                 res.status(200);
                 return new Gson().toJson(result);
@@ -72,7 +75,7 @@ public class Server {
             LoginService service = new LoginService();
             LoginResult result = service.loginUser(requestData, dataService);
 
-            if(result.responseCode() != 200) {
+            if(result.responseCode() == 200) {
                 activeAuthTokens.add(result.authToken());
                 res.status(200);
                 return new Gson().toJson(result);
@@ -81,11 +84,27 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage());
             }
-
         };
-//        public Object logoutUser(Request req, Response res) {
-//            String token = req.headers("authorization");
-//        };
+        public Object logoutUser(Request req, Response res) {
+            LogoutRequest requestData = new Gson().fromJson(req.body(), LogoutRequest.class);
+            if(requestData.authToken().isEmpty()) {
+                res.status(500);
+                return formatErrorString("Error: no auth token provided");
+            }
+
+            LogoutService service = new LogoutService();
+            LogoutResult result = service.logoutUser(requestData, dataService);
+
+            if(result.responseCode() == 200) {
+                activeAuthTokens.remove(requestData.authToken());
+                res.status(200);
+                return new Gson().toJson(result);
+            }
+            else {
+                res.status(result.responseCode());
+                return formatErrorString(result.responseMessage());
+            }
+        };
 //        public Object getGame(Request req, Response res) {
 //
 //        };

@@ -37,11 +37,11 @@ public class MemoryDAO extends DataAccessDAO {
 
     @Override
     protected void daoStoreAuthToken(AuthData data) {
-        authDataHashmap.put(data.username(), data);
+        authDataHashmap.put(data.authToken(), data);
     };
     @Override
-    protected boolean daoContainsAuthToken(String username) {
-        return authDataHashmap.containsKey(username);
+    protected boolean daoContainsAuthToken(String token) {
+        return authDataHashmap.containsKey(token);
     };
     @Override
     protected String daoGetAuthToken(String username) {

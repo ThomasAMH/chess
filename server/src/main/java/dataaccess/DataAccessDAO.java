@@ -59,8 +59,6 @@ public abstract class DataAccessDAO {
                 return new DataAccessResult("Password is valid.");
             }
         }
-
-
     }
     public class AuthDataDAO implements AuthDAO {
         public DataAccessResult getAuthToken(String username) throws DataAccessException {
@@ -69,12 +67,20 @@ public abstract class DataAccessDAO {
             daoStoreAuthToken(newData);
             return new DataAccessResult(token);
         }
-        public DataAccessResult deleteAuthToken(String username) throws DataAccessException {
-            if(daoContainsAuthToken(username)) {
-                throw new DataAccessException("Username does not have associated authentication token!");
+        public DataAccessResult deleteAuthToken(String token) throws DataAccessException {
+            if(!daoContainsAuthToken(token)) {
+                throw new DataAccessException("Provided token not associated with any logged in users.");
             }
-            daoDeleteAuthToken(username);
+            daoDeleteAuthToken(token);
             return new DataAccessResult("Deletion successful");
+        }
+
+        @Override
+        public DataAccessResult doesAuthTokenExist(String token) throws DataAccessException {
+            if(!daoContainsAuthToken(token)) {
+                return new DataAccessResult("false");
+            }
+            return new DataAccessResult("true");
         }
     }
 }
