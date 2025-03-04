@@ -26,9 +26,10 @@ public abstract class DataAccessDAO {
     protected abstract void daoDeleteAuthToken(String username);
 
     public class UserDataDAO implements UserDAO {
-        public DataAccessResult doesUserExist(RegisterRequest request) throws DataAccessException {
-            if(daoDoesUserExist(request.username())) {
-                throw new DataAccessException("Error: already taken");
+        @Override
+        public DataAccessResult doesUserExist(String username) throws DataAccessException {
+            if(daoDoesUserExist(username)) {
+                return new DataAccessResult("true");
             }
             return new DataAccessResult("false");
         }
@@ -37,6 +38,16 @@ public abstract class DataAccessDAO {
             daoSaveNewUser(newUser);
             return new DataAccessResult("User created. Request data saved.");
         }
+
+        @Override
+        public DataAccessResult getPassword(String username) throws DataAccessException {
+            if(!daoDoesUserExist(username)) {
+                throw new DataAccessException("Error: username does not exist!");
+            }
+            return new DataAccessResult(daoGetUserData(username).password());
+        }
+
+
         public DataAccessResult isPasswordValid(RegisterRequest request) throws DataAccessException {
             if(daoDoesUserExist(request.username())) {
                 throw new DataAccessException("Error: username does not exist!");

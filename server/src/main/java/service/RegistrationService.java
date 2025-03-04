@@ -11,9 +11,12 @@ public class RegistrationService {
     public RegisterResult registerUser(RegisterRequest request, DataAccessDAO dataService) {
         //Validate username
         try {
-            DataAccessResult daoResult = dataService.userData.doesUserExist(request);
+            DataAccessResult daoResult = dataService.userData.doesUserExist(request.username());
+            if(daoResult.data().equals("true")) {
+                return new RegisterResult(403, "Error: already taken", request.username(), "");
+            }
         } catch (DataAccessException e) {
-            return new RegisterResult(403, e.getMessage(), request.username(), "");
+            return new RegisterResult(500, e.getMessage(), request.username(), "");
         }
         //Attempt to add user data
         try {

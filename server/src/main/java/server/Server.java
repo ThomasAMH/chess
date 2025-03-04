@@ -1,8 +1,11 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
+import requests.LoginRequest;
 import requests.RegisterRequest;
+import results.LoginResult;
 import results.RegisterResult;
+import service.LoginService;
 import service.RegistrationService;
 import spark.Response;
 import spark.Spark;
@@ -42,6 +45,10 @@ public class Server {
         public Object addNewUser(Request req, Response res) {
             //TODO: Add some error checking here
             RegisterRequest requestData = new Gson().fromJson(req.body(), RegisterRequest.class);
+            if(requestData.username().isEmpty() || requestData.email().isEmpty() || requestData.password().isEmpty()) {
+                res.status(400);
+                return formatErrorString("Error: bad request");
+            }
             RegistrationService service = new RegistrationService();
             RegisterResult result = service.registerUser(requestData, dataService);
 
@@ -55,9 +62,27 @@ public class Server {
                 return formatErrorString(result.responseMessage());
             }
         };
-//        public Object loginUser(Request req, Response res) {
-//
-//        };
+        public Object loginUser(Request req, Response res) {
+            LoginRequest requestData = new Gson().fromJson(req.body(), LoginRequest.class);
+            if(requestData.username().isEmpty() || requestData.password().isEmpty()) {
+                res.status(400);
+                return formatErrorString("Error: bad request");
+            }
+
+            LoginService service = new LoginService();
+            LoginResult result = service.loginUser(requestData, dataService);
+
+            if(result.responseCode() != 200) {
+                activeAuthTokens.add(result.authToken());
+                res.status(200);
+                return new Gson().toJson(result);
+            }
+            else {
+                res.status(result.responseCode());
+                return formatErrorString(result.responseMessage());
+            }
+
+        };
 //        public Object logoutUser(Request req, Response res) {
 //            String token = req.headers("authorization");
 //        };
