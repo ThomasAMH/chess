@@ -3,14 +3,11 @@ import dataaccess.DataAccessDAO;
 import dataaccess.MemoryDAO;
 import org.junit.jupiter.api.Test;
 import requests.CreateGameRequest;
-import requests.ListGamesRequest;
 import requests.LoginRequest;
 import requests.RegisterRequest;
 import results.CreateGameResult;
-import results.ListGamesResult;
 import results.RegisterResult;
 import service.CreateGameService;
-import service.ListGamesService;
 import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

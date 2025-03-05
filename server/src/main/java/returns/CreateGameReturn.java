@@ -1,4 +1,4 @@
 package returns;
 
-public record CreateGameReturn(String gameName) {
+public record CreateGameReturn(int gameID) {
 }

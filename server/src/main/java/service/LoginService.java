@@ -17,7 +17,7 @@ public class LoginService {
         try {
             DataAccessResult daoResult = dataService.userData.doesUserExist(request.username());
             if(daoResult.data().equals("false")) {
-                return new LoginResult(500, "Error: username not found", request.username(), "");
+                return new LoginResult(401, "Error: unauthorized", request.username(), "");
             }
         } catch (DataAccessException e) {
             return new LoginResult(500, e.getMessage(), request.username(), "");

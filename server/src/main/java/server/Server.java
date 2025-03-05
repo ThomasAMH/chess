@@ -1,4 +1,6 @@
 package server;
+import bodyobjects.CreateGameBodyObj;
+import bodyobjects.JoinGameBodyObj;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
 import model.GameData;
@@ -14,6 +16,7 @@ import dataaccess.DataAccessDAO;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class Server {
@@ -42,12 +45,12 @@ public class Server {
     }
 
     public static class RequestHandler {
-        private static HashSet<String> activeAuthTokens = new HashSet<String>();
+        private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
 
         public Object addNewUser(Request req, Response res) {
             //TODO: Add some error checking here
             RegisterRequest requestData = new Gson().fromJson(req.body(), RegisterRequest.class);
-            if(requestData.username().isEmpty() || requestData.email().isEmpty() || requestData.password().isEmpty()) {
+            if(requestData.username() == null || requestData.email() == null || requestData.password() == null) {
                 res.status(400);
                 return formatErrorString("Error: bad request");
             }
@@ -56,7 +59,7 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 RegisterReturn returnVal = new RegisterReturn(result.username(), result.authToken());
-                activeAuthTokens.add(result.authToken());
+                activeAuthTokens.put(returnVal.authToken(), returnVal.username());
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }
@@ -77,7 +80,7 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 LoginReturn returnVal = new LoginReturn(result.username(), result.authToken());
-                activeAuthTokens.add(result.authToken());
+                activeAuthTokens.put(returnVal.authToken(), returnVal.username());
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }
@@ -87,7 +90,7 @@ public class Server {
             }
         };
         public Object logoutUser(Request req, Response res) {
-            LogoutRequest requestData = new Gson().fromJson(req.body(), LogoutRequest.class);
+            LogoutRequest requestData = new LogoutRequest(req.headers("authorization"));
             if(requestData.authToken().isEmpty()) {
                 res.status(500);
                 return formatErrorString("Error: no auth token provided");
@@ -133,7 +136,9 @@ public class Server {
             }
         };
         public Object createGame(Request req, Response res) {
-            CreateGameRequest requestData = new Gson().fromJson(req.body(), CreateGameRequest.class);
+            CreateGameBodyObj bodyObj =  new Gson().fromJson(req.body(), CreateGameBodyObj.class);
+            CreateGameRequest requestData;
+            requestData = new CreateGameRequest(bodyObj.gameName(),req.headers("authorization"));
             if(requestData.authToken().isEmpty()) {
                 res.status(400);
                 return formatErrorString("Error: no auth token provided");
@@ -143,7 +148,7 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 res.status(200);
-                CreateGameReturn returnVal = new CreateGameReturn(result.gameName());
+                CreateGameReturn returnVal = new CreateGameReturn(result.gameID());
                 return new Gson().toJson(returnVal);
             }
             else {
@@ -152,7 +157,9 @@ public class Server {
             }
         };
         public Object joinGame(Request req, Response res) {
-            JoinGameRequest requestData = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            String activeToken = req.headers("authorization");
+            JoinGameBodyObj bodyObj =  new Gson().fromJson(req.body(), JoinGameBodyObj.class);
+            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playercolor(), bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
             if(req.headers("authorization").isEmpty()) {
                 res.status(400);
                 return formatErrorString("Error: no auth token provided");
@@ -173,14 +180,14 @@ public class Server {
         public Object nukeEverything(Request req, Response res) {
             dataService.nukeEverything();
             res.status(200);
-            return "Nuking complete.";
+            return "{}";
         };
         private static String formatErrorString(String errorMessage) {
             return "{\"message\": \"" + errorMessage + "\"}";
         }
 
         private boolean isUserAuthenticated(String token) {
-            return activeAuthTokens.contains(token);
+            return activeAuthTokens.containsKey(token);
         }
     }
 }

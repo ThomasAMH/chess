@@ -104,9 +104,8 @@ public abstract class DataAccessDAO {
         }
 
         @Override
-        public DataAccessResult createGame(String gameName) throws DataAccessException {
-            daoAddGame(gameName);
-            return new DataAccessResult("Game created");
+        public int createGame(String gameName) throws DataAccessException {
+            return daoAddGame(gameName);
         }
 
         @Override
