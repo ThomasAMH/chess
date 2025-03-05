@@ -33,7 +33,7 @@ class JoinGameTest {
 
     JoinGameService joinGameService = new JoinGameService();
     JoinGameRequest badJoinGameRequest = new JoinGameRequest("WHITE", 0, "Tom", badToken);
-    JoinGameRequest goodJoinGameRequest = new JoinGameRequest("WHITE", 0, "Tom", goodToken);
+    JoinGameRequest goodJoinGameRequest = new JoinGameRequest("WHITE", 1, "Tom", goodToken);
 
     @Test
     public void testBadRequest() {
