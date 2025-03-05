@@ -156,9 +156,11 @@ public class Server {
                 return formatErrorString(result.responseMessage());
             }
         };
-//        public Object nukeEverything(Request req, Response res) {
-//
-//        };
+        public Object nukeEverything(Request req, Response res) {
+            dataService.nukeEverything();
+            res.status(200);
+            return "Nuking complete.";
+        };
         private static String formatErrorString(String errorMessage) {
             return "{\"message\": \"" + errorMessage + "\"}";
         }

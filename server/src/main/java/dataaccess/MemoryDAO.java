@@ -110,5 +110,12 @@ public class MemoryDAO extends DataAccessDAO {
         return gameDataHashMap.containsKey(gameID);
     }
 
+    @Override
+    public void nukeEverything() {
+        userDataHashmap.clear();
+        authDataHashmap.clear();
+        gameDataHashMap.clear();
+    }
+
 
 }

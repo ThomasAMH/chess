@@ -37,6 +37,8 @@ public abstract class DataAccessDAO {
     protected abstract void daoJoinGame(int gameID, String color, String username);
     protected abstract boolean daoIsGameNumberValid(int gameID);
 
+    public abstract void nukeEverything();
+
     public class UserDataDAO implements UserDAO {
         @Override
         public DataAccessResult doesUserExist(String username) throws DataAccessException {
