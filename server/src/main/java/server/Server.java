@@ -21,10 +21,10 @@ public class Server {
         RequestHandler handler = new RequestHandler();
 
         Spark.post("/user", handler::addNewUser);
-//        Spark.post("/session", handler::loginUser);
-//        Spark.delete("/session", handler::logoutUser);
-//        Spark.get("/game", handler::logoutUser);
-//        Spark.post("/game", handler::createGame);
+        Spark.post("/session", handler::loginUser);
+        Spark.delete("/session", handler::logoutUser);
+        Spark.get("/game", handler::logoutUser);
+        Spark.post("/game", handler::createGame);
 //        Spark.put("/game", handler::joinGame);
 //        Spark.delete("/db", handler::nukeEverything);
 
@@ -138,9 +138,24 @@ public class Server {
             }
         };
 
-//        public Object joinGame(Request req, Response res) {
-//
-//        };
+        public Object joinGame(Request req, Response res) {
+            JoinGameRequest requestData = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            if(req.headers("authorization").isEmpty()) {
+                res.status(400);
+                return formatErrorString("Error: no auth token provided");
+            }
+            JoinGameService service = new JoinGameService();
+            JoinGameResult result = service.joinGame(requestData, dataService);
+
+            if(result.responseCode() == 200) {
+                res.status(200);
+                return new Gson().toJson(result);
+            }
+            else {
+                res.status(result.responseCode());
+                return formatErrorString(result.responseMessage());
+            }
+        };
 //        public Object nukeEverything(Request req, Response res) {
 //
 //        };

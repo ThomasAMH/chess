@@ -80,54 +80,35 @@ public class MemoryDAO extends DataAccessDAO {
           }
           return maxEntry.getKey();
       }
-    };
-}
+    }
 
-//    public class GameDAO implements dataaccess.GameDAO {
-//        public DataAccessResult requestGames() {
-//            String games = new Gson().toJson(gameDataHashMap);
-//            return new DataAccessResult(true, games);
-//        }
-//        public DataAccessResult createGame(String gameName) {
-//            int gameID = getNewGameID();
-//            GameData newGame = new GameData(gameID, "", "", gameName, new ChessGame());
-//            gameDataHashMap.put(gameID, newGame);
-//            return new DataAccessResult(true, "");
-//        }
-//        public DataAccessResult checkGameAvailability(String gameID, String color) throws DataAccessException {
-//            int gameIDInt = Integer.parseInt(gameID);
-//            if(!gameDataHashMap.containsKey(gameIDInt)) {
-//                throw new DataAccessException("Invalid game ID!");
-//            }
-//            if(!Objects.equals(color, "WHITE") && !Objects.equals(color, "BLACK")) {
-//                throw new DataAccessException("Invalid color!");
-//            }
-//
-//            GameData targetGame = gameDataHashMap.get(gameIDInt);
-//
-//            if(color.equals("WHITE") && (!Objects.equals(targetGame.whiteUsername(), ""))) {
-//                return new DataAccessResult(false, "Selected color in selected game is already taken.");
-//            } else if(color.equals("BLACK") && (!Objects.equals(targetGame.blackUsername(), ""))) {
-//                return new DataAccessResult(false, "Selected color in selected game is already taken.");
-//            }
-//
-//            return new DataAccessResult(true, "Selected color in selected game is available.");
-//        }
-//        public DataAccessResult joinGame(String gameID, String color, String username) {
-//            int gameIDInt = Integer.parseInt(gameID);
-//            GameData currentGame = gameDataHashMap.get(gameIDInt);
-//            GameData updatedGame;
-//            if(color.equals("WHITE")) {
-//                updatedGame = new GameData(gameIDInt, username, currentGame.blackUsername(), currentGame.gameName(), currentGame.game());
-//            } else {
-//                updatedGame = new GameData(gameIDInt, currentGame.whiteUsername(), username, currentGame.gameName(), currentGame.game());
-//            }
-//
-//            gameDataHashMap.put(gameIDInt, updatedGame);
-//
-//            return new DataAccessResult(true, "Game joined.");
-//        }
-//        private int getNewGameID() {
-//            return Collections.max(gameDataHashMap.keySet()) + 1;
-//        }
-//    };
+    @Override
+    protected boolean daoIsTeamColorFree(int gameID, String color) {
+        GameData data = gameDataHashMap.get(gameID);
+        if(color.equals("WHITE")) {
+            return data.whiteUsername().isEmpty();
+        } else {
+            return data.blackUsername().isEmpty();
+        }
+    }
+
+    @Override
+    protected void daoJoinGame(int gameID, String color, String username) {
+        GameData oldData = gameDataHashMap.get(gameID);
+        GameData newData;
+        if(color.equals("WHITE")) {
+            newData = new GameData(gameID, username, oldData.blackUsername(), oldData.gameName(), oldData.game());
+        } else {
+            newData = new GameData(gameID, oldData.whiteUsername(), username, oldData.gameName(), oldData.game());
+        }
+        gameDataHashMap.remove(gameID);
+        gameDataHashMap.put(gameID, newData);
+    }
+
+    @Override
+    protected boolean daoIsGameNumberValid(int gameID) {
+        return gameDataHashMap.containsKey(gameID);
+    }
+
+
+}

@@ -1,6 +1,5 @@
 package dataaccess;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import model.UserData;
@@ -34,6 +33,9 @@ public abstract class DataAccessDAO {
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
     protected abstract int getChessGameIndex();
+    protected abstract boolean daoIsTeamColorFree(int gameID, String color);
+    protected abstract void daoJoinGame(int gameID, String color, String username);
+    protected abstract boolean daoIsGameNumberValid(int gameID);
 
     public class UserDataDAO implements UserDAO {
         @Override
@@ -107,13 +109,29 @@ public abstract class DataAccessDAO {
         }
 
         @Override
-        public DataAccessResult checkGameAvailability(String gameID, String color) throws DataAccessException {
-            return null;
+        public DataAccessResult isColorAvailable(int gameID, String color) throws DataAccessException {
+            if(daoIsTeamColorFree(gameID, color)) {
+                return new DataAccessResult("true");
+            } else {
+                return new DataAccessResult("false");
+            }
         }
 
         @Override
-        public DataAccessResult joinGame(String gameID, String color, String username) throws DataAccessException {
-            return null;
+        public DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException {
+            daoJoinGame(gameID, color, username);
+            return new DataAccessResult("true");
         }
+
+        @Override
+        public DataAccessResult isGameNumberValid(int gameID) throws DataAccessException {
+            if(daoIsGameNumberValid(gameID)) {
+                return new DataAccessResult("true");
+            } else {
+                return new DataAccessResult("false");
+            }
+        }
+
+
     }
 }

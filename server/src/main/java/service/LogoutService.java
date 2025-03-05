@@ -18,7 +18,6 @@ public class LogoutService {
         } catch (DataAccessException e) {
             return new LogoutResult(500, "Error: Unknown error detected in token query process.");
         }
-
         //Delete it
         try {
             DataAccessResult daoResult = dataService.gameData.getGames();
