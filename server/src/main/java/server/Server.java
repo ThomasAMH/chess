@@ -49,7 +49,6 @@ public class Server {
         private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
 
         public Object addNewUser(Request req, Response res) {
-            //TODO: Add some error checking here
             RegisterRequest requestData = new Gson().fromJson(req.body(), RegisterRequest.class);
             if(requestData.username() == null || requestData.email() == null || requestData.password() == null) {
                 res.status(400);
@@ -188,8 +187,5 @@ public class Server {
             return "{\"message\": \"" + errorMessage + "\"}";
         }
 
-        private boolean isUserAuthenticated(String token) {
-            return activeAuthTokens.containsKey(token);
-        }
     }
 }

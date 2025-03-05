@@ -156,10 +156,7 @@ public class ChessPiece {
                 }
             }
         }
-        // Debug System.out.println("Legal moves are:");
-//        for (ChessMove move: legalMoves) {
-//            // Debug System.out.println("Move " + move.toString());
-//        }
+
         return legalMoves;
     }
 

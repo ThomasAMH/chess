@@ -26,7 +26,7 @@ public class LoginService {
         //Is password correct?
         try {
             String password = dataService.userData.getPassword(request.username()).data();
-            if(Objects.equals(password, request.password())) {
+            if(dataService.userData.isPasswordValid(request.username(), request.password())) {
                 //Get auth token
                 String token = dataService.authData.getAuthToken(request.username()).data();
                 return new LoginResult(200,"Login successful", request.username(), token);

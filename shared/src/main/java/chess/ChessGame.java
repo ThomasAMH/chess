@@ -78,9 +78,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece pieceAtPos = gameBoard.getPiece(startPosition);
-        if(pieceAtPos == null) return null;
-        if(pieceAtPos.getTeamColor() == TeamColor.WHITE) return whitePieces.get(startPosition);
-        if(pieceAtPos.getTeamColor() == TeamColor.BLACK) return blackPieces.get(startPosition);
+        if(pieceAtPos == null) {return null;}
+        if(pieceAtPos.getTeamColor() == TeamColor.WHITE) { return whitePieces.get(startPosition);}
+        if(pieceAtPos.getTeamColor() == TeamColor.BLACK) {return blackPieces.get(startPosition);}
         return null;
     }
 
@@ -101,15 +101,15 @@ public class ChessGame {
 
         //Update game state: is the next player in check?
         TeamColor nextPlayer;
-        if(activePlayer == TeamColor.WHITE) nextPlayer = TeamColor.BLACK;
-        else nextPlayer = TeamColor.WHITE;
+        if(activePlayer == TeamColor.WHITE) {nextPlayer = TeamColor.BLACK;}
+        else {nextPlayer = TeamColor.WHITE;}
 
-        if(isInCheck(nextPlayer)) gameState = GameState.CHECK;
-        if(isInCheckmate(nextPlayer)) gameState = GameState.CHECKMATE;
-        if(isInStalemate(nextPlayer)) gameState = GameState.STALEMATE;
+        if(isInCheck(nextPlayer)) {gameState = GameState.CHECK;};
+        if(isInCheckmate(nextPlayer)) {gameState = GameState.CHECKMATE;}
+        if(isInStalemate(nextPlayer)) {gameState = GameState.STALEMATE;}
 
-        if(activePlayer == TeamColor.BLACK) activePlayer = TeamColor.WHITE;
-        else activePlayer = TeamColor.BLACK;
+        if(activePlayer == TeamColor.BLACK) {activePlayer = TeamColor.WHITE;}
+        else {activePlayer = TeamColor.BLACK;}
     }
 
     /**
@@ -124,18 +124,16 @@ public class ChessGame {
         ChessPosition startingPosition = proposedMove.getStartPosition();
         ChessPiece movingPiece = gameBoard.getPiece(startingPosition);
 
-        if(movingPiece == null) return false;
-        if(movingPiece.getTeamColor() != activePlayer) return false;
+        if(movingPiece == null) {return false;}
+        if(movingPiece.getTeamColor() != activePlayer) {return false;}
 
         //Check if move is legal / offered to player
         HashMap<ChessPosition, Collection<ChessMove>> teamMoveset;
-        if(activePlayer == TeamColor.WHITE) teamMoveset = whitePieces;
+        if(activePlayer == TeamColor.WHITE) {teamMoveset = whitePieces;}
         else teamMoveset = blackPieces;
 
-        if(!teamMoveset.containsKey(startingPosition)) return false;
-        if(!teamMoveset.get(startingPosition).contains(proposedMove)) return false;
-
-        return true;
+        if(!teamMoveset.containsKey(startingPosition)) {return false;}
+        return teamMoveset.get(startingPosition).contains(proposedMove);
     }
 
     /**
@@ -177,7 +175,6 @@ public class ChessGame {
      *                     False is used when checking if a king capture is possible (in which case it doesn't matter
      *                     if the king-capturing team is in check or not as a result of the move, as it's game over)
      * @return the map of possible moves,
-     * FIXME ADD SPECIAL MOVES
      */
     private HashMap<ChessPosition, Collection<ChessMove>> updateMoveList(ChessBoard board, TeamColor teamColor, boolean checkForCheck) {
         HashMap<ChessPosition, Collection<ChessMove>> returnList = new HashMap<ChessPosition, Collection<ChessMove>>();
@@ -187,7 +184,7 @@ public class ChessGame {
 
         for(ChessPosition boardSquare: board) {
             currPiece = board.getPiece(boardSquare);
-            if(currPiece.getTeamColor() != teamColor) continue;
+            if(currPiece.getTeamColor() != teamColor) {continue;}
             proposedMoves = currPiece.pieceMoves(board, boardSquare);
             legalMoves = new ArrayList<ChessMove>();
 
@@ -220,10 +217,10 @@ public class ChessGame {
         rStartRow = kingStartRow;
         rEndRow = rStartRow;
 
-        if(kingEndCol == 3) rStartCol = 1;
-        else rStartCol = 8;
-        if(rStartCol == 1) rEndCol = 4;
-        else rEndCol = 6;
+        if(kingEndCol == 3){rStartCol = 1;}
+        else {rStartCol = 8;}
+        if(rStartCol == 1) {rEndCol = 4;}
+        else {rEndCol = 6;}
 
         rookStartPos = new ChessPosition(rStartRow, rStartCol);
         rookEndPos = new ChessPosition(rEndRow, rEndCol);
@@ -269,7 +266,8 @@ public class ChessGame {
         return isKingInDanger(defendingTeam, attackingTeamMoves, hypotheticalBoard);
     }
 
-    private boolean isKingInDanger(TeamColor defendingTeamColor, HashMap<ChessPosition, Collection<ChessMove>> attackingTeamMoves, ChessBoard gameBoard) {
+    private boolean isKingInDanger(TeamColor defendingTeamColor, HashMap<ChessPosition,
+            Collection<ChessMove>> attackingTeamMoves, ChessBoard gameBoard) {
         ChessPosition defendingKingPos = gameBoard.getKingPos(defendingTeamColor);
         ChessPosition potentialEnemyPos;
         for(ChessPosition chessPos: attackingTeamMoves.keySet()) {
@@ -290,7 +288,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if(!isInCheck(teamColor)) return false;
+        if(!isInCheck(teamColor)) {return false;}
         return areMovesAvailable(teamColor);
     }
 
@@ -302,13 +300,13 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if(isInCheck(teamColor)) return false;
+        if(isInCheck(teamColor)) {return false;}
         return areMovesAvailable(teamColor);
     }
 
     private boolean areMovesAvailable(TeamColor teamColor) {
         HashMap<ChessPosition, Collection<ChessMove>> moveSet;
-        if(teamColor == TeamColor.WHITE) moveSet = whitePieces;
+        if(teamColor == TeamColor.WHITE) {moveSet = whitePieces;}
         else moveSet = blackPieces;
 
         for(ChessPosition piecePos: moveSet.keySet()) {
@@ -342,11 +340,13 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if(o == null || getClass() != o.getClass()) {
             return false;
         }
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(gameBoard, chessGame.gameBoard) && activePlayer == chessGame.activePlayer && Objects.equals(whitePieces, chessGame.whitePieces) && Objects.equals(blackPieces, chessGame.blackPieces) && gameState == chessGame.gameState;
+        return Objects.equals(gameBoard, chessGame.gameBoard) &&
+                activePlayer == chessGame.activePlayer && Objects.equals(whitePieces, chessGame.whitePieces) &&
+                Objects.equals(blackPieces, chessGame.blackPieces) && gameState == chessGame.gameState;
     }
 
     @Override

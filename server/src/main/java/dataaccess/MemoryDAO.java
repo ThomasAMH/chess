@@ -44,10 +44,6 @@ public class MemoryDAO extends DataAccessDAO {
         return authDataHashmap.containsKey(token);
     };
     @Override
-    protected String daoGetAuthToken(String username) {
-        return authDataHashmap.get(username).authToken();
-    };
-    @Override
     protected void daoDeleteAuthToken(String username) {
         authDataHashmap.remove(username);
     }

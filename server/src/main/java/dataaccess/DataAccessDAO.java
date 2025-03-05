@@ -26,7 +26,6 @@ public abstract class DataAccessDAO {
 
     protected abstract void daoStoreAuthToken(AuthData data);
     protected abstract boolean daoContainsAuthToken(String username);
-    protected abstract String daoGetAuthToken(String username);
     protected abstract void daoDeleteAuthToken(String username);
 
     protected abstract ArrayList<GameData> daoGetGames();
@@ -61,16 +60,12 @@ public abstract class DataAccessDAO {
         }
 
 
-        public DataAccessResult isPasswordValid(RegisterRequest request) throws DataAccessException {
-            if(daoDoesUserExist(request.username())) {
+        public Boolean isPasswordValid(String username, String password) throws DataAccessException {
+            if(!daoDoesUserExist(username)) {
                 throw new DataAccessException("Error: username does not exist!");
             }
-            UserData userData = daoGetUserData(request.username());
-            if(userData.password().equals(request.password())) {
-                return new DataAccessResult("Password is valid.");
-            } else {
-                return new DataAccessResult("Password is valid.");
-            }
+            UserData userData = daoGetUserData(username);
+            return userData.password().equals(password);
         }
     }
     public class AuthDataDAO implements AuthDAO {
