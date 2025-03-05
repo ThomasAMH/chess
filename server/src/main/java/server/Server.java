@@ -18,6 +18,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
 public class Server {
     //Change this to DB later implementation
@@ -110,7 +111,7 @@ public class Server {
             }
         };
         public Object getGame(Request req, Response res) {
-            ListGamesRequest requestData = new Gson().fromJson(req.body(), ListGamesRequest.class);
+            ListGamesRequest requestData = new ListGamesRequest(req.headers("authorization"));
             if(requestData.authToken().isEmpty()) {
                 res.status(500);
                 return formatErrorString("Error: no auth token provided");
@@ -159,8 +160,9 @@ public class Server {
         public Object joinGame(Request req, Response res) {
             String activeToken = req.headers("authorization");
             JoinGameBodyObj bodyObj =  new Gson().fromJson(req.body(), JoinGameBodyObj.class);
-            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playercolor(), bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
-            if(req.headers("authorization").isEmpty()) {
+            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playerColor(), bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
+            if(req.headers("authorization").isEmpty() ||
+                    (!Objects.equals(requestData.playerColor(), "WHITE") && !Objects.equals(requestData.playerColor(), "BLACK"))) {
                 res.status(400);
                 return formatErrorString("Error: no auth token provided");
             }

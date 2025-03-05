@@ -14,6 +14,8 @@ public class MemoryDAO extends DataAccessDAO {
     private HashMap<Integer, GameData> gameDataHashMap;
     private HashMap<String, AuthData> authDataHashmap;
 
+    private int currentGameIndex = 0;
+
     public MemoryDAO() {
         this.userDataHashmap = new HashMap<String, UserData>();
         this.gameDataHashMap = new HashMap<Integer, GameData>();
@@ -60,33 +62,24 @@ public class MemoryDAO extends DataAccessDAO {
     protected int daoAddGame(String gameName) {
         ChessGame newGame = new ChessGame();
         int gameID = daoGetChessGameIndex();
-        GameData game = new GameData(gameID, "", "", gameName, newGame);
+        GameData game = new GameData(gameID, null, null, gameName, newGame);
         gameDataHashMap.put(gameID, game);
         return gameID;
     };
 
     @Override
     protected int daoGetChessGameIndex() {
-      if(gameDataHashMap.isEmpty()) {
-          return 0;
-      } else {
-          Map.Entry<Integer, GameData> maxEntry = null;
-          for(Map.Entry<Integer, GameData> entry: gameDataHashMap.entrySet()) {
-              if(maxEntry == null || (entry.getValue().gameID()) > maxEntry.getValue().gameID()) {
-                  maxEntry = entry;
-              }
-          }
-          return maxEntry.getKey();
-      }
+          currentGameIndex++;
+          return currentGameIndex;
     }
 
     @Override
     protected boolean daoIsTeamColorFree(int gameID, String color) {
         GameData data = gameDataHashMap.get(gameID);
         if(color.equals("WHITE")) {
-            return data.whiteUsername().isEmpty();
+            return data.whiteUsername() == null;
         } else {
-            return data.blackUsername().isEmpty();
+            return data.blackUsername() == null;
         }
     }
 
