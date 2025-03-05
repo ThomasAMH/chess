@@ -51,8 +51,10 @@ public class MemoryDAO extends DataAccessDAO {
     }
 
     @Override
-    protected ArrayList<ChessGame> daoGetGames() {
-        return null;
+    protected ArrayList<GameData> daoGetGames() {
+        ArrayList<GameData> returnList = new ArrayList<GameData>();
+        returnList.addAll(gameDataHashMap.values());
+        return returnList;
     }
 
     ;

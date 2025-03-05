@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.GameData;
 import model.UserData;
 import model.AuthData;
 import requests.RegisterRequest;
@@ -30,7 +31,7 @@ public abstract class DataAccessDAO {
     protected abstract String daoGetAuthToken(String username);
     protected abstract void daoDeleteAuthToken(String username);
 
-    protected abstract ArrayList<ChessGame> daoGetGames();
+    protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
     protected abstract int getChessGameIndex();
 

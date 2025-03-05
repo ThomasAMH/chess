@@ -1,5 +1,3 @@
-package java.service;
-
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessDAO;
@@ -34,7 +32,7 @@ class GetGamesTest {
     String badToken = "12345";
 
     CreateGameService newGameService = new CreateGameService();
-    CreateGameResult createGameResult = newGameService.createGame(new CreateGameRequest("Test Game", goodToken),dataService);
+    CreateGameResult createGameResult = newGameService.createGame(new CreateGameRequest("Test Game", goodToken), dataService);
 
     @Test
     public void testBadRequest() {

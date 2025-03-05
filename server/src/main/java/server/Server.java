@@ -1,18 +1,9 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
-import requests.ListGamesRequest;
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.RegisterRequest;
-import results.ListGamesResult;
-import results.LoginResult;
-import results.LogoutResult;
-import results.RegisterResult;
-import service.ListGamesService;
-import service.LoginService;
-import service.LogoutService;
-import service.RegistrationService;
+import requests.*;
+import results.*;
+import service.*;
 import spark.Response;
 import spark.Spark;
 import spark.Request;
@@ -46,7 +37,7 @@ public class Server {
     }
 
     public static class RequestHandler {
-        private HashSet<String> activeAuthTokens = new HashSet<String>();
+        private static HashSet<String> activeAuthTokens = new HashSet<String>();
 
         public Object addNewUser(Request req, Response res) {
             //TODO: Add some error checking here
@@ -128,16 +119,32 @@ public class Server {
                 return formatErrorString(result.responseMessage());
             }
         };
-//        public Object createGame(Request req, Response res) {
-//
-//        };
+        public Object createGame(Request req, Response res) {
+            CreateGameRequest requestData = new Gson().fromJson(req.body(), CreateGameRequest.class);
+            if(requestData.authToken().isEmpty()) {
+                res.status(400);
+                return formatErrorString("Error: no auth token provided");
+            }
+            CreateGameService service = new CreateGameService();
+            CreateGameResult result = service.createGame(requestData, dataService);
+
+            if(result.responseCode() == 200) {
+                res.status(200);
+                return new Gson().toJson(result);
+            }
+            else {
+                res.status(result.responseCode());
+                return formatErrorString(result.responseMessage());
+            }
+        };
+
 //        public Object joinGame(Request req, Response res) {
 //
 //        };
 //        public Object nukeEverything(Request req, Response res) {
 //
 //        };
-        private String formatErrorString(String errorMessage) {
+        private static String formatErrorString(String errorMessage) {
             return "{\"message\": \"" + errorMessage + "\"}";
         }
 
