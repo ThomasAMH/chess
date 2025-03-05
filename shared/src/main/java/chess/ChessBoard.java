@@ -232,7 +232,7 @@ public class ChessBoard implements Iterable<ChessPosition>{
             for(int j = 1; j < 9; j++) {
                 currPos = new ChessPosition(i,j);
                 currPiece = getPiece(currPos);
-                if(currPiece == null) continue;
+                if(currPiece == null) {continue;}
                 if(currPiece.getTeamColor() == teamColor && currPiece.getPieceType() == ChessPiece.PieceType.KING) {
                     return currPos;
                 }

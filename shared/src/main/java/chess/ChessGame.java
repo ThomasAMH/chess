@@ -130,7 +130,7 @@ public class ChessGame {
         //Check if move is legal / offered to player
         HashMap<ChessPosition, Collection<ChessMove>> teamMoveset;
         if(activePlayer == TeamColor.WHITE) {teamMoveset = whitePieces;}
-        else teamMoveset = blackPieces;
+        else {teamMoveset = blackPieces;}
 
         if(!teamMoveset.containsKey(startingPosition)) {return false;}
         return teamMoveset.get(startingPosition).contains(proposedMove);
@@ -307,7 +307,7 @@ public class ChessGame {
     private boolean areMovesAvailable(TeamColor teamColor) {
         HashMap<ChessPosition, Collection<ChessMove>> moveSet;
         if(teamColor == TeamColor.WHITE) {moveSet = whitePieces;}
-        else moveSet = blackPieces;
+        else {moveSet = blackPieces;}
 
         for(ChessPosition piecePos: moveSet.keySet()) {
             if(!moveSet.get(piecePos).isEmpty()) {

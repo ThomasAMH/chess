@@ -159,9 +159,11 @@ public class Server {
         public Object joinGame(Request req, Response res) {
             String activeToken = req.headers("authorization");
             JoinGameBodyObj bodyObj =  new Gson().fromJson(req.body(), JoinGameBodyObj.class);
-            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playerColor(), bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
+            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playerColor(),
+                    bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
             if(req.headers("authorization").isEmpty() ||
-                    (!Objects.equals(requestData.playerColor(), "WHITE") && !Objects.equals(requestData.playerColor(), "BLACK"))) {
+                    (!Objects.equals(requestData.playerColor(), "WHITE") &&
+                            !Objects.equals(requestData.playerColor(), "BLACK"))) {
                 res.status(400);
                 return formatErrorString("Error: no auth token provided");
             }

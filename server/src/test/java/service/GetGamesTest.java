@@ -1,3 +1,5 @@
+package service;
+
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessDAO;
