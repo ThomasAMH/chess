@@ -1,14 +1,19 @@
 package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryDAO;
+import model.GameData;
+import model.GameMetaData;
 import requests.*;
 import results.*;
+import returns.*;
 import service.*;
 import spark.Response;
 import spark.Spark;
 import spark.Request;
 import dataaccess.DataAccessDAO;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Server {
@@ -23,10 +28,10 @@ public class Server {
         Spark.post("/user", handler::addNewUser);
         Spark.post("/session", handler::loginUser);
         Spark.delete("/session", handler::logoutUser);
-        Spark.get("/game", handler::logoutUser);
+        Spark.get("/game", handler::getGame);
         Spark.post("/game", handler::createGame);
-//        Spark.put("/game", handler::joinGame);
-//        Spark.delete("/db", handler::nukeEverything);
+        Spark.put("/game", handler::joinGame);
+        Spark.delete("/db", handler::nukeEverything);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -50,9 +55,10 @@ public class Server {
             RegisterResult result = service.registerUser(requestData, dataService);
 
             if(result.responseCode() == 200) {
+                RegisterReturn returnVal = new RegisterReturn(result.username(), result.authToken());
                 activeAuthTokens.add(result.authToken());
                 res.status(200);
-                return new Gson().toJson(result);
+                return new Gson().toJson(returnVal);
             }
             else {
                 res.status(result.responseCode());
@@ -70,9 +76,10 @@ public class Server {
             LoginResult result = service.loginUser(requestData, dataService);
 
             if(result.responseCode() == 200) {
+                LoginReturn returnVal = new LoginReturn(result.username(), result.authToken());
                 activeAuthTokens.add(result.authToken());
                 res.status(200);
-                return new Gson().toJson(result);
+                return new Gson().toJson(returnVal);
             }
             else {
                 res.status(result.responseCode());
@@ -92,7 +99,7 @@ public class Server {
             if(result.responseCode() == 200) {
                 activeAuthTokens.remove(requestData.authToken());
                 res.status(200);
-                return new Gson().toJson(result);
+                return "";
             }
             else {
                 res.status(result.responseCode());
@@ -110,9 +117,15 @@ public class Server {
             ListGamesResult result = service.listGames(new ListGamesRequest(requestData.authToken()), dataService);
 
             if(result.responseCode() == 200) {
-                activeAuthTokens.remove(requestData.authToken());
+                ArrayList<GameMetaData> returnList = new ArrayList<GameMetaData>();
+                GameMetaData gameData;
+                for(GameData data: result.games()) {
+                    gameData = new GameMetaData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName());
+                    returnList.add(gameData);
+                }
+                ListGamesReturn returnVal = new ListGamesReturn(gameData);
                 res.status(200);
-                return new Gson().toJson(result);
+                return new Gson().toJson(returnVal);
             }
             else {
                 res.status(result.responseCode());
@@ -130,14 +143,14 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 res.status(200);
-                return new Gson().toJson(result);
+                CreateGameReturn returnVal = new CreateGameReturn(result.gameName());
+                return new Gson().toJson(returnVal);
             }
             else {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage());
             }
         };
-
         public Object joinGame(Request req, Response res) {
             JoinGameRequest requestData = new Gson().fromJson(req.body(), JoinGameRequest.class);
             if(req.headers("authorization").isEmpty()) {
@@ -148,8 +161,9 @@ public class Server {
             JoinGameResult result = service.joinGame(requestData, dataService);
 
             if(result.responseCode() == 200) {
+                JoinGameReturn returnVal = new JoinGameReturn(requestData.playerColor(), requestData.gameID());
                 res.status(200);
-                return new Gson().toJson(result);
+                return new Gson().toJson(returnVal);
             }
             else {
                 res.status(result.responseCode());

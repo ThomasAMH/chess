@@ -1,6 +1,5 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
@@ -32,7 +31,7 @@ public abstract class DataAccessDAO {
 
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
-    protected abstract int getChessGameIndex();
+    protected abstract int daoGetChessGameIndex();
     protected abstract boolean daoIsTeamColorFree(int gameID, String color);
     protected abstract void daoJoinGame(int gameID, String color, String username);
     protected abstract boolean daoIsGameNumberValid(int gameID);
@@ -100,8 +99,8 @@ public abstract class DataAccessDAO {
     public class GameDataDAO implements GameDAO {
 
         @Override
-        public DataAccessResult getGames() throws DataAccessException {
-            return new DataAccessResult(new Gson().toJson(daoGetGames()));
+        public ArrayList<GameData> getGames() throws DataAccessException {
+            return daoGetGames();
         }
 
         @Override

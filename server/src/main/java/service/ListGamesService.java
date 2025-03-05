@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessDAO;
 import dataaccess.DataAccessException;
+import model.GameData;
 import requests.ListGamesRequest;
 import results.DataAccessResult;
 import results.ListGamesResult;
@@ -15,22 +16,19 @@ public class ListGamesService {
         try {
             DataAccessResult daoResult = dataService.authData.doesAuthTokenExist(request.authToken());
             if (daoResult.data().equals("false")) {
-                return new ListGamesResult(401, "Error: unauthorized", "");
+                return new ListGamesResult(401, "Error: unauthorized", null);
             }
         } catch (DataAccessException e) {
-            return new ListGamesResult(500, "Error: unknown error in token validation process", "");
+            return new ListGamesResult(500, "Error: unknown error in token validation process", null);
         }
 
         //Return games
         try {
-            DataAccessResult daoResult = dataService.gameData.getGames();
-            if (daoResult.data().equals("false")) {
-                return new ListGamesResult(401, "Error: unauthorized", "");
-            } else {
-                return new ListGamesResult(200, "Request successful", daoResult.data());
-            }
+            ArrayList<GameData> daoResult = dataService.gameData.getGames();
+            return new ListGamesResult(200, "Request successful", daoResult);
+
         } catch (DataAccessException e) {
-            return new ListGamesResult(500, "Error: unknown error in token validation process", "");
+            return new ListGamesResult(500, "Error: unknown error in token validation process", null);
         }
     }
 }

@@ -1,9 +1,12 @@
 package dataaccess;
 
+import model.GameData;
 import results.DataAccessResult;
 
+import java.util.ArrayList;
+
 interface GameDAO {
-    DataAccessResult getGames() throws DataAccessException;
+    ArrayList<GameData> getGames() throws DataAccessException;
     DataAccessResult createGame(String gameName) throws DataAccessException;
     DataAccessResult isColorAvailable(int gameID, String color) throws DataAccessException;
     DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException;

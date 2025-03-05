@@ -52,23 +52,21 @@ public class MemoryDAO extends DataAccessDAO {
 
     @Override
     protected ArrayList<GameData> daoGetGames() {
-        ArrayList<GameData> returnList = new ArrayList<GameData>();
-        returnList.addAll(gameDataHashMap.values());
-        return returnList;
+        return new ArrayList<GameData>(gameDataHashMap.values());
     }
 
     ;
     @Override
     protected int daoAddGame(String gameName) {
         ChessGame newGame = new ChessGame();
-        int gameID = getChessGameIndex();
+        int gameID = daoGetChessGameIndex();
         GameData game = new GameData(gameID, "", "", gameName, newGame);
         gameDataHashMap.put(gameID, game);
         return gameID;
     };
 
     @Override
-    protected int getChessGameIndex() {
+    protected int daoGetChessGameIndex() {
       if(gameDataHashMap.isEmpty()) {
           return 0;
       } else {

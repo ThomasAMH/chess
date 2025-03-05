@@ -7,6 +7,8 @@ import results.DataAccessResult;
 
 import results.LogoutResult;
 
+import javax.xml.crypto.Data;
+
 public class LogoutService {
     public LogoutResult logoutUser(LogoutRequest request, DataAccessDAO dataService) {
         //Check of the token provided is active
@@ -20,8 +22,8 @@ public class LogoutService {
         }
         //Delete it
         try {
-            DataAccessResult daoResult = dataService.gameData.getGames();
-            return new LogoutResult(200, daoResult.data());
+            DataAccessResult result = dataService.authData.deleteAuthToken(request.authToken());
+            return new LogoutResult(200, result.data());
         } catch (DataAccessException e) {
             return new LogoutResult(500, "Error: unexpected error in game fetching process");
         }
