@@ -123,7 +123,7 @@ public class Server {
                     gameData = new GameMetaData(data.gameID(), data.whiteUsername(), data.blackUsername(), data.gameName());
                     returnList.add(gameData);
                 }
-                ListGamesReturn returnVal = new ListGamesReturn(gameData);
+                ListGamesReturn returnVal = new ListGamesReturn(returnList);
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }
