@@ -1,0 +1,27 @@
+To Do's
+    - Study the server db connection file in the starter code
+
+Requirements
+    - Connect to DB
+    - Create tests
+
+Database Setup
+    1. ** Get mysql installed and running
+    2. ** Install dependency
+    3. Create config file
+    4. Modify connection file
+
+DB Code Setup
+    0. Design DB schema
+    1. Create empty databases
+    2. Access created databases
+
+Modify methods
+    0. Implement password hashing to overarching db access class
+
+Tests
+    1. Implement public DAO method classes, one for each DAO
+
+Notes
+Copy the starter-code/4-database/passoff/server/DatabaseTests.java file into your project’s server/src/test/java/passoff/server folder.
+^ No such directory exists. Putting data in /server/passoff.server
