@@ -1,16 +1,55 @@
 package dataaccess;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Properties;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DatabaseManager {
     private static final String DATABASE_NAME;
     private static final String USER;
     private static final String PASSWORD;
     private static final String CONNECTION_URL;
+    private static final String[] CREATE_DB_STRINGS =
+            {"""
+            CREATE TABLE IF NOT EXISTS chess.gamedata (
+              `game_id` INT NOT NULL,
+              `white_username` VARCHAR(60) NULL DEFAULT NULL,
+              `black_username` VARCHAR(60) NULL DEFAULT NULL,
+              `game_name` VARCHAR(60) NULL DEFAULT NULL,
+              `game` JSON NULL DEFAULT NULL,
+              PRIMARY KEY (`game_id`),
+              UNIQUE INDEX `gameid_UNIQUE` (`game_id` ASC) VISIBLE)
+            ENGINE = InnoDB
+            DEFAULT CHARACTER SET = utf8mb4
+            COLLATE = utf8mb4_0900_ai_ci;
+            """
+            ,
+            """
+            CREATE TABLE IF NOT EXISTS chess.userdata (
+              `username` VARCHAR(60) NOT NULL,
+              `password` VARCHAR(60) NULL DEFAULT NULL,
+              `email` VARCHAR(60) NULL DEFAULT NULL,
+              PRIMARY KEY (`username`),
+              UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE)
+            ENGINE = InnoDB
+            DEFAULT CHARACTER SET = utf8mb4
+            COLLATE = utf8mb4_0900_ai_ci;
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS chess.authdata (
+              `authtoken` VARCHAR(60) NOT NULL,
+              `username` VARCHAR(60) NULL DEFAULT NULL,
+              PRIMARY KEY (`authtoken`))
+            ENGINE = InnoDB
+            DEFAULT CHARACTER SET = utf8mb4
+            COLLATE = utf8mb4_0900_ai_ci;
+            """
+    };
 
     /*
-     * Load the database information for the db.properties file.
+     * Load the database information for the db.properties and db_create_string.txt files.
      */
     static {
         try {
@@ -31,24 +70,44 @@ public class DatabaseManager {
         } catch (Exception ex) {
             throw new RuntimeException("unable to process db.properties. " + ex.getMessage());
         }
+
     }
 
     /**
      * Creates the database if it does not already exist.
      */
+//            try {
+//        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
+//        var conn = DriverManager.getConnection(connectionUrl, user, password);
+//        try (var preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+//            preparedStatement.executeUpdate();
+//        }
+//    } catch (SQLException e) {
+//        throw new ResponseException(500, e.getMessage());
+//    }
     static void createDatabase() throws DataAccessException {
-        try {
-            var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
-            try (var preparedStatement = conn.prepareStatement(statement)) {
+        try (var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD)) {
+            try (var preparedStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME, RETURN_GENERATED_KEYS)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    /**
+    static void initializeDatabase() throws DataAccessException {
+        try (var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD)) {
+            for (String statement : CREATE_DB_STRINGS) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        /**
      * Create a connection to the database and sets the catalog based upon the
      * properties specified in db.properties. Connections to the database should
      * be short-lived, and you must close the connection when you are done with it.
@@ -60,6 +119,7 @@ public class DatabaseManager {
      * }
      * </code>
      */
+
     static Connection getConnection() throws DataAccessException {
         try {
             var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);

@@ -2,6 +2,8 @@ package server;
 import bodyobjects.CreateGameBodyObj;
 import bodyobjects.JoinGameBodyObj;
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseDAO;
 import dataaccess.MemoryDAO;
 import model.GameData;
 import model.GameMetaData;
@@ -15,14 +17,23 @@ import spark.Request;
 import dataaccess.DataAccessDAO;
 
 import java.lang.reflect.Array;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 
 public class Server {
-    //Change this to DB later implementation
-    static DataAccessDAO dataService = new MemoryDAO();
+    static DataAccessDAO dataService;
+
+    public Server() {
+        try {
+            dataService = new DatabaseDAO();
+        } catch (DataAccessException e) {
+            dataService = new MemoryDAO();
+        }
+    }
+
     public int run(int desiredPort) {
 
         Spark.port(desiredPort);
