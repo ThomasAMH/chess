@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 
@@ -39,7 +40,7 @@ public class DatabaseDAO extends DataAccessDAO {
     protected boolean daoSaveNewUser(UserData userData) {
         try (var conn = DatabaseManager.getConnection()) {
             String username = userData.username();
-            String password = userData.password();
+            String password = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
             String email = userData.email();
             String statement = "INSERT INTO userdata (username, password, email) VALUES (?, ?, ?)";
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
