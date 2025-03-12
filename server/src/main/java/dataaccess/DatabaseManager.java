@@ -14,7 +14,7 @@ public class DatabaseManager {
     private static final String[] CREATE_DB_STRINGS =
             {"""
             CREATE TABLE IF NOT EXISTS chess.gamedata (
-              `game_id` INT NOT NULL,
+              `game_id` INT NOT NULL AUTO_INCREMENT,
               `white_username` VARCHAR(60) NULL DEFAULT NULL,
               `black_username` VARCHAR(60) NULL DEFAULT NULL,
               `game_name` VARCHAR(60) NULL DEFAULT NULL,

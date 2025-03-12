@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -131,7 +133,25 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     protected int daoAddGame(String gameName) {
-        return 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            String statement = "INSERT INTO gamedata (white_username, black_username, game_name, game) VALUES (?, ?, ?, ?)";
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                String json = new Gson().toJson(new ChessGame());
+                ps.setString(1, "");
+                ps.setString(2, "");
+                ps.setString(3, gameName);
+                ps.setString(4, json);
+                ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
+
+            }
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     @Override
