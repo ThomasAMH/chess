@@ -6,6 +6,8 @@ import model.UserData;
 
 import java.util.ArrayList;
 
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
+
 public class DatabaseDAO extends DataAccessDAO {
 
     public DatabaseDAO() throws DataAccessException{
@@ -15,7 +17,17 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     protected boolean daoDoesUserExist(String username) {
-        return false;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM userdata WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -24,8 +36,23 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
-    protected void daoSaveNewUser(UserData userData) {
+    protected boolean daoSaveNewUser(UserData userData) {
+        try (var conn = DatabaseManager.getConnection()) {
+            String username = userData.username();
+            String password = userData.password();
+            String email = userData.email();
+            String statement = "INSERT INTO userdata (username, password, email) VALUES (?, ?, ?)";
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.setString(3, email);
 
+                ps.executeUpdate();
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

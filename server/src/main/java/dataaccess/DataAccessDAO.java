@@ -22,7 +22,7 @@ public abstract class DataAccessDAO {
 
     protected abstract boolean daoDoesUserExist(String username);
     protected abstract UserData daoGetUserData(String username);
-    protected abstract void daoSaveNewUser(UserData userData);
+    protected abstract boolean daoSaveNewUser(UserData userData);
 
     protected abstract void daoStoreAuthToken(AuthData data);
     protected abstract boolean daoContainsAuthToken(String username);
@@ -47,8 +47,12 @@ public abstract class DataAccessDAO {
         }
         public DataAccessResult createUser(RegisterRequest request) throws DataAccessException {
             UserData newUser = new UserData(request.username(), request.password(), request.email());
-            daoSaveNewUser(newUser);
-            return new DataAccessResult("User created. Request data saved.");
+            if (daoSaveNewUser(newUser)) {
+                return new DataAccessResult("User created. Request data saved.");
+            } else {
+                throw new DataAccessException("Error encountered in saving user data");
+            }
+
         }
 
         @Override

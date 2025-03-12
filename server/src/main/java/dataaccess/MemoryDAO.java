@@ -31,8 +31,9 @@ public class MemoryDAO extends DataAccessDAO {
         return userDataHashmap.get(username);
     };
     @Override
-    protected void daoSaveNewUser(UserData userData) {
+    protected boolean daoSaveNewUser(UserData userData) {
         userDataHashmap.put(userData.username(), userData);
+        return true;
     };
 
     @Override
