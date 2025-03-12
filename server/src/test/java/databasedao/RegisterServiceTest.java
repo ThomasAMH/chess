@@ -1,6 +1,9 @@
-package dataaccess;
+package databasedao;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessDAO;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseDAO;
 import org.junit.jupiter.api.Test;
 import requests.RegisterRequest;
 import results.RegisterResult;
@@ -9,7 +12,15 @@ import service.RegistrationService;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegisterServiceTest {
-    DataAccessDAO dataService = new MemoryDAO();
+    DataAccessDAO dataService;
+    public RegisterServiceTest() {
+        try {
+            dataService = new DatabaseDAO();
+        } catch (DataAccessException e) {
+            assertEquals(true, false);
+        }
+    }
+
     RegisterRequest request1 = new RegisterRequest("Tom", "12345", "tom@thebomb.com");
     RegisterRequest request2 = new RegisterRequest("Tom", "12345", "tom@thebomb.com");
     RegistrationService service;
@@ -28,7 +39,7 @@ public class RegisterServiceTest {
     public void attemptDuplicateAddition() {
         RegistrationService service = new RegistrationService();
         RegisterResult result1 = service.registerUser(request1, dataService);
-        assertEquals(200, result1.responseCode());
+        assertEquals(403, result1.responseCode());
         assertEquals("Tom", result1.username());
 
 

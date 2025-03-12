@@ -33,7 +33,22 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     protected UserData daoGetUserData(String username) {
-        return null;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM userdata WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    if(rs.next()) {
+                        UserData returnData = new UserData(rs.getNString("username"),rs.getNString("password"),rs.getNString("email"));
+                        return returnData;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -57,8 +72,27 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
-    protected void daoStoreAuthToken(AuthData data) {
+    protected boolean daoIsPasswordValid(UserData userData) {
+        String proposedPassword = userData.password();
+        String storedPassword = daoGetUserData(userData.username()).password();
+        return BCrypt.checkpw(proposedPassword, storedPassword);
+    }
 
+    @Override
+    protected boolean daoStoreAuthToken(AuthData data) {
+        try (var conn = DatabaseManager.getConnection()) {
+            String username = data.username();
+            String token = data.authToken();
+            String statement = "INSERT INTO authdata (authtoken, username) VALUES (?, ?)";
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                ps.setString(1, token);
+                ps.setString(2, username);
+                ps.executeUpdate();
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

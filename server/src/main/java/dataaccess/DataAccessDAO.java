@@ -23,8 +23,9 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoDoesUserExist(String username);
     protected abstract UserData daoGetUserData(String username);
     protected abstract boolean daoSaveNewUser(UserData userData);
+    protected abstract boolean daoIsPasswordValid(UserData userData);
 
-    protected abstract void daoStoreAuthToken(AuthData data);
+    protected abstract boolean daoStoreAuthToken(AuthData data);
     protected abstract boolean daoContainsAuthToken(String username);
     protected abstract void daoDeleteAuthToken(String username);
 
@@ -63,13 +64,12 @@ public abstract class DataAccessDAO {
             return new DataAccessResult(daoGetUserData(username).password());
         }
 
-
         public Boolean isPasswordValid(String username, String password) throws DataAccessException {
             if(!daoDoesUserExist(username)) {
                 throw new DataAccessException("Error: username does not exist!");
             }
-            UserData userData = daoGetUserData(username);
-            return userData.password().equals(password);
+            UserData userData = new UserData(username, password, null);
+            return daoIsPasswordValid(userData);
         }
     }
     public class AuthDataDAO implements AuthDAO {

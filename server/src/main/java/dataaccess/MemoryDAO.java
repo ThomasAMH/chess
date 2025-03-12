@@ -34,11 +34,20 @@ public class MemoryDAO extends DataAccessDAO {
     protected boolean daoSaveNewUser(UserData userData) {
         userDataHashmap.put(userData.username(), userData);
         return true;
-    };
+    }
 
     @Override
-    protected void daoStoreAuthToken(AuthData data) {
+    protected boolean daoIsPasswordValid(UserData userData) {
+        String proposedPassword = userData.password();
+        String storedPassword = daoGetUserData(userData.username()).password();
+        return proposedPassword.equals(storedPassword);
+    }
+
+
+    @Override
+    protected boolean daoStoreAuthToken(AuthData data) {
         authDataHashmap.put(data.authToken(), data);
+        return true;
     };
     @Override
     protected boolean daoContainsAuthToken(String token) {
