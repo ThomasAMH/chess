@@ -96,13 +96,32 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
-    protected boolean daoContainsAuthToken(String username) {
-        return false;
+    protected boolean daoContainsAuthToken(String token) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authtoken FROM authdata WHERE authtoken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, token);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
-    protected void daoDeleteAuthToken(String username) {
-
+    protected void daoDeleteAuthToken(String token) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "DELETE FROM authdata WHERE (authtoken = ?)";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, token);
+                ps.executeUpdate();
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
     }
 
     @Override
