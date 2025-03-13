@@ -24,6 +24,10 @@ public class ChessBoard implements Iterable<ChessPosition>{
             }
         }
     }
+    public ChessBoard(String boardString) {
+        board = new ChessPiece[8][8];
+
+    }
     public enum MoveResult {
         CAPTURE,
         LEGAL,

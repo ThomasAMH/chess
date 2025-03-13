@@ -15,8 +15,8 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard gameBoard;
     private TeamColor activePlayer;
-    private HashMap<ChessPosition, Collection<ChessMove>> whitePieces;
     private HashMap<ChessPosition, Collection<ChessMove>> blackPieces;
+    private HashMap<ChessPosition, Collection<ChessMove>> whitePieces;
     private GameState gameState;
 
     public ChessGame() {
@@ -25,6 +25,13 @@ public class ChessGame {
         activePlayer = TeamColor.WHITE;
         gameState = GameState.NORMAL;
         initializePieceHashmaps();
+    }
+    public ChessGame(ChessBoard gameBoard, TeamColor activePlayer, HashMap<ChessPosition, Collection<ChessMove>> blackPieces, HashMap<ChessPosition, Collection<ChessMove>> whitePieces, GameState gameState) {
+        this.gameBoard = gameBoard;
+        this.activePlayer = activePlayer;
+        this.blackPieces = blackPieces;
+        this.whitePieces = whitePieces;
+        this.gameState = gameState;
     }
 
     private void initializePieceHashmaps() {

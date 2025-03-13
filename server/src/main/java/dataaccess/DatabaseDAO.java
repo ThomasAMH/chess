@@ -1,21 +1,33 @@
 package dataaccess;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DatabaseDAO extends DataAccessDAO {
-
+    GsonBuilder chessGameBuilder;
     public DatabaseDAO() throws DataAccessException{
         DatabaseManager.createDatabase();
         DatabaseManager.initializeDatabase();
+        chessGameBuilder = new GsonBuilder();
+        chessGameBuilder.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
     }
 
     @Override
@@ -126,9 +138,37 @@ public class DatabaseDAO extends DataAccessDAO {
         }
     }
 
+
     @Override
     protected ArrayList<GameData> daoGetGames() {
-        return null;
+        ArrayList<GameData> gameData = new ArrayList<GameData>();
+        String whiteUsername, blackUsername, gameName, gameString;
+        int gameID;
+        ChessGame chessGame;
+        GameData gameDataEntry;
+        Gson gson = chessGameBuilder.create();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM gamedata";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while(rs.next()) {
+                        whiteUsername = rs.getNString("white_username");
+                        blackUsername = rs.getNString("black_username");
+                        gameName = rs.getNString("game_name");
+                        gameID = rs.getInt("game_id");
+                        gameString = rs.getNString("game");
+                        chessGame = gson.fromJson(gameString, ChessGame.class);
+                        gameDataEntry = new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
+                        gameData.add(gameDataEntry);
+                    }
+                    return gameData;
+                }
+            }  catch (Exception e) {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
@@ -154,10 +194,6 @@ public class DatabaseDAO extends DataAccessDAO {
         }
     }
 
-    @Override
-    protected int daoGetChessGameIndex() {
-        return 0;
-    }
 
     @Override
     protected boolean daoIsTeamColorFree(int gameID, String color) {
@@ -178,4 +214,68 @@ public class DatabaseDAO extends DataAccessDAO {
     public void nukeEverything() {
 
     }
+
+    private static class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
+        @Override
+        public void write(JsonWriter jsonWriter, ChessGame chessGame) throws IOException {
+            Gson gson = new Gson();
+            gson.getAdapter(ChessGame.class).write(jsonWriter, chessGame);
+        }
+
+        @Override
+        public ChessGame read(JsonReader jsonReader) throws IOException {
+            ChessBoard gameBoard = null;
+            ChessGame.TeamColor activePlayer = null;
+            HashMap<ChessPosition, Collection<ChessMove>> blackPieces = null;
+            HashMap<ChessPosition, Collection<ChessMove>> whitePieces = null;
+            ChessGame.GameState gameState = null;
+            jsonReader.beginObject();
+
+            while(jsonReader.hasNext()) {
+                String name = jsonReader.nextName();
+                switch(name) {
+                    case "gameBoard" -> gameBoard = new Gson().fromJson(jsonReader, ChessBoard.class);
+                    case "gameState" -> gameState = determineGameState(jsonReader.nextString());
+                    case "activePlayer" -> activePlayer = determineTeamColor(jsonReader.nextString());
+                    case "whitePieces" -> whitePieces = new Gson().fromJson(jsonReader, HashMap.class);
+                    case "blackPieces" -> blackPieces = new Gson().fromJson(jsonReader, HashMap.class);
+                }
+            }
+            jsonReader.endObject();
+            return new ChessGame(gameBoard, activePlayer, blackPieces, whitePieces, gameState);
+        }
+
+        private ChessGame.GameState determineGameState(String gameState) {
+            switch(gameState) {
+                case "NORMAL" -> {
+                    return ChessGame.GameState.NORMAL;
+                }
+                case "CHECK" -> {
+                    return ChessGame.GameState.CHECK;
+                }
+                case "STALEMATE" -> {
+                    return ChessGame.GameState.STALEMATE;
+                }
+                case "CHECKMATE" -> {
+                    return ChessGame.GameState.CHECKMATE;
+                }
+                default -> {
+                    return null;
+                }
+            }
+        }
+        private ChessGame.TeamColor determineTeamColor(String teamColor) {
+            if(teamColor.equals("WHITE")) {
+                return ChessGame.TeamColor.WHITE;
+            } else {
+                return ChessGame.TeamColor.BLACK;
+            }
+        }
+        private HashMap<ChessPosition, Collection<ChessMove>> createTeamPieces(ChessGame.TeamColor teamColor, String pieces) {
+            HashMap<ChessPosition, Collection<ChessMove>> teamMoves = new HashMap<ChessPosition, Collection<ChessMove>>();
+
+            return teamMoves;
+        }
+    }
+
 }

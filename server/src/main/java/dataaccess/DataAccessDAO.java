@@ -31,7 +31,6 @@ public abstract class DataAccessDAO {
 
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
-    protected abstract int daoGetChessGameIndex();
     protected abstract boolean daoIsTeamColorFree(int gameID, String color);
     protected abstract void daoJoinGame(int gameID, String color, String username);
     protected abstract boolean daoIsGameNumberValid(int gameID);

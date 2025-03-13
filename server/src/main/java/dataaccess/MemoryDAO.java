@@ -73,7 +73,6 @@ public class MemoryDAO extends DataAccessDAO {
         return gameID;
     };
 
-    @Override
     protected int daoGetChessGameIndex() {
           currentGameIndex++;
           return currentGameIndex;
