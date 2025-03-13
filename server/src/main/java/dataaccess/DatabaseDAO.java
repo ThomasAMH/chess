@@ -15,6 +15,7 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -197,22 +198,83 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     protected boolean daoIsTeamColorFree(int gameID, String color) {
-        return false;
+        String whiteUsername, blackUsername;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT white_username, black_username FROM gamedata WHERE game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    whiteUsername = rs.getNString("white_username");
+                    blackUsername = rs.getNString("black_username");
+                    if(color.equals("WHITE")) {
+                        return whiteUsername.isEmpty();
+                    } else if(color.equals("BLACK")) {
+                        return blackUsername.isEmpty();
+                    } else {
+                        return false;
+                    }
+                }
+            }  catch (Exception e) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     protected void daoJoinGame(int gameID, String color, String username) {
-
+        String whiteUsername, blackUsername;
+        String statement = null;
+        if(color.equals("WHITE")) {
+            statement = "UPDATE gamedata SET white_username = ? WHERE game_id=?";
+        } else {
+            statement = "UPDATE gamedata SET black_username = ? WHERE game_id=?";
+        }
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                ps.setInt(2, gameID);
+                try (var rs = ps.executeQuery()) {
+                    return;
+                }
+            }  catch (Exception e) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
     }
 
     @Override
     protected boolean daoIsGameNumberValid(int gameID) {
-        return false;
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game_id FROM gamedata WHERE game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
     public void nukeEverything() {
-
+        String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata"};
+        try (var conn = DatabaseManager.getConnection()) {
+            for(String nukeCode: nukeCodes) {
+                try (var ps = conn.prepareStatement(nukeCode)) {
+                        ps.executeUpdate();
+                    } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            } catch (Exception e) {
+                return;
+        }
     }
 
     private static class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
