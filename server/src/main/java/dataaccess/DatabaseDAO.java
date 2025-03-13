@@ -265,7 +265,7 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     public void nukeEverything() {
-        String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata"};
+        String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata","DROP DATABASE chess"};
         try (var conn = DatabaseManager.getConnection()) {
             for(String nukeCode: nukeCodes) {
                 try (var ps = conn.prepareStatement(nukeCode)) {
