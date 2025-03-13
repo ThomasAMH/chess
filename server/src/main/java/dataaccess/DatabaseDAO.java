@@ -204,12 +204,16 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    whiteUsername = rs.getNString("white_username");
-                    blackUsername = rs.getNString("black_username");
-                    if(color.equals("WHITE")) {
-                        return whiteUsername.isEmpty();
-                    } else if(color.equals("BLACK")) {
-                        return blackUsername.isEmpty();
+                    if(rs.next()) {
+                        whiteUsername = rs.getNString("white_username");
+                        blackUsername = rs.getNString("black_username");
+                        if(color.equals("WHITE")) {
+                            return whiteUsername.isEmpty();
+                        } else if(color.equals("BLACK")) {
+                            return blackUsername.isEmpty();
+                        } else {
+                            return false;
+                        }
                     } else {
                         return false;
                     }
@@ -235,9 +239,7 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 ps.setInt(2, gameID);
-                try (var rs = ps.executeQuery()) {
-                    return;
-                }
+                ps.executeUpdate();
             }  catch (Exception e) {
                 return;
             }
