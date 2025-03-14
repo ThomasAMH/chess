@@ -202,16 +202,15 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
-                    if(rs.next()) {
-                        whiteUsername = rs.getNString("white_username");
-                        blackUsername = rs.getNString("black_username");
-                        if(color.equals("WHITE")) {
-                            return whiteUsername == null;
-                        } else if(color.equals("BLACK")) {
-                            return blackUsername == null;
-                        } else {
-                            return false;
-                        }
+                    if(!rs.next()) {
+                        return false;
+                    }
+                    whiteUsername = rs.getNString("white_username");
+                    blackUsername = rs.getNString("black_username");
+                    if(color.equals("WHITE")) {
+                        return whiteUsername == null;
+                    } else if(color.equals("BLACK")) {
+                        return blackUsername == null;
                     } else {
                         return false;
                     }
@@ -348,11 +347,7 @@ public class DatabaseDAO extends DataAccessDAO {
                 return ChessGame.TeamColor.BLACK;
             }
         }
-        private HashMap<ChessPosition, Collection<ChessMove>> createTeamPieces(ChessGame.TeamColor teamColor, String pieces) {
-            HashMap<ChessPosition, Collection<ChessMove>> teamMoves = new HashMap<ChessPosition, Collection<ChessMove>>();
 
-            return teamMoves;
-        }
     }
 
 }

@@ -26,7 +26,9 @@ public class ChessGame {
         gameState = GameState.NORMAL;
         initializePieceHashmaps();
     }
-    public ChessGame(ChessBoard gameBoard, TeamColor activePlayer, HashMap<ChessPosition, Collection<ChessMove>> blackPieces, HashMap<ChessPosition, Collection<ChessMove>> whitePieces, GameState gameState) {
+    public ChessGame(ChessBoard gameBoard, TeamColor activePlayer, HashMap<ChessPosition,
+            Collection<ChessMove>> blackPieces, HashMap<ChessPosition,
+            Collection<ChessMove>> whitePieces, GameState gameState) {
         this.gameBoard = gameBoard;
         this.activePlayer = activePlayer;
         this.blackPieces = blackPieces;
