@@ -26,8 +26,8 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoIsPasswordValid(UserData userData);
 
     protected abstract boolean daoStoreAuthToken(AuthData data);
-    protected abstract boolean daoContainsAuthToken(String username);
-    protected abstract void daoDeleteAuthToken(String username);
+    protected abstract boolean daoContainsAuthToken(String token);
+    protected abstract void daoDeleteAuthToken(String token);
 
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
