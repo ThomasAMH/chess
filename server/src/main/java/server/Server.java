@@ -46,7 +46,7 @@ public class Server {
         Spark.get("/game", handler::getGame);
         Spark.post("/game", handler::createGame);
         Spark.put("/game", handler::joinGame);
-        Spark.delete("/db", handler::nukeEverything);
+        Spark.delete("/db", handler::clearDatabase);
 
         Spark.awaitInitialization();
         return Spark.port();
@@ -191,8 +191,8 @@ public class Server {
                 return formatErrorString(result.responseMessage());
             }
         };
-        public Object nukeEverything(Request req, Response res) {
-            dataService.nukeEverything();
+        public Object clearDatabase(Request req, Response res) {
+            dataService.clearDatabase();
             res.status(200);
             return "{}";
         };

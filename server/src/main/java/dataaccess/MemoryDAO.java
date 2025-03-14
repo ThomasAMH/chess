@@ -113,5 +113,10 @@ public class MemoryDAO extends DataAccessDAO {
         gameDataHashMap.clear();
     }
 
+    @Override
+    public void clearDatabase() {
+        nukeEverything();
+    }
+
 
 }

@@ -139,7 +139,6 @@ public class DatabaseDAO extends DataAccessDAO {
         }
     }
 
-
     @Override
     protected ArrayList<GameData> daoGetGames() {
         ArrayList<GameData> gameData = new ArrayList<GameData>();
@@ -194,7 +193,6 @@ public class DatabaseDAO extends DataAccessDAO {
             return -1;
         }
     }
-
 
     @Override
     protected boolean daoIsTeamColorFree(int gameID, String color) {
@@ -276,6 +274,21 @@ public class DatabaseDAO extends DataAccessDAO {
             }
             } catch (Exception e) {
                 return;
+        }
+    }
+
+    public void clearDatabase() {
+        String[] statements = {"DELETE FROM gamedata", "DELETE FROM userdata", "DELETE FROM authdata"};
+        try (var conn = DatabaseManager.getConnection()) {
+            for(String statement: statements) {
+                try (var ps = conn.prepareStatement(statement)) {
+                    ps.executeUpdate();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        } catch (Exception e) {
+            return;
         }
     }
 

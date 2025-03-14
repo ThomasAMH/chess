@@ -13,7 +13,7 @@ public class DatabaseManager {
     private static final String CONNECTION_URL;
     private static final String[] CREATE_DB_STRINGS =
             {"""
-            CREATE TABLE IF NOT EXISTS chess.gamedata (
+            CREATE TABLE IF NOT EXISTS dbname.gamedata (
               `game_id` INT NOT NULL AUTO_INCREMENT,
               `white_username` VARCHAR(60) NULL DEFAULT NULL,
               `black_username` VARCHAR(60) NULL DEFAULT NULL,
@@ -27,7 +27,7 @@ public class DatabaseManager {
             """
             ,
             """
-            CREATE TABLE IF NOT EXISTS chess.userdata (
+            CREATE TABLE IF NOT EXISTS dbname.userdata (
               `username` VARCHAR(60) NOT NULL,
               `password` VARCHAR(60) NULL DEFAULT NULL,
               `email` VARCHAR(60) NULL DEFAULT NULL,
@@ -38,7 +38,7 @@ public class DatabaseManager {
             COLLATE = utf8mb4_0900_ai_ci;
             """,
             """
-            CREATE TABLE IF NOT EXISTS chess.authdata (
+            CREATE TABLE IF NOT EXISTS dbname.authdata (
               `authtoken` VARCHAR(60) NOT NULL,
               `username` VARCHAR(60) NULL DEFAULT NULL,
               PRIMARY KEY (`authtoken`))
@@ -76,15 +76,7 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-//            try {
-//        var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
-//        var conn = DriverManager.getConnection(connectionUrl, user, password);
-//        try (var preparedStatement = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-//            preparedStatement.executeUpdate();
-//        }
-//    } catch (SQLException e) {
-//        throw new ResponseException(500, e.getMessage());
-//    }
+
     static void createDatabase() throws DataAccessException {
         try (var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD)) {
             try (var preparedStatement = conn.prepareStatement("CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME, RETURN_GENERATED_KEYS)) {
@@ -96,9 +88,11 @@ public class DatabaseManager {
     }
 
     static void initializeDatabase() throws DataAccessException {
+        String cleanStatement;
         try (var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD)) {
             for (String statement : CREATE_DB_STRINGS) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                cleanStatement = statement.replaceFirst("dbname.", DATABASE_NAME+".");
+                try (var preparedStatement = conn.prepareStatement(cleanStatement)) {
                     preparedStatement.executeUpdate();
                 }
             }

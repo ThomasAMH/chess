@@ -36,6 +36,7 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoIsGameNumberValid(int gameID);
 
     public abstract void nukeEverything();
+    public abstract void clearDatabase();
 
     public class UserDataDAO implements UserDAO {
         @Override
