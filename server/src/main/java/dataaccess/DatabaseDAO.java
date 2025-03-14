@@ -177,8 +177,8 @@ public class DatabaseDAO extends DataAccessDAO {
             String statement = "INSERT INTO gamedata (white_username, black_username, game_name, game) VALUES (?, ?, ?, ?)";
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 String json = new Gson().toJson(new ChessGame());
-                ps.setString(1, "");
-                ps.setString(2, "");
+                ps.setString(1, null);
+                ps.setString(2, null);
                 ps.setString(3, gameName);
                 ps.setString(4, json);
                 ps.executeUpdate();
@@ -206,9 +206,9 @@ public class DatabaseDAO extends DataAccessDAO {
                         whiteUsername = rs.getNString("white_username");
                         blackUsername = rs.getNString("black_username");
                         if(color.equals("WHITE")) {
-                            return whiteUsername.isEmpty();
+                            return whiteUsername == null;
                         } else if(color.equals("BLACK")) {
-                            return blackUsername.isEmpty();
+                            return blackUsername == null;
                         } else {
                             return false;
                         }
