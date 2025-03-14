@@ -1,16 +1,15 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestAuthEndpoints {
+public class TestAuthDaoFunctions {
     DataAccessDAO dataAccessDAO;
 
-    public TestAuthEndpoints() {
+    public TestAuthDaoFunctions() {
         try {
             dataAccessDAO = new DatabaseDAO();
         } catch (DataAccessException e) {
@@ -61,13 +60,4 @@ public class TestAuthEndpoints {
         dataAccessDAO.nukeEverything();
     }
 
-
-    /*
-    protected abstract ArrayList<GameData> daoGetGames();
-    protected abstract int daoAddGame(String gameName);
-    protected abstract boolean daoIsTeamColorFree(int gameID, String color);
-    protected abstract void daoJoinGame(int gameID, String color, String username);
-    protected abstract boolean daoIsGameNumberValid(int gameID);
-
- */
 }

@@ -1,15 +1,14 @@
 package dataaccess;
 
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestUserEndpoints {
+public class TestUserDaoFunctions {
     DataAccessDAO dataAccessDAO;
 
-    public TestUserEndpoints() {
+    public TestUserDaoFunctions() {
         try {
             dataAccessDAO = new DatabaseDAO();
         } catch (DataAccessException e) {
@@ -96,16 +95,5 @@ public class TestUserEndpoints {
         UserData badData = new UserData("Tom", "67890", "tom@thebomb.com");
         assertFalse(dataAccessDAO.daoIsPasswordValid(badData));
     }
-    /*
-    protected abstract boolean daoStoreAuthToken(AuthData data);
-    protected abstract boolean daoContainsAuthToken(String username);
-    protected abstract void daoDeleteAuthToken(String username);
 
-    protected abstract ArrayList<GameData> daoGetGames();
-    protected abstract int daoAddGame(String gameName);
-    protected abstract boolean daoIsTeamColorFree(int gameID, String color);
-    protected abstract void daoJoinGame(int gameID, String color, String username);
-    protected abstract boolean daoIsGameNumberValid(int gameID);
-
- */
 }
