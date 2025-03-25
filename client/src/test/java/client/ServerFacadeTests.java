@@ -29,10 +29,19 @@ public class ServerFacadeTests {
         public RegisterRequest badRegisterRequest = new RegisterRequest(null, "12345", "jerry@thebomb.com");
 
         public LoginRequest goodLoginRequest = new LoginRequest("Tom", "12345");
+        public LoginRequest badLoginRequest = new LoginRequest("Tom", "11111");
 
-        public RegisterResult loginUser1() {
+        public RegisterResult createUser1() {
             try {
                 return facade.addNewUser(goodRegisterRequest1);
+            } catch (ResponseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public LoginResult loginuser1() {
+            try {
+                return facade.loginUser(goodLoginRequest);
             } catch (ResponseException e) {
                 throw new RuntimeException(e);
             }
@@ -67,7 +76,7 @@ public class ServerFacadeTests {
     @Test
     public void testRegistrationPositive() {
         try {
-            RegisterResult result = requests.loginUser1();
+            RegisterResult result = requests.createUser1();
             DataAccessResult daoResult = databaseDAO.userData.doesUserExist(requests.goodRegisterRequest1.username());
             Assertions.assertEquals("true", daoResult.data());
         } catch (DataAccessException e) {
@@ -89,7 +98,7 @@ public class ServerFacadeTests {
     @Test
     public void testLogoutPositive() {
         try {
-            RegisterResult result = requests.loginUser1();
+            RegisterResult result = requests.createUser1();
             String token = result.authToken();
             requests.logoutUser1(token);
             DataAccessResult daoResult = databaseDAO.authData.doesAuthTokenExist(token);
@@ -102,7 +111,7 @@ public class ServerFacadeTests {
     @Test
     public void testLogoutNegative() {
         try {
-            RegisterResult result = requests.loginUser1();
+            RegisterResult result = requests.createUser1();
             String token = result.authToken();
             LogoutResult logoutResult = requests.logoutUser1("cheese curds");
             Assertions.fail();
@@ -115,14 +124,29 @@ public class ServerFacadeTests {
     @Test
     public void testLoginPositive() {
         try {
-            requests.loginUser1();
-            LoginRequest loginRequest = new LoginRequest(requests.goodRegisterRequest1.username(), requests.goodRegisterRequest1.password());
-            LoginResult loginResult = facade.loginUser(loginRequest);
-            DataAccessResult daoResult = databaseDAO.authData.getAuthToken(loginRequest.username());
-            Assertions.assertEquals(daoResult.data(), loginResult.authToken());
+            RegisterResult req = requests.createUser1();
+            requests.logoutUser1(req.authToken());
+            LoginResult loginResult = requests.loginuser1();
+            DataAccessResult daoResult = databaseDAO.authData.doesAuthTokenExist(loginResult.authToken());
+            Assertions.assertEquals("true", daoResult.data());
 
-        } catch (ResponseException | DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testLoginNegative() {
+        try {
+            RegisterResult req = requests.createUser1();
+            requests.logoutUser1(req.authToken());
+            LoginResult loginResult = facade.loginUser(requests.badLoginRequest);
+            DataAccessResult daoResult = databaseDAO.authData.doesAuthTokenExist(loginResult.authToken());
+            Assertions.assertEquals("false", daoResult.data());
+            Assertions.fail();
+
+        } catch (DataAccessException | ResponseException e) {
+            Assertions.assertTrue(true);
         }
     }
 

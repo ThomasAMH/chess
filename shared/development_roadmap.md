@@ -1,10 +1,12 @@
 ## Commit Count
-_3_
+_5_
 
 ### Commit Log
 1. Added the test files and organized program directory in accordance in with instructions
 2. Draft up server facade
 3. Wrote first test: register user.
+4. Added login and register tests
+5. Add logout tests
 
 ### Phases
 Design repl loops
