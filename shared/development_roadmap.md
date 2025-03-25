@@ -1,5 +1,5 @@
 ## Commit Count
-_2_
+_3_
 
 ### Commit Log
 1. Added the test files and organized program directory in accordance in with instructions

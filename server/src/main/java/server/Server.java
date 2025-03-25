@@ -101,7 +101,7 @@ public class Server {
             }
         };
         public Object logoutUser(Request req, Response res) {
-            LogoutRequest requestData = new LogoutRequest(req.headers("authorization"));
+            LogoutRequest requestData = new Gson().fromJson(req.body(), LogoutRequest.class);
             if(requestData.authToken().isEmpty()) {
                 res.status(500);
                 return formatErrorString("Error: no auth token provided");
