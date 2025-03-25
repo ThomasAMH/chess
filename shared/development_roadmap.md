@@ -1,8 +1,10 @@
 ## Commit Count
-_1_
+_2_
 
 ### Commit Log
 1. Added the test files and organized program directory in accordance in with instructions
+2. Draft up server facade
+3. Wrote first test: register user.
 
 ### Phases
 Design repl loops

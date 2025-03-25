@@ -1,3 +1,5 @@
+package serverFacade;
+
 import com.google.gson.Gson;
 import exceptions.ResponseException;
 import requests.*;
@@ -96,22 +98,9 @@ public class ServerFacade {
                 if (respErr != null) {
                     throw ResponseException.fromJson(respErr);
                 }
+            } catch (ResponseException ex) {
+                throw new ResponseException(status, "other failure: " + status);
             }
-            throw new ResponseException(status, "other failure: " + status);
         }
     }
-
-//    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
-//        try {
-//
-//            http.connect();
-//            throwIfNotSuccessful(http);
-//            return readBody(http, responseClass);
-//        } catch (ResponseException ex) {
-//            throw ex;
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
-
 }
