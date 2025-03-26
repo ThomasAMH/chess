@@ -7,6 +7,7 @@ _5_
 3. Wrote first test: register user.
 4. Added login and register tests
 5. Add logout tests
+6. Added create game tests
 
 ### Phases
 Design repl loops

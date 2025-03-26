@@ -5,13 +5,11 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseDAO;
 import exceptions.ResponseException;
 import org.junit.jupiter.api.*;
+import requests.CreateGameRequest;
 import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
-import results.DataAccessResult;
-import results.LoginResult;
-import results.LogoutResult;
-import results.RegisterResult;
+import results.*;
 import server.Server;
 import serverFacade.ServerFacade;
 
@@ -71,7 +69,6 @@ public class ServerFacadeTests {
             throw new RuntimeException(e);
         }
     }
-
 
     @Test
     public void testRegistrationPositive() {
@@ -144,6 +141,36 @@ public class ServerFacadeTests {
             DataAccessResult daoResult = databaseDAO.authData.doesAuthTokenExist(loginResult.authToken());
             Assertions.assertEquals("false", daoResult.data());
             Assertions.fail();
+
+        } catch (DataAccessException | ResponseException e) {
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCreateGamePositive() {
+        try {
+            RegisterResult res = requests.createUser1();
+            CreateGameRequest createGameRequest = new CreateGameRequest("test game", res.authToken());
+            CreateGameResult result = facade.createGame(createGameRequest);
+
+            DataAccessResult daoResult = databaseDAO.gameData.isGameNumberValid(result.gameID());
+            Assertions.assertEquals("true", daoResult.data());
+
+        } catch (DataAccessException | ResponseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testCreateGameNegative() {
+        // This test is tricky, as the server does NOT throw an error if a game has a null name; it expects the
+        // front end to do the validation
+        try {
+            RegisterResult res = requests.createUser1();
+            CreateGameRequest createGameRequest = new CreateGameRequest("A cheesy match", "Cheese puffs");
+            CreateGameResult result = facade.createGame(createGameRequest);
+            DataAccessResult daoResult = databaseDAO.gameData.isGameNumberValid(result.gameID());
 
         } catch (DataAccessException | ResponseException e) {
             Assertions.assertTrue(true);

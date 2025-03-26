@@ -121,7 +121,7 @@ public class Server {
             }
         };
         public Object getGame(Request req, Response res) {
-            ListGamesRequest requestData = new ListGamesRequest(req.headers("authorization"));
+            ListGamesRequest requestData = new ListGamesRequest(req.headers("authToken"));
             if(requestData.authToken().isEmpty()) {
                 res.status(500);
                 return formatErrorString("Error: no auth token provided");
@@ -147,9 +147,9 @@ public class Server {
             }
         };
         public Object createGame(Request req, Response res) {
-            CreateGameBodyObj bodyObj =  new Gson().fromJson(req.body(), CreateGameBodyObj.class);
-            CreateGameRequest requestData;
-            requestData = new CreateGameRequest(bodyObj.gameName(),req.headers("authorization"));
+            CreateGameRequest requestData =  new Gson().fromJson(req.body(), CreateGameRequest.class);
+            CreateGameBodyObj bodyObj;
+            bodyObj = new CreateGameBodyObj(requestData.gameName());
             if(requestData.authToken().isEmpty()) {
                 res.status(400);
                 return formatErrorString("Error: no auth token provided");
@@ -168,11 +168,11 @@ public class Server {
             }
         };
         public Object joinGame(Request req, Response res) {
-            String activeToken = req.headers("authorization");
+            String activeToken = req.headers("authToken");
             JoinGameBodyObj bodyObj =  new Gson().fromJson(req.body(), JoinGameBodyObj.class);
             JoinGameRequest requestData = new JoinGameRequest(bodyObj.playerColor(),
                     bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
-            if(req.headers("authorization").isEmpty() ||
+            if(req.headers("authToken").isEmpty() ||
                     (!Objects.equals(requestData.playerColor(), "WHITE") &&
                             !Objects.equals(requestData.playerColor(), "BLACK"))) {
                 res.status(400);
