@@ -168,21 +168,20 @@ public class Server {
             }
         };
         public Object joinGame(Request req, Response res) {
-            String activeToken = req.headers("authToken");
-            JoinGameBodyObj bodyObj =  new Gson().fromJson(req.body(), JoinGameBodyObj.class);
-            JoinGameRequest requestData = new JoinGameRequest(bodyObj.playerColor(),
-                    bodyObj.gameID(), activeAuthTokens.get(activeToken), activeToken);
-            if(req.headers("authToken").isEmpty() ||
-                    (!Objects.equals(requestData.playerColor(), "WHITE") &&
-                            !Objects.equals(requestData.playerColor(), "BLACK"))) {
+            JoinGameRequest request = new Gson().fromJson(req.body(), JoinGameRequest.class);
+            JoinGameBodyObj bodyObj =  new JoinGameBodyObj(request.playerColor(), request.gameID());
+            String activeToken = request.authToken();
+            if(activeToken.isEmpty() ||
+                    (!Objects.equals(bodyObj.playerColor(), "WHITE") &&
+                            !Objects.equals(bodyObj.playerColor(), "BLACK"))) {
                 res.status(400);
-                return formatErrorString("Error: no auth token provided");
+                return formatErrorString("Error: Bad request format; check auth token or colors");
             }
             JoinGameService service = new JoinGameService();
-            JoinGameResult result = service.joinGame(requestData, dataService);
+            JoinGameResult result = service.joinGame(request, dataService);
 
             if(result.responseCode() == 200) {
-                JoinGameReturn returnVal = new JoinGameReturn(requestData.playerColor(), requestData.gameID());
+                JoinGameReturn returnVal = new JoinGameReturn(result.responseCode(),request.playerColor(), request.gameID());
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }

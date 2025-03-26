@@ -209,6 +209,45 @@ public class ServerFacadeTests {
         }
     }
 
+    @Test
+    public void testJoinGamePositive() throws ResponseException, DataAccessException {
+        RegisterResult res = requests.createUser1();
+        CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), res.username(), res.authToken());
+        JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
+        DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
+        Assertions.assertEquals("false", daoResult.data());
+    }
+
+    @Test
+    public void testJoinGameNegative() throws ResponseException, DataAccessException {
+        try {
+            RegisterResult res = requests.createUser1();
+            CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
+            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), res.username(), res.authToken());
+            JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
+            DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
+
+    }
+
+    @Test
+    public void testJoinGameNegative2() throws ResponseException, DataAccessException {
+        try {
+            RegisterResult res = requests.createUser1();
+            CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
+            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), res.username(), "Cheese");
+            JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
+            DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
+            Assertions.fail();
+        } catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
+    }
+
     @AfterEach
     void clearDatabase() throws ResponseException {
         facade.clearDatabase();

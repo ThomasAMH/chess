@@ -1,7 +1,4 @@
-## Commit Count
-_5_
-
-### Commit Log
+## Commit Log
 1. Added the test files and organized program directory in accordance in with instructions
 2. Draft up server facade
 3. Wrote first test: register user.
@@ -9,8 +6,9 @@ _5_
 5. Add logout tests
 6. Added create game tests 
 7. Added list game tests
+8. Completed join game tests
 
-### Phases
+## Phases
 Design repl loops
 * Possibly use a state flag?
 * Validator
