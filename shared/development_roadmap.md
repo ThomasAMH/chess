@@ -8,6 +8,8 @@ _5_
 4. Added login and register tests
 5. Add logout tests
 6. Added create game tests 
+7. Added list game tests
+
 ### Phases
 Design repl loops
 * Possibly use a state flag?

@@ -5,13 +5,13 @@ import dataaccess.DataAccessException;
 import dataaccess.DatabaseDAO;
 import exceptions.ResponseException;
 import org.junit.jupiter.api.*;
-import requests.CreateGameRequest;
-import requests.LoginRequest;
-import requests.LogoutRequest;
-import requests.RegisterRequest;
+import requests.*;
 import results.*;
+import returns.ListGamesReturn;
 import server.Server;
 import serverFacade.ServerFacade;
+
+import java.util.List;
 
 
 public class ServerFacadeTests {
@@ -52,6 +52,10 @@ public class ServerFacadeTests {
             } catch (ResponseException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        public CreateGameResult createGoodGame(String authToken, String gameName) throws ResponseException {
+            return facade.createGame(new CreateGameRequest(gameName, authToken));
         }
 
     }
@@ -151,10 +155,12 @@ public class ServerFacadeTests {
     public void testCreateGamePositive() {
         try {
             RegisterResult res = requests.createUser1();
-            CreateGameRequest createGameRequest = new CreateGameRequest("test game", res.authToken());
-            CreateGameResult result = facade.createGame(createGameRequest);
+            CreateGameResult createResult1 = requests.createGoodGame(res.authToken(), "test game");
+            CreateGameResult createResult2 = requests.createGoodGame(res.authToken(), "test game too");
+            DataAccessResult daoResult = databaseDAO.gameData.isGameNumberValid(createResult1.gameID());
+            Assertions.assertEquals("true", daoResult.data());
 
-            DataAccessResult daoResult = databaseDAO.gameData.isGameNumberValid(result.gameID());
+            daoResult = databaseDAO.gameData.isGameNumberValid(createResult2.gameID());
             Assertions.assertEquals("true", daoResult.data());
 
         } catch (DataAccessException | ResponseException e) {
@@ -173,6 +179,32 @@ public class ServerFacadeTests {
             DataAccessResult daoResult = databaseDAO.gameData.isGameNumberValid(result.gameID());
 
         } catch (DataAccessException | ResponseException e) {
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testListGamesPositive() throws ResponseException {
+        RegisterResult res = requests.createUser1();
+        requests.createGoodGame(res.authToken(), "test game");
+        requests.createGoodGame(res.authToken(), "test game too");
+        ListGamesRequest listGamesRequest = new ListGamesRequest(res.authToken());
+
+        ListGamesReturn listGamesResult = facade.listGames(listGamesRequest);
+        Assertions.assertEquals(2, listGamesResult.games().size());
+    }
+
+    @Test
+    public void testListGamesNegative() throws ResponseException {
+        try {
+            RegisterResult res = requests.createUser1();
+            requests.createGoodGame(res.authToken(), "test game");
+            requests.createGoodGame(res.authToken(), "test game too");
+            ListGamesRequest listGamesRequest = new ListGamesRequest("Peanut_Butter");
+
+            ListGamesReturn listGamesResult = facade.listGames(listGamesRequest);
+            Assertions.fail();
+        } catch (Exception e) {
             Assertions.assertTrue(true);
         }
     }

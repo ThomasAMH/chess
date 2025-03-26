@@ -4,14 +4,14 @@ import com.google.gson.Gson;
 import exceptions.ResponseException;
 import requests.*;
 import results.*;
+import returns.ListGamesReturn;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -35,9 +35,9 @@ public class ServerFacade {
         return this.makeRequest("DELETE", path, request, LogoutResult.class);
     }
 
-    public ListGamesResult listGames(ListGamesRequest request) throws ResponseException {
+    public ListGamesReturn listGames(ListGamesRequest request) throws ResponseException {
         String path = "/game";
-        return this.makeRequest("GET", path, request, ListGamesResult.class);
+        return this.getGamesRequest(path, request, ListGamesReturn.class);
     }
 
     public CreateGameResult createGame(CreateGameRequest request) throws ResponseException {
@@ -55,6 +55,30 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
+    private <T> T getGamesRequest(String path, Object request, Class<T> responseClass) throws ResponseException {
+        try {
+            ListGamesRequest req = (ListGamesRequest) request;
+            String authTokenString = "?authToken=" + req.authToken();
+            URL url = new URI(serverUrl + path + authTokenString).toURL();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod("GET");
+            http.setDoOutput(true);
+            http.setRequestProperty("authToken", req.authToken());
+
+            //http.addRequestProperty("Content-Type", "application/json");
+//            DataOutputStream out = new DataOutputStream(http.getOutputStream());
+//            out.writeBytes(authTokenString);
+//            out.flush();
+//            out.close();
+
+            http.connect();
+            throwIfNotSuccessful(http);
+            return readBody(http, responseClass);
+
+        } catch (Exception ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
 
     private <T> T makeRequest(String httpMethod, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
@@ -63,9 +87,9 @@ public class ServerFacade {
             http.setRequestMethod(httpMethod);
             http.setDoOutput(true);
 
-            http.addRequestProperty("Content-Type", "application/json");
-            String reqData = new Gson().toJson(request);
             if(request != null) {
+                http.addRequestProperty("Content-Type", "application/json");
+                String reqData = new Gson().toJson(request);
                 try (OutputStream reqBody = http.getOutputStream()) {
                     reqBody.write(reqData.getBytes());
                 }
