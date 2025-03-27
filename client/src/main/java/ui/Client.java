@@ -1,11 +1,17 @@
 package ui;
 
+import com.google.gson.Gson;
 import exceptions.ResponseException;
+import model.GameData;
+import model.GameMetaData;
 import requests.*;
 import results.*;
+import returns.ListGamesReturn;
 import serverFacade.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 import static ui.EscapeSequences.*;
@@ -16,6 +22,7 @@ public class Client {
     private State state = State.LOGGED_OUT;
     private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
     private static String activeUser;
+    private static HashMap<Integer, Integer> gameList;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -33,7 +40,7 @@ public class Client {
                 case "login" -> login(params);
                 case "logout" -> logout();
                 case "create" -> createGame(params);
-//                case "list" -> listGames();
+                case "list" -> listGames();
 //                case "play" -> playGame(params);
 //                case "observe" -> observeGame();
                 case "quit" -> "quit";
@@ -104,7 +111,33 @@ public class Client {
 
         return String.format(SET_TEXT_COLOR_BLUE + "\nGame created: %s.", params[0]);
     }
-//
+
+    public String listGames() throws ResponseException {
+
+        ListGamesRequest request = new ListGamesRequest(activeAuthTokens.get(activeUser));
+        ListGamesReturn result = server.listGames(request);
+        ArrayList<GameMetaData> games = result.games();
+        gameList = new HashMap<Integer, Integer>();
+
+        int i = 1;
+        String gameDataString;
+        String whitePlayer;
+        String blackPlayer;
+        System.out.println("Running Games:");
+        for(GameMetaData game: games) {
+            whitePlayer = (game.whiteUsername() == null ) ? "None" : game.whiteUsername();
+            blackPlayer = (game.blackUsername() == null) ? "None" : game.blackUsername();
+            gameDataString = "Game Number: " + String.valueOf(i) + "Game Name: "+ game.gameName() +
+                    ", White Player: " + whitePlayer + ", Black Player: " + blackPlayer;
+            gameList.put(i, game.gameID());
+            i++;
+            System.out.println(SET_TEXT_COLOR_MAGENTA + "\t" + gameDataString);
+        }
+
+
+
+        return SET_TEXT_COLOR_BLUE + "Join a game by running the join command and providing the game number";
+    }
 //    public String adoptPet(String... params) throws ResponseException {
 //        assertSignedIn();
 //        if (params.length == 1) {

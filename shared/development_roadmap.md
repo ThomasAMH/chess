@@ -10,6 +10,7 @@
 9. Got login ui working; refactored how errors and handled
 10. Added login and logout
 11. Add game feature added
+12. Added list games feature
 
 ## Phases
 Design repl loops
