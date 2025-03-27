@@ -6,6 +6,7 @@ import results.*;
 import serverFacade.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static ui.EscapeSequences.*;
 
@@ -13,6 +14,8 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.LOGGED_OUT;
+    private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
+    private static String activeUser;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -27,9 +30,9 @@ public class Client {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register" -> register(params);
-//                case "login" -> login(params);
-//                case "logout" -> logOut();
-//                case "create" -> createGame(params);
+                case "login" -> login(params);
+                case "logout" -> logout();
+                case "create" -> createGame(params);
 //                case "list" -> listGames();
 //                case "play" -> playGame(params);
 //                case "observe" -> observeGame();
@@ -53,42 +56,54 @@ public class Client {
         RegisterResult result = server.addNewUser(request);
 
         state = State.LOGGED_IN;
-        return String.format(SET_TEXT_COLOR_BLUE + "\nYou signed in as %s.", params[0]);
+        activeAuthTokens.put(result.username(), result.authToken());
+        activeUser = result.username();
+        return String.format(SET_TEXT_COLOR_BLUE + "\nYou signed in as %s.", activeUser);
     }
 
-//    public String login(String... params) throws ResponseException {
-//        if (params.length >= 1) {
-//            state = State.SIGNEDIN;
-//            visitorName = String.join("-", params);
-//            ws = new WebSocketFacade(serverUrl, notificationHandler);
-//            ws.enterPetShop(visitorName);
-//            return String.format("You signed in as %s.", visitorName);
-//        }
-//        throw new ResponseException(400, "Expected: <yourname>");
-//    }
-//
-//    public String rescuePet(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length >= 2) {
-//            var name = params[0];
-//            var type = PetType.valueOf(params[1].toUpperCase());
-//            var pet = new Pet(0, name, type);
-//            pet = server.addPet(pet);
-//            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
-//        }
-//        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
-//    }
-//
-//    public String listPets() throws ResponseException {
-//        assertSignedIn();
-//        var pets = server.listPets();
-//        var result = new StringBuilder();
-//        var gson = new Gson();
-//        for (var pet : pets) {
-//            result.append(gson.toJson(pet)).append('\n');
-//        }
-//        return result.toString();
-//    }
+    public String login(String... params) throws ResponseException {
+        String exceptionString = SET_TEXT_COLOR_RED + "Expected: <USERNAME> <PASSWORD>";
+        if(params.length < 2) {
+            throw new ResponseException(400, exceptionString);
+        }
+        if(params[0].isBlank() || params[1].isBlank()) {
+            throw new ResponseException(400, exceptionString);
+        }
+        LoginRequest request = new LoginRequest(params[0], params[1]);
+        LoginResult result = server.loginUser(request);
+
+        state = State.LOGGED_IN;
+        activeAuthTokens.put(result.username(), result.authToken());
+        activeUser = result.username();
+        return String.format(SET_TEXT_COLOR_BLUE + "\nYou signed in as %s.", activeUser);
+    }
+
+    public String logout() throws ResponseException {
+        if(state == State.LOGGED_OUT) {
+            throw new ResponseException(400, "You're not logged in");
+        }
+        LogoutRequest request = new LogoutRequest(activeAuthTokens.get(activeUser));
+        LogoutResult result = server.logoutUser(request);
+
+        state = State.LOGGED_OUT;
+        activeAuthTokens.remove(activeUser);
+        return String.format(SET_TEXT_COLOR_BLUE + "\nLogged out");
+    }
+
+    public String createGame(String... params) throws ResponseException {
+
+        String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMENAME>";
+        if(params.length != 1) {
+            throw new ResponseException(400, exceptionString);
+        }
+        if(params[0].isBlank()) {
+            throw new ResponseException(400, exceptionString);
+        }
+        CreateGameRequest request = new CreateGameRequest(params[0], activeAuthTokens.get(activeUser));
+        CreateGameResult result = server.createGame(request);
+
+        return String.format(SET_TEXT_COLOR_BLUE + "\nGame created: %s.", params[0]);
+    }
 //
 //    public String adoptPet(String... params) throws ResponseException {
 //        assertSignedIn();
@@ -143,8 +158,9 @@ public class Client {
                     """;
         }
         return SET_TEXT_COLOR_YELLOW + """
-                - login <USERNAME> <PASSWORD>
+                - logout
                 - register <USERNAME> <PASSWORD> <EMAIL>
+                - create <GAMENAME>
                 - quit
                 """;
     }

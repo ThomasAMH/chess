@@ -8,10 +8,11 @@
 7. Added list game tests
 8. Completed join game tests
 9. Got login ui working; refactored how errors and handled
+10. Added login and logout
+11. Add game feature added
 
 ## Phases
 Design repl loops
-* Possibly use a state flag?
 * Validator
 * Handler
 

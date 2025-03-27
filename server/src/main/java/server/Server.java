@@ -56,7 +56,6 @@ public class Server {
     }
 
     public static class RequestHandler {
-        private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
 
         public Object addNewUser(Request req, Response res) {
             RegisterRequest requestData = new Gson().fromJson(req.body(), RegisterRequest.class);
@@ -69,7 +68,6 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 RegisterReturn returnVal = new RegisterReturn(result.username(), result.authToken());
-                activeAuthTokens.put(returnVal.authToken(), returnVal.username());
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }
@@ -90,7 +88,6 @@ public class Server {
 
             if(result.responseCode() == 200) {
                 LoginReturn returnVal = new LoginReturn(result.username(), result.authToken());
-                activeAuthTokens.put(returnVal.authToken(), returnVal.username());
                 res.status(200);
                 return new Gson().toJson(returnVal);
             }
@@ -110,7 +107,6 @@ public class Server {
             LogoutResult result = service.logoutUser(requestData, dataService);
 
             if(result.responseCode() == 200) {
-                activeAuthTokens.remove(requestData.authToken());
                 res.status(200);
                 return "";
             }
