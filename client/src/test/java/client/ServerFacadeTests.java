@@ -11,9 +11,6 @@ import returns.ListGamesReturn;
 import server.Server;
 import serverFacade.ServerFacade;
 
-import java.util.List;
-
-
 public class ServerFacadeTests {
 
     private static Server server;

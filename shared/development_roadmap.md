@@ -7,6 +7,7 @@
 6. Added create game tests 
 7. Added list game tests
 8. Completed join game tests
+9. Got login ui working; refactored how errors and handled
 
 ## Phases
 Design repl loops

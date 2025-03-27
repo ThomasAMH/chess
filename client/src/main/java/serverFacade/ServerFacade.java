@@ -118,13 +118,13 @@ public class ServerFacade {
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
-        if (status / 100 == 2) {
+        if (status / 100 != 2) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
                     throw ResponseException.fromJson(respErr);
                 }
             } catch (ResponseException ex) {
-                throw new ResponseException(status, "other failure: " + status);
+                throw new ResponseException(status, ex.getMessage());
             }
         }
     }
