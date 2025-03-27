@@ -11,6 +11,7 @@
 10. Added login and logout
 11. Add game feature added
 12. Added list games feature
+13. Added join games feature
 
 ## Phases
 Design repl loops

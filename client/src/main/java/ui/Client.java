@@ -41,7 +41,7 @@ public class Client {
                 case "logout" -> logout();
                 case "create" -> createGame(params);
                 case "list" -> listGames();
-//                case "play" -> playGame(params);
+                case "play" -> playGame(params);
 //                case "observe" -> observeGame();
                 case "quit" -> "quit";
                 default -> help();
@@ -127,60 +127,45 @@ public class Client {
         for(GameMetaData game: games) {
             whitePlayer = (game.whiteUsername() == null ) ? "None" : game.whiteUsername();
             blackPlayer = (game.blackUsername() == null) ? "None" : game.blackUsername();
-            gameDataString = "Game Number: " + String.valueOf(i) + "Game Name: "+ game.gameName() +
+            gameDataString = "Game Number: " + String.valueOf(i) + ", Game Name: "+ game.gameName() +
                     ", White Player: " + whitePlayer + ", Black Player: " + blackPlayer;
             gameList.put(i, game.gameID());
             i++;
             System.out.println(SET_TEXT_COLOR_MAGENTA + "\t" + gameDataString);
         }
 
-
-
-        return SET_TEXT_COLOR_BLUE + "Join a game by running the join command and providing the game number";
+        return SET_TEXT_COLOR_BLUE + "Join a game by running the play command and providing the game number and color";
     }
-//    public String adoptPet(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length == 1) {
-//            try {
-//                var id = Integer.parseInt(params[0]);
-//                var pet = getPet(id);
-//                if (pet != null) {
-//                    server.deletePet(id);
-//                    return String.format("%s says %s", pet.name(), pet.sound());
-//                }
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
-//        throw new ResponseException(400, "Expected: <pet id>");
-//    }
-//
-//    public String adoptAllPets() throws ResponseException {
-//        assertSignedIn();
-//        var buffer = new StringBuilder();
-//        for (var pet : server.listPets()) {
-//            buffer.append(String.format("%s says %s%n", pet.name(), pet.sound()));
-//        }
-//
-//        server.deleteAllPets();
-//        return buffer.toString();
-//    }
-//
-//    public String logOut() throws ResponseException {
-//        assertSignedIn();
-//        ws.leavePetShop(visitorName);
-//        ws = null;
-//        state = State.SIGNEDOUT;
-//        return String.format("%s left the shop", visitorName);
-//    }
-//
-//    private Pet getPet(int id) throws ResponseException {
-//        for (var pet : server.listPets()) {
-//            if (pet.id() == id) {
-//                return pet;
-//            }
-//        }
-//        return null;
-//    }
+
+    public String playGame(String... params) throws ResponseException {
+        String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMEID> <WHITE/BLACK>";
+        Integer trueGameIndex;
+        if(params.length < 2) {
+            throw new ResponseException(400, exceptionString);
+        }
+        else if(params[0].isBlank() || params[1].isBlank()) {
+            throw new ResponseException(400, exceptionString);
+        }
+        try {
+            Integer providedGameIndex = Integer.parseInt(params[0]);
+            trueGameIndex = gameList.get(providedGameIndex);
+            if(trueGameIndex == null) {
+                throw new ResponseException(400, exceptionString + SET_TEXT_ITALIC + " must be number from the list");
+            }
+        } catch (NumberFormatException | ResponseException e) {
+            throw new ResponseException(400, exceptionString + SET_TEXT_ITALIC + " must be number from the list");
+        }
+
+        String color = params[1].toLowerCase();
+        if(!color.equals("white") && !color.equals("black")) {
+            throw new ResponseException(400, exceptionString + SET_TEXT_ITALIC + " must provide color: WHITE/BLACK");
+        }
+
+        JoinGameRequest request = new JoinGameRequest(color.toUpperCase(), trueGameIndex, activeUser, activeAuthTokens.get(activeUser));
+        JoinGameResult result = server.joinGame(request);
+
+        return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
+    }
 
     public String help() {
         if (state == State.LOGGED_OUT) {
@@ -192,8 +177,9 @@ public class Client {
         }
         return SET_TEXT_COLOR_YELLOW + """
                 - logout
-                - register <USERNAME> <PASSWORD> <EMAIL>
                 - create <GAMENAME>
+                - list
+                - join <GAMEID#> <COLOR>
                 - quit
                 """;
     }
