@@ -3,7 +3,7 @@ package ui;
 import exceptions.ResponseException;
 import model.GameMetaData;
 import returns.ListGamesReturn;
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -14,8 +14,8 @@ public class BoardDrawer {
     ChessBoard board;
     HashMap<ChessPiece.PieceType, String> whitePieces;
     HashMap<ChessPiece.PieceType, String> blackPieces;
-    String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
-    String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
+    static String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
+    static String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
 
     public void drawGenericBoardWhite() {
         drawChessBoardWhite("Generic Board", "Generic Board");

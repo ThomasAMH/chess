@@ -7,7 +7,7 @@ import exceptions.ResponseException;
 import org.junit.jupiter.api.*;
 import returns.ListGamesReturn;
 import server.Server;
-import serverFacade.ServerFacade;
+import serverfacade.ServerFacade;
 import requests.*;
 import results.*;
 
