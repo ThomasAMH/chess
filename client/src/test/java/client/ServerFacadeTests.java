@@ -210,7 +210,7 @@ public class ServerFacadeTests {
     public void testJoinGamePositive() throws ResponseException, DataAccessException {
         RegisterResult res = requests.createUser1();
         CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
-        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), res.username(), res.authToken());
+        JoinGameRequest joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), res.authToken());
         JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
         DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
         Assertions.assertEquals("false", daoResult.data());
@@ -221,7 +221,7 @@ public class ServerFacadeTests {
         try {
             RegisterResult res = requests.createUser1();
             CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
-            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), res.username(), res.authToken());
+            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), res.authToken());
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
             DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
             Assertions.fail();
@@ -236,7 +236,7 @@ public class ServerFacadeTests {
         try {
             RegisterResult res = requests.createUser1();
             CreateGameResult createGameResult =  requests.createGoodGame(res.authToken(), "test game");
-            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), res.username(), "Cheese");
+            JoinGameRequest joinGameRequest = new JoinGameRequest("Cheese", createGameResult.gameID(), "Cheese");
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
             DataAccessResult daoResult = databaseDAO.gameData.isColorAvailable(createGameResult.gameID(), "WHITE");
             Assertions.fail();

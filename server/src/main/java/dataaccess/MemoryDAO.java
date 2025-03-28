@@ -89,6 +89,11 @@ public class MemoryDAO extends DataAccessDAO {
     }
 
     @Override
+    protected String daoGetUsernameFromAuthToken(String authToken) {
+        return authDataHashmap.get(authToken).username();
+    }
+
+    @Override
     protected void daoJoinGame(int gameID, String color, String username) {
         GameData oldData = gameDataHashMap.get(gameID);
         GameData newData;

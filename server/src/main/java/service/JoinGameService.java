@@ -40,7 +40,7 @@ public class JoinGameService {
 
         //Join game
         try {
-            DataAccessResult daoResult = dataService.gameData.joinGame(request.gameID(), request.playerColor(), request.username());
+            DataAccessResult daoResult = dataService.gameData.joinGame(request.gameID(), request.playerColor(), request.authToken());
             return new JoinGameResult(200, "Game joined successfully");
         } catch (DataAccessException e) {
             return new JoinGameResult(500, "Error: Unknown error detected in color checking process.");

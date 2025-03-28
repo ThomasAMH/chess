@@ -19,17 +19,17 @@ public class ServerFacade {
 
     public RegisterResult addNewUser(RegisterRequest request) throws ResponseException {
         String path = "/user";
-        return this.makeRequest("POST", path, request, RegisterResult.class);
+        return this.makeRequest("POST", path, request, RegisterResult.class, null);
     }
 
     public LoginResult loginUser(LoginRequest request) throws ResponseException {
         String path = "/session";
-        return this.makeRequest("POST", path, request, LoginResult.class);
+        return this.makeRequest("POST", path, request, LoginResult.class, null);
     }
 
     public LogoutResult logoutUser(LogoutRequest request) throws ResponseException {
         String path = "/session";
-        return this.makeRequest("DELETE", path, request, LogoutResult.class);
+        return this.makeRequest("DELETE", path, request, LogoutResult.class, request.authToken());
     }
 
     public ListGamesReturn listGames(ListGamesRequest request) throws ResponseException {
@@ -39,34 +39,28 @@ public class ServerFacade {
 
     public CreateGameResult createGame(CreateGameRequest request) throws ResponseException {
         String path = "/game";
-        return this.makeRequest("POST", path, request, CreateGameResult.class);
+        return this.makeRequest("POST", path, request, CreateGameResult.class, request.authToken());
     }
 
     public JoinGameResult joinGame(JoinGameRequest request) throws ResponseException {
         String path = "/game";
-        return this.makeRequest("PUT", path, request, JoinGameResult.class);
+        return this.makeRequest("PUT", path, request, JoinGameResult.class, request.authToken());
     }
 
     public void clearDatabase() throws ResponseException {
         String path = "/db";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, null, null, null);
     }
 
     private <T> T getGamesRequest(String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             ListGamesRequest req = (ListGamesRequest) request;
-            String authTokenString = "?authToken=" + req.authToken();
+            String authTokenString = "?authorization=" + req.authToken();
             URL url = new URI(serverUrl + path + authTokenString).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod("GET");
             http.setDoOutput(true);
-            http.setRequestProperty("authToken", req.authToken());
-
-            //http.addRequestProperty("Content-Type", "application/json");
-//            DataOutputStream out = new DataOutputStream(http.getOutputStream());
-//            out.writeBytes(authTokenString);
-//            out.flush();
-//            out.close();
+            http.setRequestProperty("authorization", req.authToken());
 
             http.connect();
             throwIfNotSuccessful(http);
@@ -77,7 +71,7 @@ public class ServerFacade {
         }
     }
 
-    private <T> T makeRequest(String httpMethod, String path, Object request, Class<T> responseClass) throws ResponseException {
+    private <T> T makeRequest(String httpMethod, String path, Object request, Class<T> responseClass, String authToken) throws ResponseException {
         try {
             URL url = new URI(serverUrl + path).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -87,6 +81,7 @@ public class ServerFacade {
             if(request != null) {
                 http.addRequestProperty("Content-Type", "application/json");
                 String reqData = new Gson().toJson(request);
+                http.setRequestProperty("authorization", authToken);
                 try (OutputStream reqBody = http.getOutputStream()) {
                     reqBody.write(reqData.getBytes());
                 }

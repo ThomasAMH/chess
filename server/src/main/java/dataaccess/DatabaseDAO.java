@@ -124,6 +124,21 @@ public class DatabaseDAO extends DataAccessDAO {
             return false;
         }
     }
+    @Override
+    protected String daoGetUsernameFromAuthToken(String authToken) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM authdata WHERE authtoken=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    rs.next();
+                    return rs.getNString("username");
+                }
+            }
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
     @Override
     protected void daoDeleteAuthToken(String token) {
@@ -224,8 +239,9 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
-    protected void daoJoinGame(int gameID, String color, String username) {
+    protected void daoJoinGame(int gameID, String color, String authToken) {
         String whiteUsername, blackUsername;
+        String username = daoGetUsernameFromAuthToken(authToken);
         String statement = null;
         if(color.equals("WHITE")) {
             statement = "UPDATE gamedata SET white_username = ? WHERE game_id=?";

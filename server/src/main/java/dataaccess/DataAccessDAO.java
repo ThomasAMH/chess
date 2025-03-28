@@ -28,11 +28,12 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoStoreAuthToken(AuthData data);
     protected abstract boolean daoContainsAuthToken(String token);
     protected abstract void daoDeleteAuthToken(String token);
+    protected abstract void daoJoinGame(int gameID, String color, String authToken);
 
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
     protected abstract boolean daoIsTeamColorFree(int gameID, String color);
-    protected abstract void daoJoinGame(int gameID, String color, String username);
+    protected abstract String daoGetUsernameFromAuthToken(String authToken);
     protected abstract boolean daoIsGameNumberValid(int gameID);
 
     public abstract void nukeEverything();
@@ -117,9 +118,12 @@ public abstract class DataAccessDAO {
         }
 
         @Override
-        public DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException {
-            daoJoinGame(gameID, color, username);
-            return new DataAccessResult("true");
+        public DataAccessResult joinGame(int gameID, String color, String authToken) throws DataAccessException {
+            if(daoContainsAuthToken(authToken)) {
+                daoJoinGame(gameID, color, authToken);
+                return new DataAccessResult("true");
+            }
+            return new DataAccessResult("false");
         }
 
         @Override

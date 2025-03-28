@@ -29,8 +29,8 @@ class JoinGameTest {
     CreateGameResult createGameResult = newGameService.createGame(new CreateGameRequest("Test Game", goodToken),dataService);
 
     JoinGameService joinGameService = new JoinGameService();
-    JoinGameRequest badJoinGameRequest = new JoinGameRequest("WHITE", 0, "Tom", badToken);
-    JoinGameRequest goodJoinGameRequest = new JoinGameRequest("WHITE", 1, "Tom", goodToken);
+    JoinGameRequest badJoinGameRequest = new JoinGameRequest("WHITE", 0, badToken);
+    JoinGameRequest goodJoinGameRequest = new JoinGameRequest("WHITE", 1, goodToken);
 
     @Test
     public void testBadRequest() {
