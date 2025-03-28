@@ -13,6 +13,7 @@
 12. Added list games feature
 13. Added join games feature
 14. Crated board drawing methods
+15. Added observe feature
 
 ## Phases
 Design repl loops

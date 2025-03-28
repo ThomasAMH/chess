@@ -14,34 +14,27 @@ public class BoardDrawer {
     ChessBoard board;
     HashMap<ChessPiece.PieceType, String> whitePieces;
     HashMap<ChessPiece.PieceType, String> blackPieces;
+
+    public void drawGenericBoardWhite() {
+        drawChessBoardWhite("Generic Board", "Generic Board");
+    }
+
+    public void drawGenericBoardBlack() {
+        drawChessBoardBlack("Generic Board", "Generic Board");
+    }
+
     public void drawChessBoardBlack(String whiteUsername, String blackUsername) {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
-        ChessPiece currPiece;
-        ChessPosition currPosition;
-        String pieceChar;
         String squareColor = SET_BG_COLOR_BLACK;
 
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
         for(int r = 8; r >= 1; r--) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
             for(int c = 8; c >= 1; c--) {
-                currPosition = new ChessPosition(r, c);
-                currPiece = board.getPiece(currPosition);
-
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-                if(currPiece == null) {
-                    System.out.print(squareColor + EMPTY);
-                    continue;
-                }
-
-                if(currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    pieceChar = whitePieces.get(currPiece.getPieceType());
-                } else {
-                    pieceChar = blackPieces.get(currPiece.getPieceType());
-                }
-                System.out.print(squareColor + pieceChar);
+                printPiece(r, c, squareColor);
             }
             squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
@@ -54,9 +47,7 @@ public class BoardDrawer {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
-        ChessPiece currPiece;
-        ChessPosition currPosition;
-        String pieceChar;
+
         String squareColor = SET_BG_COLOR_BLACK;
         if (whiteUsername == null) {
             whiteUsername = "[vacant]";
@@ -68,21 +59,8 @@ public class BoardDrawer {
         for(int r = 1; r <= 8; r++) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
             for(int c = 1; c <= 8; c++) {
-                currPosition = new ChessPosition(r, c);
-                currPiece = board.getPiece(currPosition);
-
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-                if(currPiece == null) {
-                    System.out.print(squareColor + EMPTY);
-                    continue;
-                }
-
-                if(currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    pieceChar = whitePieces.get(currPiece.getPieceType());
-                } else {
-                    pieceChar = blackPieces.get(currPiece.getPieceType());
-                }
-                System.out.print(squareColor + pieceChar);
+                printPiece(r, c, squareColor);
             }
             squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
@@ -109,5 +87,25 @@ public class BoardDrawer {
         blackPieces.put(ChessPiece.PieceType.ROOK, BLACK_ROOK);
         blackPieces.put(ChessPiece.PieceType.PAWN, BLACK_PAWN);
 
+    }
+
+    private void printPiece(int r, int c, String squareColor) {
+        ChessPiece currPiece;
+        ChessPosition currPosition;
+        String pieceChar;
+        currPosition = new ChessPosition(r, c);
+        currPiece = board.getPiece(currPosition);
+
+        squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
+        if(currPiece == null) {
+            System.out.print(squareColor + EMPTY);
+            return;
+        }
+        if(currPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            pieceChar = whitePieces.get(currPiece.getPieceType());
+        } else {
+            pieceChar = blackPieces.get(currPiece.getPieceType());
+        }
+        System.out.print(squareColor + pieceChar);
     }
 }
