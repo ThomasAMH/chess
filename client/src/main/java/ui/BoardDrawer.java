@@ -14,6 +14,8 @@ public class BoardDrawer {
     ChessBoard board;
     HashMap<ChessPiece.PieceType, String> whitePieces;
     HashMap<ChessPiece.PieceType, String> blackPieces;
+    String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
+    String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
 
     public void drawGenericBoardWhite() {
         drawChessBoardWhite("Generic Board", "Generic Board");
@@ -32,6 +34,7 @@ public class BoardDrawer {
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
         for(int r = 8; r >= 1; r--) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
+            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + r + " "));
             for(int c = 8; c >= 1; c--) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 printPiece(r, c, squareColor);
@@ -40,6 +43,7 @@ public class BoardDrawer {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
             System.out.print("\n");
         }
+        printColumnLabels("black");
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + blackUsername);
     }
 
@@ -58,14 +62,17 @@ public class BoardDrawer {
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + blackUsername);
         for(int r = 1; r <= 8; r++) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
+            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + r + " "));
+
             for(int c = 1; c <= 8; c++) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 printPiece(r, c, squareColor);
             }
             squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-            System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
+            System.out.print(SET_BG_COLOR_BLACK + EMPTY + EMPTY);
             System.out.print("\n");
         }
+        printColumnLabels("white");
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
     }
 
@@ -106,6 +113,15 @@ public class BoardDrawer {
         } else {
             pieceChar = blackPieces.get(currPiece.getPieceType());
         }
-        System.out.print(squareColor + pieceChar);
+        System.out.print(PIECE_COLOR + squareColor + pieceChar);
+    }
+    private void printColumnLabels(String perspectiveColor) {
+        String row = " A " + " B " + " C " + " D " + " E " + " F " + " G " + " H ";
+        String buffer = "  " + EMPTY + EMPTY;
+        if(perspectiveColor.equals("white")) {
+            System.out.println(AXIS_COLOR + buffer + SET_BG_COLOR_BLACK + row);
+            return;
+        }
+        System.out.println(AXIS_COLOR + buffer + SET_BG_COLOR_BLACK +  new StringBuilder(row).reverse().toString());
     }
 }

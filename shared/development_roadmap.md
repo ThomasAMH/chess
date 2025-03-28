@@ -14,6 +14,7 @@
 13. Added join games feature
 14. Crated board drawing methods
 15. Added observe feature
+16. Added labels to chessboard
 
 ## Phases
 Design repl loops
