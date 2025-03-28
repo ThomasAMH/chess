@@ -22,6 +22,7 @@
 21. Refactored client to have correct imports
 22. Refactored server facade test file to have correct imports
 23. Heavily refactored server to accept authtoken in headers, facade to send tokens in headers, and server to not require username for joingame
+24. Refactored to pass all tests... I hope
 
 ## Phases
 Design repl loops

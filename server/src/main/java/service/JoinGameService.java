@@ -28,6 +28,17 @@ public class JoinGameService {
             return new JoinGameResult(500, "Error: Unknown error detected in game number query process.");
         }
 
+        //Is color null
+        if (request.playerColor() == null) {
+            return new JoinGameResult(400, "Error: no color passed");
+        }
+
+
+        //Is color valid
+        if (!request.playerColor().equalsIgnoreCase("white") && !request.playerColor().equalsIgnoreCase("black")) {
+            return new JoinGameResult(400, "Error: non-standard color passed");
+        }
+
         //Is color available
         try {
             DataAccessResult daoResult = dataService.gameData.isColorAvailable(request.gameID(), request.playerColor());

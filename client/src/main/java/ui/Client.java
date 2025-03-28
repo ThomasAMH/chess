@@ -155,7 +155,7 @@ public class Client {
             throw new ResponseException(400, exceptionString + SET_TEXT_ITALIC + " must provide color: WHITE/BLACK");
         }
 
-        JoinGameRequest request = new JoinGameRequest(color.toUpperCase(), trueGameIndex, activeUser, activeAuthTokens.get(activeUser));
+        JoinGameRequest request = new JoinGameRequest(color.toUpperCase(), trueGameIndex, activeAuthTokens.get(activeUser));
         JoinGameResult result = server.joinGame(request);
 
         if(color.equals("white")) {

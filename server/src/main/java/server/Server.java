@@ -99,7 +99,7 @@ public class Server {
                 return formatErrorString("Error: no auth token provided", res.status());
             }
 
-            LogoutRequest requestData = new Gson().fromJson(req.body(), LogoutRequest.class);
+            LogoutRequest requestData = new LogoutRequest(req.headers("authorization"));
             LogoutService service = new LogoutService();
             LogoutResult result = service.logoutUser(requestData, dataService);
 
