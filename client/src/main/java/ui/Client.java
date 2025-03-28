@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import requests.*;
+import results.*;
+
+
 import static ui.EscapeSequences.*;
 
 public class Client {
