@@ -7,6 +7,9 @@ import dataaccess.DatabaseDAO;
 import dataaccess.MemoryDAO;
 import model.GameData;
 import model.GameMetaData;
+import requests.*;
+import results.*;
+import returns.*;
 import service.*;
 import spark.Response;
 import spark.Spark;
@@ -69,7 +72,7 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object loginUser(Request req, Response res) {
             LoginRequest requestData = new Gson().fromJson(req.body(), LoginRequest.class);
             if(requestData.username().isEmpty() || requestData.password().isEmpty()) {
@@ -89,7 +92,7 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object logoutUser(Request req, Response res) {
             LogoutRequest requestData = new Gson().fromJson(req.body(), LogoutRequest.class);
             if(requestData.authToken().isEmpty()) {
@@ -108,7 +111,7 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object getGame(Request req, Response res) {
             ListGamesRequest requestData = new ListGamesRequest(req.headers("authToken"));
             if(requestData.authToken().isEmpty()) {
@@ -134,7 +137,7 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object createGame(Request req, Response res) {
             CreateGameRequest requestData =  new Gson().fromJson(req.body(), CreateGameRequest.class);
             CreateGameBodyObj bodyObj;
@@ -156,7 +159,7 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object joinGame(Request req, Response res) {
             JoinGameRequest request = new Gson().fromJson(req.body(), JoinGameRequest.class);
             JoinGameBodyObj bodyObj =  new JoinGameBodyObj(request.playerColor(), request.gameID());
@@ -179,12 +182,12 @@ public class Server {
                 res.status(result.responseCode());
                 return formatErrorString(result.responseMessage(), res.status());
             }
-        };
+        }
         public Object clearDatabase(Request req, Response res) {
             dataService.clearDatabase();
             res.status(200);
             return "{}";
-        };
+        }
         private static String formatErrorString(String errorMessage, int status) {
             HashMap<String, String> returnVal = new HashMap<String, String>();
             returnVal.put("status", String.valueOf(status));

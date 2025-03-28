@@ -16,6 +16,8 @@
 15. Added observe feature
 16. Added labels to chessboard
 17. Corrected board labels
+18. Moved some folders to shared
+19. Refactored server class to have correct imports
 
 ## Phases
 Design repl loops
