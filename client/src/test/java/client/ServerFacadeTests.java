@@ -8,6 +8,8 @@ import org.junit.jupiter.api.*;
 import returns.ListGamesReturn;
 import server.Server;
 import serverFacade.ServerFacade;
+import requests.*;
+import results.*;
 
 public class ServerFacadeTests {
 

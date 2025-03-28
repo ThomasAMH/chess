@@ -20,6 +20,7 @@
 19. Refactored server class to have correct imports
 20. Refactored ServerFacade to have correct imports
 21. Refactored client to have correct imports
+22. Refactored server facade test file to have correct imports
 
 ## Phases
 Design repl loops
