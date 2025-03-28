@@ -3,7 +3,8 @@ package serverFacade;
 import com.google.gson.Gson;
 import exceptions.ResponseException;
 import returns.ListGamesReturn;
-
+import requests.*;
+import results.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;

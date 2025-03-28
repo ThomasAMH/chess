@@ -18,6 +18,7 @@
 17. Corrected board labels
 18. Moved some folders to shared
 19. Refactored server class to have correct imports
+20. Refactored ServerFacade to have correct imports
 
 ## Phases
 Design repl loops
