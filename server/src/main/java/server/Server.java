@@ -7,20 +7,14 @@ import dataaccess.DatabaseDAO;
 import dataaccess.MemoryDAO;
 import model.GameData;
 import model.GameMetaData;
-import requests.*;
-import results.*;
-import returns.*;
 import service.*;
 import spark.Response;
 import spark.Spark;
 import spark.Request;
 import dataaccess.DataAccessDAO;
 
-import java.lang.reflect.Array;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Objects;
 
 public class Server {

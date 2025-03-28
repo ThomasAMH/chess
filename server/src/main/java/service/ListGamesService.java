@@ -1,13 +1,12 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.DataAccessDAO;
 import dataaccess.DataAccessException;
 import model.GameData;
 import requests.ListGamesRequest;
 import results.DataAccessResult;
 import results.ListGamesResult;
-import results.LogoutResult;
+
 import java.util.ArrayList;
 
 public class ListGamesService {

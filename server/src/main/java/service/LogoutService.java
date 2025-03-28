@@ -7,8 +7,6 @@ import results.DataAccessResult;
 
 import results.LogoutResult;
 
-import javax.xml.crypto.Data;
-
 public class LogoutService {
     public LogoutResult logoutUser(LogoutRequest request, DataAccessDAO dataService) {
         //Check of the token provided is active

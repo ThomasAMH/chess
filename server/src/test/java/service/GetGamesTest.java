@@ -1,6 +1,5 @@
 package service;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessDAO;
 import dataaccess.MemoryDAO;
@@ -11,12 +10,7 @@ import requests.LoginRequest;
 import requests.RegisterRequest;
 import results.CreateGameResult;
 import results.ListGamesResult;
-import results.LoginResult;
 import results.RegisterResult;
-import service.CreateGameService;
-import service.ListGamesService;
-import service.LoginService;
-import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

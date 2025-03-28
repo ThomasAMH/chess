@@ -2,16 +2,12 @@ package serverFacade;
 
 import com.google.gson.Gson;
 import exceptions.ResponseException;
-import requests.*;
-import results.*;
 import returns.ListGamesReturn;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ServerFacade {
     private final String serverUrl;

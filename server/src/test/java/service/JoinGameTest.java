@@ -10,9 +10,6 @@ import requests.RegisterRequest;
 import results.CreateGameResult;
 import results.JoinGameResult;
 import results.RegisterResult;
-import service.CreateGameService;
-import service.JoinGameService;
-import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

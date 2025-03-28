@@ -5,7 +5,6 @@ import dataaccess.MemoryDAO;
 import org.junit.jupiter.api.Test;
 import requests.RegisterRequest;
 import results.RegisterResult;
-import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

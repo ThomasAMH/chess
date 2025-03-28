@@ -5,9 +5,6 @@ import dataaccess.DataAccessException;
 import requests.LoginRequest;
 import results.DataAccessResult;
 import results.LoginResult;
-import results.RegisterResult;
-
-import java.util.Objects;
 
 public class LoginService {
     public LoginResult loginUser(LoginRequest request, DataAccessDAO dataService) {

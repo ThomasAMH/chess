@@ -3,15 +3,10 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessDAO;
 import dataaccess.MemoryDAO;
 import org.junit.jupiter.api.Test;
-import requests.LoginRequest;
 import requests.LogoutRequest;
 import requests.RegisterRequest;
-import results.LoginResult;
 import results.LogoutResult;
 import results.RegisterResult;
-import service.LoginService;
-import service.LogoutService;
-import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

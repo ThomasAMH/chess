@@ -2,8 +2,6 @@ package ui;
 
 import exceptions.ResponseException;
 import model.GameMetaData;
-import requests.*;
-import results.*;
 import returns.ListGamesReturn;
 import serverFacade.ServerFacade;
 

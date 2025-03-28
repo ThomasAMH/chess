@@ -7,8 +7,6 @@ import requests.LogoutRequest;
 import requests.RegisterRequest;
 import results.LogoutResult;
 import results.RegisterResult;
-import service.LogoutService;
-import service.RegistrationService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import requests.CreateGameRequest;
 import results.CreateGameResult;
 import results.DataAccessResult;
-import results.LogoutResult;
 
 public class CreateGameService {
     public CreateGameResult createGame(CreateGameRequest request, DataAccessDAO dataService) {
