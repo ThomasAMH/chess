@@ -15,6 +15,7 @@
 14. Crated board drawing methods
 15. Added observe feature
 16. Added labels to chessboard
+17. Corrected board labels
 
 ## Phases
 Design repl loops

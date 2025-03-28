@@ -34,7 +34,7 @@ public class BoardDrawer {
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
         for(int r = 8; r >= 1; r--) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
-            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + r + " "));
+            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf(9 - r) + " "));
             for(int c = 8; c >= 1; c--) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 printPiece(r, c, squareColor);
@@ -62,7 +62,7 @@ public class BoardDrawer {
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + blackUsername);
         for(int r = 1; r <= 8; r++) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
-            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + r + " "));
+            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf( 9 - r) + " "));
 
             for(int c = 1; c <= 8; c++) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
