@@ -98,7 +98,7 @@ public class Client {
     }
 
     public String createGame(String... params) throws ResponseException {
-
+        assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMENAME>";
         if(params.length != 1) {
             throw new ResponseException(400, exceptionString);
@@ -113,7 +113,7 @@ public class Client {
     }
 
     public String listGames() throws ResponseException {
-
+        assertSignedIn();
         ListGamesRequest request = new ListGamesRequest(activeAuthTokens.get(activeUser));
         ListGamesReturn result = server.listGames(request);
         ArrayList<GameMetaData> games = result.games();
@@ -138,6 +138,7 @@ public class Client {
     }
 
     public String playGame(String... params) throws ResponseException {
+        assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMEID> <WHITE/BLACK>";
         Integer trueGameIndex;
         if(params.length < 2) {

@@ -21,7 +21,6 @@ public class Repl {
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
-
             try {
                 result = client.eval(line);
                 System.out.print(result);
