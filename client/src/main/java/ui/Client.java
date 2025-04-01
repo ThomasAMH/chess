@@ -54,7 +54,7 @@ public class Client {
 
     public String register(String... params) throws ResponseException {
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <USERNAME> <PASSWORD> <EMAIL>";
-        if(params.length < 2) {
+        if(params.length < 3) {
             throw new ResponseException(400, exceptionString);
         }
         if(params[0].isBlank() || params[1].isBlank() || params[2].isBlank()) {
@@ -187,10 +187,29 @@ public class Client {
             return SET_TEXT_COLOR_YELLOW + """
                     - login <USERNAME> <PASSWORD>
                     - register <USERNAME> <PASSWORD> <EMAIL>
+                    - help
                     - quit
+                    """;
+        } else if (state == State.PLAYING) {
+            return SET_TEXT_COLOR_YELLOW + """
+                    - help
+                    - moves
+                    - move r1,c1 r2,c2
+                        - Where r1 and c1 are the row and column of the moving piece,
+                          and r2 c2 are the row and column where you'd like to move the piece
+                    - redraw
+                    - leave
+                    - resign
+                    """;
+        }  else if (state == State.OBSERVING) {
+            return SET_TEXT_COLOR_YELLOW + """
+                    - help
+                    - redraw
+                    - leave
                     """;
         }
         return SET_TEXT_COLOR_YELLOW + """
+                - help
                 - logout
                 - create <GAMENAME>
                 - list

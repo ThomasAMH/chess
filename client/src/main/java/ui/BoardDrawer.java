@@ -29,7 +29,7 @@ public class BoardDrawer {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
-        String squareColor = SET_BG_COLOR_BLACK;
+        String squareColor = SET_BG_COLOR_WHITE;
 
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
         for(int r = 8; r >= 1; r--) {
@@ -52,7 +52,7 @@ public class BoardDrawer {
         board = new ChessBoard();
         board.resetBoard();
 
-        String squareColor = SET_BG_COLOR_BLACK;
+        String squareColor = SET_BG_COLOR_WHITE;
         if (whiteUsername == null) {
             whiteUsername = "[vacant]";
         }
