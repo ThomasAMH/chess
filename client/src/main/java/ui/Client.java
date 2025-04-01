@@ -5,6 +5,7 @@ import model.GameMetaData;
 import returns.ListGamesReturn;
 import serverfacade.ServerFacade;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,20 +37,55 @@ public class Client {
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             cmd = cmd.toLowerCase();
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "register" -> register(params);
-                case "login" -> login(params);
-                case "logout" -> logout();
-                case "create" -> createGame(params);
-                case "list" -> listGames();
-                case "play" -> playGame(params);
-                case "observe" -> observeGame(params);
-                case "quit" -> "quit";
-                default -> help();
+            return switch (state) {
+                case State.LOGGED_OUT -> handleLoggedOutRequests(cmd, params);
+                case State.LOGGED_IN -> handleLoggedInRequests(cmd, params);
+                case State.PLAYING -> handlePlayingRequests(cmd, params);
+                case State.OBSERVING -> handleObservingRequests(cmd, params);
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String handleLoggedOutRequests(String cmd, String[] params) throws ResponseException {
+        return switch (cmd) {
+            case "register" -> register(params);
+            case "login" -> login(params);
+            case "quit" -> "quit";
+            default -> help();
+        };
+    }
+
+    private String handleLoggedInRequests(String cmd, String[] params) throws ResponseException {
+        return switch (cmd) {
+            case "logout" -> logout();
+            case "create" -> createGame(params);
+            case "list" -> listGames();
+            case "play" -> playGame(params);
+            case "observe" -> observeGame(params);
+            case "quit" -> "quit";
+            default -> help();
+        };
+    }
+
+    private String handlePlayingRequests(String cmd, String[] params) throws ResponseException {
+        return switch (cmd) {
+            case "moves" -> "";
+            case "leave" -> "";
+            case "move" -> "";
+            case "redraw" -> "";
+            case "resign" -> "";
+            default -> help();
+        };
+    }
+
+    private String handleObservingRequests(String cmd, String[] params) throws ResponseException {
+        return switch (cmd) {
+            case "redraw" -> "";
+            case "leave" -> "";
+            default -> help();
+        };
     }
 
     public String register(String... params) throws ResponseException {
