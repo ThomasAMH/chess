@@ -28,6 +28,14 @@ public class Client {
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        activeGame = new ChessGame();
+    }
+
+    // For testing
+    public Client(String serverUrl, ChessGame game) {
+        server = new ServerFacade(serverUrl);
+        this.serverUrl = serverUrl;
+        this.activeGame = game;
     }
 
     public String eval(String input) {
@@ -71,58 +79,136 @@ public class Client {
     private String handlePlayingRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "moves" -> showMoves(params);
-            case "leave" -> "";
-            case "move" -> "";
-            case "redraw" -> "";
-            case "resign" -> "";
+            case "leave" -> leaveGameMode();
+            case "move" -> makeMove(params);
+            case "redraw" -> redrawGameScreen();
+            case "resign" -> resignFromGame();
+            default -> help();
+        };
+    }
+    private String handleObservingRequests(String cmd, String[] params) throws ResponseException {
+        return switch (cmd) {
+            case "redraw" -> redrawGameScreen();
+            case "leave" -> leaveGameMode();
             default -> help();
         };
     }
 
-    private String showMoves(String... params) throws ResponseException {
-        String exceptionString = SET_TEXT_COLOR_RED + "Expected: r,c";
-        if(params.length < 2) {
+    private String makeMove(String... params) throws ResponseException {
+        if(activeGame.getTeamTurn() == playerColor) {
+            String exceptionString = SET_TEXT_COLOR_RED + "It's not your turn!";
             throw new ResponseException(400, exceptionString);
         }
-        int row;
-        String col;
-        String[] args;
-        args = params[1].split(",");
+
+        String exceptionString = SET_TEXT_COLOR_RED + """
+                r1,c1 r2,c2
+                - Where r1 and c1 are the row and column of the moving piece,
+                  and r2 c2 are the row and column where you'd like to move the piece""";
+        if(params.length != 2) {
+            throw new ResponseException(400, exceptionString);
+        }
+        int row1 = 0, row2 = 0;
+        String col1 = "", col2 = "";
+        String[] coord1, coord2;
+        coord1 = params[0].split(",");
+        coord2 = params[1].split(",");
         try {
-            row = Integer.parseInt(args[0]);
-        } catch(NumberFormatException e) {
-            exceptionString = SET_TEXT_COLOR_RED + "Expected: r,c \n where r is a number (1-8) and c is a letter (a-h)";
+            validateUserCoord(coord1);
+            validateUserCoord(coord2);
+        } catch (ResponseException e) {
+            throw new ResponseException(400, e.getMessage());
+        }
+        col1 = coord1[1].toLowerCase();
+        char col1Char = col1.charAt(0);
+        int col1Int = -1;
+        for(int i = 0; i < 8; i++) {
+            if('a' + i == col1Char) {
+                col1Int = i;
+                break;
+            }
+        }
+        col2 = coord2[1].toLowerCase();
+        char col2Char = col1.charAt(0);
+        int col2Int = -1;
+        for(int i = 0; i < 8; i++) {
+            if('a' + i == col1Char) {
+                col2Int = i;
+                break;
+            }
+        }
+        if(col1Int == -1 || col2Int == -1) {
+            exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r \n where r is a number (1-8) and c is a letter (a-h)";
             throw new ResponseException(400, exceptionString);
         }
-        col = args[1].toLowerCase();
+
+        ChessPosition startPos = new ChessPosition(row1, col1Int);
+        ChessPosition endPos = new ChessPosition(row2, col2Int);
+        ChessMove move = new ChessMove(startPos, endPos, ChessPiece.PieceType.QUEEN);
+        try {
+            activeGame.makeMove(move);
+        } catch(chess.InvalidMoveException e) {
+            exceptionString = SET_TEXT_COLOR_RED + "Error: Illegal move";
+            throw new ResponseException(400, exceptionString);
+        }
+        redrawGameScreen();
+        return "Move executed successfully";
+    }
+
+    private String resignFromGame() {
+        state = State.OBSERVING;
+        return "You have resigned. Enter leave to return to the home menu";
+    }
+
+    private String redrawGameScreen() {
+        System.out.print(ERASE_SCREEN);
+        printGameBoard();
+        return "";
+    }
+
+    private String leaveGameMode() {
+        System.out.print(ERASE_SCREEN);
+        state = State.LOGGED_IN;
+        return "Returned to home menu";
+    }
+
+    private String showMoves(String... params) throws ResponseException {
+        String exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r";
+        if(params.length != 1) {
+            throw new ResponseException(400, exceptionString);
+        }
+        String[] args;
+        args = params[0].split(",");
+        if(args.length < 2) {
+            throw new ResponseException(400, exceptionString);
+        }
+        try {
+            validateUserCoord(args);
+        } catch (ResponseException e) {
+            throw new ResponseException(400, e.getMessage());
+        }
+        int row = Integer.parseInt(args[1]);
+        String col;
+        col = args[0].toLowerCase();
         char colChar = col.charAt(0);
-        if(colChar > 'h' || colChar < 'a' || col.length() > 1) {
-            exceptionString = SET_TEXT_COLOR_RED + "Expected: r,c \n where r is a number (1-8) and c is a letter (a-h)";
-            throw new ResponseException(400, exceptionString);
-        }
         int colInt = -1;
         for(int i = 0; i < 8; i++) {
             if('a' + i == colChar) {
-                colInt = i;
+                colInt = i + 1;
                 break;
             }
         }
         if(colInt == -1) {
-            exceptionString = SET_TEXT_COLOR_RED + "Expected: r,c \n where r is a number (1-8) and c is a letter (a-h)";
+            exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r \n where r is a number (1-8) and c is a letter (a-h)";
             throw new ResponseException(400, exceptionString);
         }
+
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
+        boolean hasMoves = bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
 
-        return "Showing moves for piece at " + args[0] + "," + args[1];
-    }
-
-    private String handleObservingRequests(String cmd, String[] params) throws ResponseException {
-        return switch (cmd) {
-            case "redraw" -> "";
-            case "leave" -> "";
-            default -> help();
-        };
+        if(hasMoves) {
+            return "Showing moves for piece at " + args[0] + "," + args[1];
+        }
+        return "No moves to show for the piece at " + args[0] + "," + args[1];
     }
 
     public String register(String... params) throws ResponseException {
@@ -237,10 +323,15 @@ public class Client {
         } else {
             activePlayer = ChessGame.TeamColor.BLACK;
         }
-        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor);
+        printGameBoard();
+        state = State.PLAYING;
 
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
+    }
+
+    private void printGameBoard() {
+        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
+        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor);
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -269,7 +360,7 @@ public class Client {
         } else if (state == State.PLAYING) {
             return SET_TEXT_COLOR_YELLOW + """
                     - help
-                    - moves r,c
+                    - moves c,r
                         - Where r and c are the row and column of the piece you'd like to see the moves of
                     - move r1,c1 r2,c2
                         - Where r1 and c1 are the row and column of the moving piece,
@@ -294,6 +385,23 @@ public class Client {
                 - observe <GAMEID#>
                 - quit
                 """;
+    }
+
+    private void validateUserCoord(String... args) throws ResponseException {
+        String exceptionString;
+        String col;
+        try {
+            Integer.parseInt(args[1]);
+        } catch(NumberFormatException e) {
+            exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r \n where r is a number (1-8) and c is a letter (a-h)";
+            throw new ResponseException(400, exceptionString);
+        }
+        col = args[0].toLowerCase();
+        char colChar = col.charAt(0);
+        if(colChar > 'h' || colChar < 'a' || col.length() > 1) {
+            exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r \n where r is a number (1-8) and c is a letter (a-h)";
+            throw new ResponseException(400, exceptionString);
+        }
     }
 
     private Integer validateGameNumber(String exceptionString, String[] params) throws ResponseException {

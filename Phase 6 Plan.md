@@ -1,4 +1,6 @@
-Where I left off on 04-02: Change the BoardDrawer to have a version of the function that takes in a list of moves
+## Other Things
+Join games you've left
+Join games without calling list
 
 Planning helper
 1. Intended function
@@ -109,3 +111,4 @@ Root Client sends RESIGN
 Server marks the game as over (no more moves can be made). Game is updated in the database.
 Server sends a Notification message to all clients in that game informing them that the root client resigned. This applies to both players and observers.
 
+## Completed Functionality

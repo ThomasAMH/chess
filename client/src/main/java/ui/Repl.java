@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessGame;
+
 import java.util.Scanner;
 
 import static java.awt.Color.*;
@@ -10,6 +12,11 @@ public class Repl {
 
     public Repl(String serverUrl) {
         client = new Client(serverUrl);
+    }
+
+    // For debugging
+    public Repl(String serverUrl, ChessGame game) {
+        client = new Client(serverUrl, game);
     }
 
     public void run() {
