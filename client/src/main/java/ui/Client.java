@@ -26,6 +26,7 @@ public class Client {
     private ChessGame activeGame;
 
     public Client(String serverUrl) {
+        playerColor = ChessGame.TeamColor.WHITE;
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         activeGame = new ChessGame();
@@ -95,7 +96,7 @@ public class Client {
     }
 
     private String makeMove(String... params) throws ResponseException {
-        if(activeGame.getTeamTurn() == playerColor) {
+        if(activeGame.getTeamTurn() != playerColor) {
             String exceptionString = SET_TEXT_COLOR_RED + "It's not your turn!";
             throw new ResponseException(400, exceptionString);
         }
@@ -107,32 +108,35 @@ public class Client {
         if(params.length != 2) {
             throw new ResponseException(400, exceptionString);
         }
-        int row1 = 0, row2 = 0;
-        String col1 = "", col2 = "";
-        String[] coord1, coord2;
+
+        String[] coord1;
+        String[] coord2 = params[1].split(",");
         coord1 = params[0].split(",");
-        coord2 = params[1].split(",");
         try {
             validateUserCoord(coord1);
             validateUserCoord(coord2);
         } catch (ResponseException e) {
             throw new ResponseException(400, e.getMessage());
         }
-        col1 = coord1[1].toLowerCase();
+        int row1 = Integer.parseInt(coord1[1]);
+        String col1 = "";
+        col1 = coord1[0].toLowerCase();
         char col1Char = col1.charAt(0);
         int col1Int = -1;
         for(int i = 0; i < 8; i++) {
             if('a' + i == col1Char) {
-                col1Int = i;
+                col1Int = i + 1;
                 break;
             }
         }
-        col2 = coord2[1].toLowerCase();
-        char col2Char = col1.charAt(0);
+
+        int row2 = Integer.parseInt(coord2[1]);
+        String col2 = coord2[0].toLowerCase();
+        char col2Char = col2.charAt(0);
         int col2Int = -1;
         for(int i = 0; i < 8; i++) {
-            if('a' + i == col1Char) {
-                col2Int = i;
+            if('a' + i == col2Char) {
+                col2Int = i + 1;
                 break;
             }
         }
@@ -143,7 +147,7 @@ public class Client {
 
         ChessPosition startPos = new ChessPosition(row1, col1Int);
         ChessPosition endPos = new ChessPosition(row2, col2Int);
-        ChessMove move = new ChessMove(startPos, endPos, ChessPiece.PieceType.QUEEN);
+        ChessMove move = new ChessMove(startPos, endPos, null);
         try {
             activeGame.makeMove(move);
         } catch(chess.InvalidMoveException e) {
@@ -317,11 +321,10 @@ public class Client {
         JoinGameRequest request = new JoinGameRequest(color.toUpperCase(), trueGameIndex, activeAuthTokens.get(activeUser));
         JoinGameResult result = server.joinGame(request);
 
-        ChessGame.TeamColor activePlayer;
         if(color.equals("white")) {
-            activePlayer = ChessGame.TeamColor.WHITE;
+            playerColor = ChessGame.TeamColor.WHITE;
         } else {
-            activePlayer = ChessGame.TeamColor.BLACK;
+            playerColor = ChessGame.TeamColor.BLACK;
         }
         printGameBoard();
         state = State.PLAYING;
@@ -331,7 +334,7 @@ public class Client {
 
     private void printGameBoard() {
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor);
+        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor, activeGame.getBoard());
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -345,7 +348,7 @@ public class Client {
         }
         Integer trueGameIndex = validateGameNumber(exceptionString, params);
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), ChessGame.TeamColor.WHITE);
+        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), ChessGame.TeamColor.WHITE, activeGame.getBoard());
         return SET_TEXT_COLOR_BLUE + "Observing game. Enjoy the show!";
     }
 

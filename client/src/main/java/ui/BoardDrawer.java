@@ -22,30 +22,40 @@ public class BoardDrawer {
     }
 
 
-    public void drawChessBoard(String whiteUsername, String blackUsername, ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer) {
+    public void drawChessBoard(String whiteUsername, String blackUsername, ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer, ChessBoard board) {
         initializePiecesMaps();
-        board = new ChessBoard();
-        board.resetBoard();
 
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+        if(perspective == ChessGame.TeamColor.WHITE) {
+            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+        } else {
+            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+        }
+
         printBoard(perspective);
         printColumnLabels(perspective);
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+
+        if(perspective == ChessGame.TeamColor.BLACK) {
+            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+        } else {
+            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+        }
         printGameInfo(activePlayer);
     }
 
     private void printBoard(ChessGame.TeamColor perspective) {
         int start, end;
         int step;
-        String squareColor = SET_BG_COLOR_WHITE;
+        String squareColor;
         if(perspective == ChessGame.TeamColor.WHITE) {
             start = 1;
             end = 9;
             step = 1;
+            squareColor = SET_BG_COLOR_BLACK;
         } else {
             start = 8;
             end = 0;
             step = -1;
+            squareColor = SET_BG_COLOR_WHITE;
         }
         int r, c;
         for(r = start; r != end; r+=step) {

@@ -142,6 +142,7 @@ public class ChessGame {
         else {teamMoveset = blackPieces;}
 
         if(!teamMoveset.containsKey(startingPosition)) {return false;}
+
         return teamMoveset.get(startingPosition).contains(proposedMove);
     }
 
