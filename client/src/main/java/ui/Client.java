@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import exceptions.ResponseException;
 import model.GameMetaData;
 import returns.ListGamesReturn;
@@ -24,13 +21,13 @@ public class Client {
     private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
     private static String activeUser;
     private static HashMap<Integer, Integer> gameList;
-    private static BoardDrawer boardDrawer;
-    private static ChessBoard activeBoard;
+    private String whiteUsername, blackusername;
+    private ChessGame.TeamColor playerColor;
+    private ChessGame activeGame;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        boardDrawer = new BoardDrawer(new ChessBoard());
     }
 
     public String eval(String input) {
@@ -114,18 +111,9 @@ public class Client {
             exceptionString = SET_TEXT_COLOR_RED + "Expected: r,c \n where r is a number (1-8) and c is a letter (a-h)";
             throw new ResponseException(400, exceptionString);
         }
-        ChessPosition pos = new ChessPosition(row, colInt);
-        ChessPiece movingPiece = activeBoard.getPiece(pos);
-        Collection<ChessMove> moves = movingPiece.pieceMoves(activeBoard, pos);
+        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
+        bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
 
-        HashSet<ChessPosition> possibleSquares = new HashSet<ChessPosition>();
-        int currRow;
-        int currCol;
-        for(ChessMove move: moves) {
-            currRow = move.getEndPosition().getRow();
-            currCol = move.getEndPosition().getColumn();
-            possibleSquares.add(new ChessPosition(currRow, currCol));
-        }
         return "Showing moves for piece at " + args[0] + "," + args[1];
     }
 
@@ -243,11 +231,14 @@ public class Client {
         JoinGameRequest request = new JoinGameRequest(color.toUpperCase(), trueGameIndex, activeAuthTokens.get(activeUser));
         JoinGameResult result = server.joinGame(request);
 
+        ChessGame.TeamColor activePlayer;
         if(color.equals("white")) {
-            boardDrawer.drawGenericBoardWhite();
+            activePlayer = ChessGame.TeamColor.WHITE;
         } else {
-            boardDrawer.drawGenericBoardBlack();
+            activePlayer = ChessGame.TeamColor.BLACK;
         }
+        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
+        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor);
 
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
     }
@@ -262,8 +253,8 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
         Integer trueGameIndex = validateGameNumber(exceptionString, params);
-
-        boardDrawer.drawGenericBoardWhite();
+        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
+        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), ChessGame.TeamColor.WHITE);
         return SET_TEXT_COLOR_BLUE + "Observing game. Enjoy the show!";
     }
 

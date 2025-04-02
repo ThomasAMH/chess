@@ -1,11 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.BLACK_PAWN;
@@ -19,43 +18,19 @@ public class BoardDrawer {
 
     public BoardDrawer(ChessBoard board) {
         this.board = board;
+        initializePiecesMaps();
     }
 
-    public void drawGenericBoardWhite() {
-        drawChessBoardWhite("Generic Board", "Generic Board", "White");
-    }
 
-    public void drawGenericBoardBlack() {
-        drawChessBoardBlack("Generic Board", "Generic Board", "White");
-    }
-
-    public void drawChessBoardBlack(String whiteUsername, String blackUsername, String activePlayer) {
+    public void drawChessBoard(String whiteUsername, String blackUsername, ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer) {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
 
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
-        printBoard(ChessGame.TeamColor.BLACK);
-        printColumnLabels("black");
+        printBoard(perspective);
+        printColumnLabels(perspective);
         System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
-        printGameInfo(activePlayer);
-    }
-
-    public void drawChessBoardWhite(String whiteUsername, String blackUsername, String activePlayer) {
-        initializePiecesMaps();
-        board = new ChessBoard();
-        board.resetBoard();
-
-        if (whiteUsername == null) {
-            whiteUsername = "[vacant]";
-        }
-        if (blackUsername == null) {
-            blackUsername = "[vacant]";
-        }
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
-        printBoard(ChessGame.TeamColor.WHITE);
-        printColumnLabels("white");
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
         printGameInfo(activePlayer);
     }
 
@@ -65,19 +40,19 @@ public class BoardDrawer {
         String squareColor = SET_BG_COLOR_WHITE;
         if(perspective == ChessGame.TeamColor.WHITE) {
             start = 1;
-            end = 8;
+            end = 9;
             step = 1;
         } else {
             start = 8;
-            end = 1;
+            end = 0;
             step = -1;
         }
         int r, c;
-        for(r = start; r <= end; r+=step) {
+        for(r = start; r != end; r+=step) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
             System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf( 9 - r) + " "));
 
-            for(c = start; c <= end; c+=step) {
+            for(c = start; c != end; c+=step) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 printPiece(r, c, squareColor);
             }
@@ -86,6 +61,63 @@ public class BoardDrawer {
             System.out.print("\n");
         }
 
+    }
+
+    public boolean showPieceMoves(int row, int col, ChessGame.TeamColor perspective) {
+        row = 9 - row;
+
+        ChessPosition pos = new ChessPosition(row, col);
+        ChessPiece movingPiece = board.getPiece(pos);
+        Collection<ChessMove> moves = movingPiece.pieceMoves(board, pos);
+        boolean printedMovesFlag = false;
+
+        HashSet<ChessPosition> possibleSquares = new HashSet<ChessPosition>();
+        int currRow;
+        int currCol;
+        for(ChessMove move: moves) {
+            currRow = move.getEndPosition().getRow();
+            currCol = move.getEndPosition().getColumn();
+            possibleSquares.add(new ChessPosition(currRow, currCol));
+        }
+
+        int start, end;
+        int step;
+        String squareColor = SET_BG_COLOR_WHITE;
+        boolean isWhite;
+        if(perspective == ChessGame.TeamColor.WHITE) {
+            start = 1;
+            end = 9;
+            step = 1;
+            isWhite = false;
+        } else {
+            start = 8;
+            end = 0;
+            step = -1;
+            isWhite = true;
+        }
+        int r, c;
+        ChessPosition currentPos;
+        for(r = start; r != end; r+=step) {
+            System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
+            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf( 9 - r) + " "));
+
+            for(c = start; c != end; c+=step) {
+                currentPos = new ChessPosition(r, c);
+                if(possibleSquares.contains(currentPos)) {
+                    squareColor = (isWhite) ? SET_BG_COLOR_DARK_GREEN: SET_BG_COLOR_GREEN;
+                    printedMovesFlag = true;
+                } else {
+                    squareColor = (isWhite) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
+                }
+                isWhite = !isWhite;
+                printPiece(r, c, squareColor);
+            }
+            isWhite = !isWhite;
+            System.out.print(SET_BG_COLOR_BLACK + EMPTY + EMPTY);
+            System.out.print("\n");
+        }
+        printColumnLabels(perspective);
+        return printedMovesFlag;
     }
 
     private void initializePiecesMaps() {
@@ -115,7 +147,7 @@ public class BoardDrawer {
         currPosition = new ChessPosition(r, c);
         currPiece = board.getPiece(currPosition);
 
-        squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
+
         if(currPiece == null) {
             System.out.print(squareColor + EMPTY);
             return;
@@ -126,19 +158,20 @@ public class BoardDrawer {
             pieceChar = blackPieces.get(currPiece.getPieceType());
         }
         System.out.print(PIECE_COLOR + squareColor + pieceChar);
+
     }
-    private void printColumnLabels(String perspectiveColor) {
+    private void printColumnLabels(ChessGame.TeamColor perspective) {
         String row = " A " + " B " + " C " + " D " + " E " + " F " + " G " + " H ";
         String buffer = "  " + EMPTY + EMPTY;
-        if(perspectiveColor.equals("white")) {
+        if(perspective == ChessGame.TeamColor.WHITE) {
             System.out.println(AXIS_COLOR + buffer + SET_BG_COLOR_BLACK + row);
             return;
         }
         System.out.println(AXIS_COLOR + buffer + SET_BG_COLOR_BLACK +  new StringBuilder(row).reverse().toString());
     }
-    private void printGameInfo(String activePlayer) {
+    private void printGameInfo(ChessGame.TeamColor activePlayer) {
         System.out.println("----------------------");
-        System.out.println("Active player: " + activePlayer);
+        System.out.println("Active player: " + ((activePlayer) == ChessGame.TeamColor.WHITE ? "White": "Black"));
         System.out.println("----------------------");
     }
 }

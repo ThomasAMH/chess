@@ -12,7 +12,7 @@ import java.util.HashMap;
 import static ui.EscapeSequences.*;
 
 public class BoardDrawTest {
-    ChessBoard board;
+
     HashMap<ChessPiece.PieceType, String> whitePieces;
     HashMap<ChessPiece.PieceType, String> blackPieces;
     BoardDrawer bd;
@@ -20,15 +20,25 @@ public class BoardDrawTest {
     @Test
     public void testDrawChessBoardWhite() {
         bd = new BoardDrawer(new ChessBoard());
-        bd.drawChessBoardWhite("Tom", "Jenn", "White");
+        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.WHITE, ChessGame.TeamColor.WHITE);
         Assertions.assertTrue(true);
     }
 
     @Test
     public void testDrawChessBoardBlack() {
         bd = new BoardDrawer(new ChessBoard());
-        bd.drawChessBoardBlack("Tom", "Jenn", "White");
+        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.BLACK, ChessGame.TeamColor.BLACK);
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    public void testMoveOptions() {
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+        bd = new BoardDrawer(board);
+        boolean b = bd.showPieceMoves(2, 2, ChessGame.TeamColor.BLACK);
+        Assertions.assertTrue(b);
+
     }
 
 }
