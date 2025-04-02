@@ -1,3 +1,5 @@
+Where I left off on 04-02: Change the BoardDrawer to have a version of the function that takes in a list of moves
+
 Planning helper
 1. Intended function
 2. Context (command to use)

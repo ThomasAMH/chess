@@ -17,54 +17,67 @@ public class BoardDrawer {
     static final String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
     static final String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
 
+    public BoardDrawer(ChessBoard board) {
+        this.board = board;
+    }
+
     public void drawGenericBoardWhite() {
-        drawChessBoardWhite("Generic Board", "Generic Board");
+        drawChessBoardWhite("Generic Board", "Generic Board", "White");
     }
 
     public void drawGenericBoardBlack() {
-        drawChessBoardBlack("Generic Board", "Generic Board");
+        drawChessBoardBlack("Generic Board", "Generic Board", "White");
     }
 
-    public void drawChessBoardBlack(String whiteUsername, String blackUsername) {
+    public void drawChessBoardBlack(String whiteUsername, String blackUsername, String activePlayer) {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
-        String squareColor = SET_BG_COLOR_WHITE;
 
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
-        for(int r = 8; r >= 1; r--) {
-            System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
-            System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf(9 - r) + " "));
-            for(int c = 8; c >= 1; c--) {
-                squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-                printPiece(r, c, squareColor);
-            }
-            squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-            System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
-            System.out.print("\n");
-        }
+        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+        printBoard(ChessGame.TeamColor.BLACK);
         printColumnLabels("black");
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + blackUsername);
+        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+        printGameInfo(activePlayer);
     }
 
-    public void drawChessBoardWhite(String whiteUsername, String blackUsername) {
+    public void drawChessBoardWhite(String whiteUsername, String blackUsername, String activePlayer) {
         initializePiecesMaps();
         board = new ChessBoard();
         board.resetBoard();
 
-        String squareColor = SET_BG_COLOR_WHITE;
         if (whiteUsername == null) {
             whiteUsername = "[vacant]";
         }
         if (blackUsername == null) {
             blackUsername = "[vacant]";
         }
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + blackUsername);
-        for(int r = 1; r <= 8; r++) {
+        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+        printBoard(ChessGame.TeamColor.WHITE);
+        printColumnLabels("white");
+        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+        printGameInfo(activePlayer);
+    }
+
+    private void printBoard(ChessGame.TeamColor perspective) {
+        int start, end;
+        int step;
+        String squareColor = SET_BG_COLOR_WHITE;
+        if(perspective == ChessGame.TeamColor.WHITE) {
+            start = 1;
+            end = 8;
+            step = 1;
+        } else {
+            start = 8;
+            end = 1;
+            step = -1;
+        }
+        int r, c;
+        for(r = start; r <= end; r+=step) {
             System.out.print(SET_BG_COLOR_BLACK+ EMPTY + EMPTY);
             System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf( 9 - r) + " "));
 
-            for(int c = 1; c <= 8; c++) {
+            for(c = start; c <= end; c+=step) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 printPiece(r, c, squareColor);
             }
@@ -72,8 +85,7 @@ public class BoardDrawer {
             System.out.print(SET_BG_COLOR_BLACK + EMPTY + EMPTY);
             System.out.print("\n");
         }
-        printColumnLabels("white");
-        System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + whiteUsername);
+
     }
 
     private void initializePiecesMaps() {
@@ -123,5 +135,10 @@ public class BoardDrawer {
             return;
         }
         System.out.println(AXIS_COLOR + buffer + SET_BG_COLOR_BLACK +  new StringBuilder(row).reverse().toString());
+    }
+    private void printGameInfo(String activePlayer) {
+        System.out.println("----------------------");
+        System.out.println("Active player: " + activePlayer);
+        System.out.println("----------------------");
     }
 }

@@ -19,15 +19,15 @@ public class BoardDrawTest {
 
     @Test
     public void testDrawChessBoardWhite() {
-        bd = new BoardDrawer();
-        bd.drawChessBoardWhite("Tom", "Jenn");
+        bd = new BoardDrawer(new ChessBoard());
+        bd.drawChessBoardWhite("Tom", "Jenn", "White");
         Assertions.assertTrue(true);
     }
 
     @Test
     public void testDrawChessBoardBlack() {
-        bd = new BoardDrawer();
-        bd.drawChessBoardBlack("Tom", "Jenn");
+        bd = new BoardDrawer(new ChessBoard());
+        bd.drawChessBoardBlack("Tom", "Jenn", "White");
         Assertions.assertTrue(true);
     }
 
