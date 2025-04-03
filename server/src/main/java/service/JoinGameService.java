@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessDAO;
 import dataaccess.DataAccessException;
 import requests.JoinGameRequest;
@@ -33,11 +34,30 @@ public class JoinGameService {
             return new JoinGameResult(400, "Error: no color passed");
         }
 
-
         //Is color valid
         if (!request.playerColor().equalsIgnoreCase("white") && !request.playerColor().equalsIgnoreCase("black")) {
             return new JoinGameResult(400, "Error: non-standard color passed");
         }
+
+        //Is the user already the specified color
+        ChessGame.TeamColor color;
+        if(request.playerColor().equals("white")) {
+            color = ChessGame.TeamColor.WHITE;
+        } else {
+            color = ChessGame.TeamColor.BLACK;
+        }
+        try {
+            String colorUsername = dataService.gameData.getUsernameByGameID(request.gameID(), color).data();
+            if(colorUsername != null) {
+                String authTokenUsername = dataService.authData.getUserFromAuthToken(request.authToken()).data();
+                if (colorUsername.equals(authTokenUsername)) {
+                    return new JoinGameResult(200, "User had already joined game");
+                }
+            }
+        } catch (DataAccessException e) {
+            return new JoinGameResult(500, "Error: Unknown error detected in color checking process.");
+        }
+
 
         //Is color available
         try {

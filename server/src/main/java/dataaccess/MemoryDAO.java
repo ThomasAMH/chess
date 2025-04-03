@@ -112,6 +112,11 @@ public class MemoryDAO extends DataAccessDAO {
     }
 
     @Override
+    protected String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color) {
+        return "";
+    }
+
+    @Override
     public void nukeEverything() {
         userDataHashmap.clear();
         authDataHashmap.clear();

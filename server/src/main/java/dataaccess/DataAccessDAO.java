@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
@@ -7,6 +8,7 @@ import requests.RegisterRequest;
 import results.DataAccessResult;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class DataAccessDAO {
@@ -35,6 +37,7 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoIsTeamColorFree(int gameID, String color);
     protected abstract String daoGetUsernameFromAuthToken(String authToken);
     protected abstract boolean daoIsGameNumberValid(int gameID);
+    protected abstract String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color);
 
     public abstract void nukeEverything();
     public abstract void clearDatabase();
@@ -95,6 +98,11 @@ public abstract class DataAccessDAO {
             }
             return new DataAccessResult("true");
         }
+
+        @Override
+        public DataAccessResult getUserFromAuthToken(String token) throws DataAccessException {
+            return new DataAccessResult(daoGetUsernameFromAuthToken(token));
+        }
     }
     public class GameDataDAO implements GameDAO {
 
@@ -119,6 +127,14 @@ public abstract class DataAccessDAO {
 
         @Override
         public DataAccessResult joinGame(int gameID, String color, String authToken) throws DataAccessException {
+            String username = daoGetUsernameFromAuthToken(authToken);
+            String targetUsername;
+            if(Objects.equals(color, "white")) {
+                targetUsername = daoGetPlayerUsername(gameID, ChessGame.TeamColor.WHITE);
+            } else {
+                targetUsername = daoGetPlayerUsername(gameID, ChessGame.TeamColor.BLACK);
+            }
+
             if(daoContainsAuthToken(authToken)) {
                 daoJoinGame(gameID, color, authToken);
                 return new DataAccessResult("true");
@@ -135,6 +151,9 @@ public abstract class DataAccessDAO {
             }
         }
 
-
+        @Override
+        public DataAccessResult getUsernameByGameID(int gameID, ChessGame.TeamColor color) throws DataAccessException {
+            return new DataAccessResult(daoGetPlayerUsername(gameID, color));
+        }
     }
 }

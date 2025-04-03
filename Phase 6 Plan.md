@@ -1,3 +1,6 @@
+Where we left off:
+Get those join game tests with the same username working
+
 ## Other Things
 Join games you've left
 Join games without calling list

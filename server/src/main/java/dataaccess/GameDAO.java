@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 import results.DataAccessResult;
 
@@ -11,4 +12,5 @@ interface GameDAO {
     DataAccessResult isColorAvailable(int gameID, String color) throws DataAccessException;
     DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException;
     DataAccessResult isGameNumberValid(int gameID) throws DataAccessException;;
+    DataAccessResult getUsernameByGameID(int gameID, ChessGame.TeamColor color) throws DataAccessException;
 }

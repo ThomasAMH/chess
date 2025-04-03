@@ -277,6 +277,30 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
+    protected String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color) {
+        String statement;
+        String col_name;
+        try (var conn = DatabaseManager.getConnection()) {
+            if(color == ChessGame.TeamColor.WHITE) {
+                col_name = "white_username";
+                statement = "SELECT " +  col_name + " FROM gamedata WHERE game_id=?";
+            } else {
+                col_name = "black_username";
+                statement = "SELECT " +  col_name + " FROM gamedata WHERE game_id=?";
+            }
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    rs.next();
+                    return rs.getNString(col_name);
+                }
+            }
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Override
     public void nukeEverything() {
         String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata","DROP DATABASE chess"};
         try (var conn = DatabaseManager.getConnection()) {
