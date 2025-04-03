@@ -207,7 +207,7 @@ public class Client {
         }
 
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        boolean hasMoves = bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
+        boolean hasMoves = bd.showPieceMoves( row, colInt, activeGame.getTeamTurn());
 
         if(hasMoves) {
             return "Showing moves for piece at " + args[0] + "," + args[1];
@@ -334,7 +334,7 @@ public class Client {
 
     private void printGameBoard() {
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), playerColor, activeGame.getBoard());
+        bd.drawChessBoard(whiteUsername, blackusername, playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
     }
 
     public String observeGame(String... params) throws ResponseException {

@@ -156,7 +156,6 @@ public class ChessPiece {
                 }
             }
         }
-
         return legalMoves;
     }
 

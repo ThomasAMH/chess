@@ -64,7 +64,7 @@ public class BoardDrawer {
 
             for(c = start; c != end; c+=step) {
                 squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-                printPiece(r, c, squareColor);
+                printPiece(9 - r, c, squareColor);
             }
             squareColor = (squareColor.equals(SET_BG_COLOR_WHITE)) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
             System.out.print(SET_BG_COLOR_BLACK + EMPTY + EMPTY);
@@ -74,20 +74,15 @@ public class BoardDrawer {
     }
 
     public boolean showPieceMoves(int row, int col, ChessGame.TeamColor perspective) {
-        row = 9 - row;
-
         ChessPosition pos = new ChessPosition(row, col);
         ChessPiece movingPiece = board.getPiece(pos);
         Collection<ChessMove> moves = movingPiece.pieceMoves(board, pos);
         boolean printedMovesFlag = false;
 
         HashSet<ChessPosition> possibleSquares = new HashSet<ChessPosition>();
-        int currRow;
-        int currCol;
+
         for(ChessMove move: moves) {
-            currRow = move.getEndPosition().getRow();
-            currCol = move.getEndPosition().getColumn();
-            possibleSquares.add(new ChessPosition(currRow, currCol));
+            possibleSquares.add(move.getEndPosition());
         }
 
         int start, end;
@@ -112,7 +107,7 @@ public class BoardDrawer {
             System.out.print(String.valueOf(SET_BG_COLOR_BLACK + AXIS_COLOR + String.valueOf( 9 - r) + " "));
 
             for(c = start; c != end; c+=step) {
-                currentPos = new ChessPosition(r, c);
+                currentPos = new ChessPosition(9 - r, c);
                 if(possibleSquares.contains(currentPos)) {
                     squareColor = (isWhite) ? SET_BG_COLOR_DARK_GREEN: SET_BG_COLOR_GREEN;
                     printedMovesFlag = true;
@@ -120,7 +115,7 @@ public class BoardDrawer {
                     squareColor = (isWhite) ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 }
                 isWhite = !isWhite;
-                printPiece(r, c, squareColor);
+                printPiece(9 - r, c, squareColor);
             }
             isWhite = !isWhite;
             System.out.print(SET_BG_COLOR_BLACK + EMPTY + EMPTY);
