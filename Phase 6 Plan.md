@@ -1,8 +1,7 @@
-Where we left off:
-Get those join game tests with the same username working
+Things the program CANNOT DO
+You can't play chess with yourself
 
 ## Other Things
-Join games you've left
 Join games without calling list
 
 Planning helper
@@ -15,36 +14,6 @@ Planning helper
 7. Identify error catching
 
 ## Functionality for Client
-* Possible moves
-  * Command: _moves_
-  * Argument: A chess position
-  * Returns: A chess board image with all possible moves highlighted in green/dark green
-  * Throws: Nothing. If space is empty, red error text is returned saying "Error: No piece at location"
-  * Logic:
-    * Check if there is a piece at location
-    * Fetch the possible moves for that piece (use the function)
-    * Draw the chessboard, and if an i,j coord is in the moves list, use alt. colors
-    * Print message: Showing moves for [piece type] at [location]
-* Leave (-> post login UI)
-  * Command: Leave
-  * Returns: Nothing
-  * Throws: Nothing
-  * Logic:
-    * Send "left" message via websocket
-    * Close websocket connection
-    * Change program state
-    * Return happy message
-* Make move & update board
-  * Command: move <r,c> <r,c>
-  * Logic
-    * Check if move is valid
-    * Update the chessboard (use function)
-    * Redraw the chessboard for client
-    * Send updated board via websocket
-* Redraw
-  * Command: redraw
-  * Logic:
-    * Clear the terminal and redraw the board + vital information
 * Resign
   * Command: resign
   * Send message to server via websocket
@@ -115,3 +84,33 @@ Server marks the game as over (no more moves can be made). Game is updated in th
 Server sends a Notification message to all clients in that game informing them that the root client resigned. This applies to both players and observers.
 
 ## Completed Functionality
+* Possible moves
+  * Command: _moves_
+  * Argument: A chess position
+  * Returns: A chess board image with all possible moves highlighted in green/dark green
+  * Throws: Nothing. If space is empty, red error text is returned saying "Error: No piece at location"
+  * Logic:
+    * Check if there is a piece at location
+    * Fetch the possible moves for that piece (use the function)
+    * Draw the chessboard, and if an i,j coord is in the moves list, use alt. colors
+    * Print message: Showing moves for [piece type] at [location]
+* Leave (-> post login UI)
+  * Command: Leave
+  * Returns: Nothing
+  * Throws: Nothing
+  * Logic:
+    * Send "left" message via websocket
+    * Close websocket connection
+    * Change program state
+    * Return happy message
+* Make move & update board
+  * Command: move <r,c> <r,c>
+  * Logic
+    * Check if move is valid
+    * Update the chessboard (use function)
+    * Redraw the chessboard for client
+    * Send updated board via websocket
+* Redraw
+  * Command: redraw
+  * Logic:
+    * Clear the terminal and redraw the board + vital information

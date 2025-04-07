@@ -10,6 +10,8 @@ import java.util.*;
 
 import requests.*;
 import results.*;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
 
 
 import static ui.EscapeSequences.*;
@@ -24,12 +26,15 @@ public class Client {
     private String whiteUsername, blackusername;
     private ChessGame.TeamColor playerColor;
     private ChessGame activeGame;
+    private WebSocketFacade ws;
+    private NotificationHandler notificationHandler;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl, NotificationHandler notificationHandler) {
         playerColor = ChessGame.TeamColor.WHITE;
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         activeGame = new ChessGame();
+        this.notificationHandler = notificationHandler;
     }
 
     // For testing
