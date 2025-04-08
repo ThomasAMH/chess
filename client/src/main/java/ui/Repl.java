@@ -17,7 +17,6 @@ public class Repl implements NotificationHandler {
         client = new Client(serverUrl, this);
     }
 
-
     public void run() {
         System.out.println(SET_TEXT_COLOR_BLUE + "\u2659 Java Chess \u265f");
         System.out.print(client.help());
@@ -39,11 +38,16 @@ public class Repl implements NotificationHandler {
     }
 
     private void printPrompt() {
-        System.out.print(SET_TEXT_COLOR_GREEN + "\n>>> ");
+        System.out.print(SET_TEXT_COLOR_GREEN + RESET_TEXT_ITALIC + "\n>>> ");
+    }
+
+    private void printNotification(String text) {
+        System.out.print(SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA + text);
     }
 
     @Override
     public void notify(ServerMessage notification) {
+        printNotification(notification.message);
         printPrompt();
     }
 }

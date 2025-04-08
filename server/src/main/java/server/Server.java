@@ -10,6 +10,7 @@ import model.GameMetaData;
 import requests.*;
 import results.*;
 import returns.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 import spark.Response;
 import spark.Spark;
@@ -21,19 +22,24 @@ import java.util.HashMap;
 
 public class Server {
     static DataAccessDAO dataService;
+    static WebSocketHandler webSocketHandler;
 
     public Server() {
         try {
             dataService = new DatabaseDAO();
+            webSocketHandler = new WebSocketHandler();
         } catch (DataAccessException e) {
             dataService = new MemoryDAO();
         }
+
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
         Spark.staticFiles.location("web");
         RequestHandler handler = new RequestHandler();
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         Spark.post("/user", handler::addNewUser);
         Spark.post("/session", handler::loginUser);

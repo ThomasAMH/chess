@@ -1,9 +1,11 @@
 package dataaccess;
 
 import chess.ChessGame;
+import dbobjects.GameRecord;
 import model.GameData;
 import results.DataAccessResult;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 interface GameDAO {
@@ -13,4 +15,5 @@ interface GameDAO {
     DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException;
     DataAccessResult isGameNumberValid(int gameID) throws DataAccessException;;
     DataAccessResult getUsernameByGameID(int gameID, ChessGame.TeamColor color) throws DataAccessException;
+    GameRecord GetGameByID(Integer gameID) throws DataAccessException;
 }

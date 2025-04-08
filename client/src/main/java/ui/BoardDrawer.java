@@ -26,9 +26,9 @@ public class BoardDrawer {
         initializePiecesMaps();
 
         if(perspective == ChessGame.TeamColor.WHITE) {
-            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
+            System.out.println(SET_TEXT_COLOR_WHITE + SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "Black Player: " + blackUsername);
         } else {
-            System.out.println(SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
+            System.out.println(SET_TEXT_COLOR_WHITE + SET_BG_COLOR_BLACK+ EMPTY + EMPTY + "White Player: " + whiteUsername);
         }
 
         printBoard(perspective);

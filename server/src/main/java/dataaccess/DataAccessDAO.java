@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import dbobjects.GameRecord;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
@@ -38,6 +39,7 @@ public abstract class DataAccessDAO {
     protected abstract String daoGetUsernameFromAuthToken(String authToken);
     protected abstract boolean daoIsGameNumberValid(int gameID);
     protected abstract String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color);
+    protected abstract GameRecord daoGetGameByID(Integer gameID);
 
     public abstract void nukeEverything();
     public abstract void clearDatabase();
@@ -105,6 +107,10 @@ public abstract class DataAccessDAO {
         }
     }
     public class GameDataDAO implements GameDAO {
+        @Override
+        public GameRecord GetGameByID(Integer gameID) {
+            return daoGetGameByID(gameID);
+        }
 
         @Override
         public ArrayList<GameData> getGames() throws DataAccessException {

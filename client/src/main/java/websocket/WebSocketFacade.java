@@ -1,8 +1,12 @@
 package websocket;
 
+import chess.ChessGame;
+import chess.ChessGameTypeAdapter;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import exceptions.ResponseException;
+import ui.Client;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -11,18 +15,26 @@ import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
+
 
 //need to extend Endpoint for websocket to work properly
 public class WebSocketFacade extends Endpoint {
 
     Session session;
     NotificationHandler notificationHandler;
+    Client callingClient;
+    GsonBuilder chessGameBuilder;
 
-    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws ResponseException {
+
+    public WebSocketFacade(String url, NotificationHandler notificationHandler, Client callingClient) throws ResponseException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
             this.notificationHandler = notificationHandler;
+            this.callingClient = callingClient;
+            chessGameBuilder = new GsonBuilder();
+            chessGameBuilder.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -32,7 +44,13 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(notification);
+                    if (Objects.requireNonNull(notification.serverMessageType) == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        Gson gson = chessGameBuilder.create();
+                        ChessGame game = gson.fromJson(notification.message, ChessGame.class);
+                        callingClient.setGame(game);
+                    } else {
+                        notificationHandler.notify(notification);
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
@@ -46,7 +64,7 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void joinGame(String token, int gameId) throws ResponseException {
-        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT, token, gameId);
+        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT_PLAYER, token, gameId);
     }
 
     public void leaveGame(String token, int gameId) throws ResponseException {
@@ -59,7 +77,7 @@ public class WebSocketFacade extends Endpoint {
 
     private void sendGameStatusCommand(UserGameCommand.CommandType commandType, String token, int gameID) throws ResponseException{
         try {
-            var command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, token, gameID);
+            var command = new UserGameCommand(commandType, token, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());

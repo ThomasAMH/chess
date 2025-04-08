@@ -331,6 +331,9 @@ public class Client {
         } else {
             playerColor = ChessGame.TeamColor.BLACK;
         }
+
+        ws = new WebSocketFacade(serverUrl, notificationHandler, this);
+        ws.joinGame(activeAuthTokens.get(activeUser), trueGameIndex);
         printGameBoard();
         state = State.PLAYING;
 
@@ -393,6 +396,10 @@ public class Client {
                 - observe <GAMEID#>
                 - quit
                 """;
+    }
+
+    public void setGame(ChessGame game) {
+        this.activeGame = game;
     }
 
     private void validateUserCoord(String... args) throws ResponseException {

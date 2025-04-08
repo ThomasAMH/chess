@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import dbobjects.GameRecord;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -114,6 +115,11 @@ public class MemoryDAO extends DataAccessDAO {
     @Override
     protected String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color) {
         return "";
+    }
+
+    @Override
+    protected GameRecord daoGetGameByID(Integer gameID) {
+        return null;
     }
 
     @Override

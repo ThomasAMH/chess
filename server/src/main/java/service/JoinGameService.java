@@ -41,7 +41,7 @@ public class JoinGameService {
 
         //Is the user already the specified color
         ChessGame.TeamColor color;
-        if(request.playerColor().equals("white")) {
+        if(request.playerColor().equalsIgnoreCase("white")) {
             color = ChessGame.TeamColor.WHITE;
         } else {
             color = ChessGame.TeamColor.BLACK;

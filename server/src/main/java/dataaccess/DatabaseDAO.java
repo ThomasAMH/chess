@@ -1,14 +1,12 @@
 package dataaccess;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import dbobjects.GameRecord;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -301,6 +299,28 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
+    protected GameRecord daoGetGameByID(Integer gameID) {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT game_id, white_username, black_username, game_name, game FROM gamedata WHERE game_id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (var rs = ps.executeQuery()) {
+                    rs.next();
+                    String whiteUsername = rs.getNString("white_username");
+                    String blackUsername = rs.getNString("black_username");
+                    String gameName = rs.getNString("game_name");
+                    String gameJSON = rs.getNString("game");
+                    return new GameRecord(gameJSON, whiteUsername, blackUsername, gameName, gameID);
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void nukeEverything() {
         String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata","DROP DATABASE chess"};
         try (var conn = DatabaseManager.getConnection()) {
@@ -331,63 +351,5 @@ public class DatabaseDAO extends DataAccessDAO {
         }
     }
 
-    private static class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
-        @Override
-        public void write(JsonWriter jsonWriter, ChessGame chessGame) throws IOException {
-            Gson gson = new Gson();
-            gson.getAdapter(ChessGame.class).write(jsonWriter, chessGame);
-        }
-
-        @Override
-        public ChessGame read(JsonReader jsonReader) throws IOException {
-            ChessBoard gameBoard = null;
-            ChessGame.TeamColor activePlayer = null;
-            HashMap<ChessPosition, Collection<ChessMove>> blackPieces = null;
-            HashMap<ChessPosition, Collection<ChessMove>> whitePieces = null;
-            ChessGame.GameState gameState = null;
-            jsonReader.beginObject();
-
-            while(jsonReader.hasNext()) {
-                String name = jsonReader.nextName();
-                switch(name) {
-                    case "gameBoard" -> gameBoard = new Gson().fromJson(jsonReader, ChessBoard.class);
-                    case "gameState" -> gameState = determineGameState(jsonReader.nextString());
-                    case "activePlayer" -> activePlayer = determineTeamColor(jsonReader.nextString());
-                    case "whitePieces" -> whitePieces = new Gson().fromJson(jsonReader, HashMap.class);
-                    case "blackPieces" -> blackPieces = new Gson().fromJson(jsonReader, HashMap.class);
-                }
-            }
-            jsonReader.endObject();
-            return new ChessGame(gameBoard, activePlayer, blackPieces, whitePieces, gameState);
-        }
-
-        private ChessGame.GameState determineGameState(String gameState) {
-            switch(gameState) {
-                case "NORMAL" -> {
-                    return ChessGame.GameState.NORMAL;
-                }
-                case "CHECK" -> {
-                    return ChessGame.GameState.CHECK;
-                }
-                case "STALEMATE" -> {
-                    return ChessGame.GameState.STALEMATE;
-                }
-                case "CHECKMATE" -> {
-                    return ChessGame.GameState.CHECKMATE;
-                }
-                default -> {
-                    return null;
-                }
-            }
-        }
-        private ChessGame.TeamColor determineTeamColor(String teamColor) {
-            if(teamColor.equals("WHITE")) {
-                return ChessGame.TeamColor.WHITE;
-            } else {
-                return ChessGame.TeamColor.BLACK;
-            }
-        }
-
-    }
 
 }
