@@ -54,8 +54,8 @@ public class ChessPosition {
     }
 
     static public ChessPosition fromString(String chessPosString) {
-        chessPosString = chessPosString.substring(1,3);
+        chessPosString = chessPosString.substring(1,5);
         var coords = chessPosString.split(",");
-        return new ChessPosition(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]));
+        return new ChessPosition(Integer.parseInt(coords[0].trim()), Integer.parseInt(coords[1].trim()));
     }
 }

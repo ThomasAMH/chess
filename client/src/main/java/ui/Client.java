@@ -93,6 +93,7 @@ public class Client {
             default -> help();
         };
     }
+
     private String handleObservingRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "redraw" -> redrawGameScreen();
@@ -160,7 +161,6 @@ public class Client {
             exceptionString = SET_TEXT_COLOR_RED + "Error: Illegal move";
             throw new ResponseException(400, exceptionString);
         }
-        ws.joinGame(activeAuthTokens.get(activeUser), trueGameIndex);
         ws.makeMove(activeAuthTokens.get(activeUser), trueGameIndex, move);
         redrawGameScreen();
         return "Move executed successfully";

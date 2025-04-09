@@ -159,7 +159,10 @@ public class DatabaseDAO extends DataAccessDAO {
         int gameID;
         ChessGame chessGame;
         GameData gameDataEntry;
+//        chessGameBuilder = new GsonBuilder();
+//        chessGameBuilder.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
         Gson gson = chessGameBuilder.create();
+
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM gamedata";
             try (var ps = conn.prepareStatement(statement)) {
