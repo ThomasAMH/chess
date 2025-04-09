@@ -26,6 +26,7 @@ public class Client {
     private String whiteUsername, blackusername;
     private ChessGame.TeamColor playerColor;
     private ChessGame activeGame;
+    private Integer trueGameIndex;
     private WebSocketFacade ws;
     private NotificationHandler notificationHandler;
 
@@ -159,6 +160,8 @@ public class Client {
             exceptionString = SET_TEXT_COLOR_RED + "Error: Illegal move";
             throw new ResponseException(400, exceptionString);
         }
+        ws.joinGame(activeAuthTokens.get(activeUser), trueGameIndex);
+        ws.makeMove(activeAuthTokens.get(activeUser), trueGameIndex, move);
         redrawGameScreen();
         return "Move executed successfully";
     }
@@ -309,14 +312,14 @@ public class Client {
     public String playGame(String... params) throws ResponseException {
         assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMEID> <WHITE/BLACK>";
-        Integer trueGameIndex;
+
         if(params.length < 2) {
             throw new ResponseException(400, exceptionString);
         }
         else if(params[0].isBlank() || params[1].isBlank()) {
             throw new ResponseException(400, exceptionString);
         }
-        trueGameIndex = validateGameNumber(exceptionString, params);
+        this.trueGameIndex = validateGameNumber(exceptionString, params);
 
         String color = params[1].toLowerCase();
         if(!color.equals("white") && !color.equals("black")) {

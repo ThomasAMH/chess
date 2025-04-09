@@ -131,15 +131,23 @@ public class ChessGame {
      */
     private boolean isMoveLegal(ChessMove proposedMove) {
         ChessPosition startingPosition = proposedMove.getStartPosition();
+        ChessPosition endPosition = proposedMove.getEndPosition();
         ChessPiece movingPiece = gameBoard.getPiece(startingPosition);
 
-        if(movingPiece == null) {return false;}
-        if(movingPiece.getTeamColor() != activePlayer) {return false;}
+        if (movingPiece == null) {
+            return false;
+        }
+        if (movingPiece.getTeamColor() != activePlayer) {
+            return false;
+        }
 
         //Check if move is legal / offered to player
         HashMap<ChessPosition, Collection<ChessMove>> teamMoveset;
-        if(activePlayer == TeamColor.WHITE) {teamMoveset = whitePieces;}
-        else {teamMoveset = blackPieces;}
+        if (activePlayer == TeamColor.WHITE) {
+            teamMoveset = whitePieces;
+        } else {
+            teamMoveset = blackPieces;
+        }
 
         if(!teamMoveset.containsKey(startingPosition)) {return false;}
 

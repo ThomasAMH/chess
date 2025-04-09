@@ -321,6 +321,22 @@ public class DatabaseDAO extends DataAccessDAO {
     }
 
     @Override
+    protected void daoUpdateGameByID(Integer gameID, String gameJson) {
+        String statement = "UPDATE gamedata SET game = ? WHERE game_id=?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameJson);
+                ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }  catch (Exception e) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    @Override
     public void nukeEverything() {
         String[] nukeCodes = {"DROP TABLE gamedata", "DROP TABLE userdata", "DROP TABLE authdata","DROP DATABASE chess"};
         try (var conn = DatabaseManager.getConnection()) {

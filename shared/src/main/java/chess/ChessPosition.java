@@ -52,4 +52,10 @@ public class ChessPosition {
     public String toString() {
         return "(" + row + ", " + col + ")";
     }
+
+    static public ChessPosition fromString(String chessPosString) {
+        chessPosString = chessPosString.substring(1,3);
+        var coords = chessPosString.split(",");
+        return new ChessPosition(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]));
+    }
 }

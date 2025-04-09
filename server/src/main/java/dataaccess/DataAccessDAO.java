@@ -31,8 +31,8 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoStoreAuthToken(AuthData data);
     protected abstract boolean daoContainsAuthToken(String token);
     protected abstract void daoDeleteAuthToken(String token);
-    protected abstract void daoJoinGame(int gameID, String color, String authToken);
 
+    protected abstract void daoJoinGame(int gameID, String color, String authToken);
     protected abstract ArrayList<GameData> daoGetGames();
     protected abstract int daoAddGame(String gameName);
     protected abstract boolean daoIsTeamColorFree(int gameID, String color);
@@ -40,6 +40,7 @@ public abstract class DataAccessDAO {
     protected abstract boolean daoIsGameNumberValid(int gameID);
     protected abstract String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color);
     protected abstract GameRecord daoGetGameByID(Integer gameID);
+    protected abstract void daoUpdateGameByID(Integer gameID, String gameJson);
 
     public abstract void nukeEverything();
     public abstract void clearDatabase();
@@ -108,8 +109,13 @@ public abstract class DataAccessDAO {
     }
     public class GameDataDAO implements GameDAO {
         @Override
-        public GameRecord GetGameByID(Integer gameID) {
+        public GameRecord getGameByID(Integer gameID) {
             return daoGetGameByID(gameID);
+        }
+
+        @Override
+        public void setGameByID(Integer gameID, String gameJson) throws DataAccessException {
+            daoUpdateGameByID(gameID, gameJson);
         }
 
         @Override

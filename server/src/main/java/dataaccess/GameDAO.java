@@ -15,5 +15,6 @@ interface GameDAO {
     DataAccessResult joinGame(int gameID, String color, String username) throws DataAccessException;
     DataAccessResult isGameNumberValid(int gameID) throws DataAccessException;;
     DataAccessResult getUsernameByGameID(int gameID, ChessGame.TeamColor color) throws DataAccessException;
-    GameRecord GetGameByID(Integer gameID) throws DataAccessException;
+    GameRecord getGameByID(Integer gameID) throws DataAccessException;
+    void setGameByID(Integer gameID, String gameJson) throws DataAccessException;
 }

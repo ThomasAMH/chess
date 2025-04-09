@@ -1,6 +1,7 @@
 package chess;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -8,6 +9,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
     @Override
@@ -31,8 +33,8 @@ public class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
                 case "gameBoard" -> gameBoard = new Gson().fromJson(jsonReader, ChessBoard.class);
                 case "gameState" -> gameState = determineGameState(jsonReader.nextString());
                 case "activePlayer" -> activePlayer = determineTeamColor(jsonReader.nextString());
-                case "whitePieces" -> whitePieces = new Gson().fromJson(jsonReader, HashMap.class);
-                case "blackPieces" -> blackPieces = new Gson().fromJson(jsonReader, HashMap.class);
+                case "whitePieces" -> whitePieces = readPieceMaps(new Gson().fromJson(jsonReader, HashMap.class));
+                case "blackPieces" -> blackPieces = readPieceMaps(new Gson().fromJson(jsonReader, HashMap.class));
             }
         }
         jsonReader.endObject();
@@ -65,5 +67,13 @@ public class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
             return ChessGame.TeamColor.BLACK;
         }
     }
-
+    private HashMap<ChessPosition, Collection<ChessMove>> readPieceMaps(HashMap<String, Collection<ChessMove>> stringMap) {
+        HashMap<ChessPosition, Collection<ChessMove>> returnObj = new HashMap<ChessPosition, Collection<ChessMove>>();
+        for (Map.Entry<String, Collection<ChessMove>> entry: stringMap.entrySet()) {
+            ChessPosition key = ChessPosition.fromString(entry.getKey()); // Assuming fromString("e2") etc.
+            Collection<ChessMove> value = entry.getValue();
+            returnObj.put(key, value);
+        }
+        return returnObj;
+    }
 }

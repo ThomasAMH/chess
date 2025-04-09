@@ -123,6 +123,11 @@ public class MemoryDAO extends DataAccessDAO {
     }
 
     @Override
+    protected void daoUpdateGameByID(Integer gameID, String gameJson) {
+
+    }
+
+    @Override
     public void nukeEverything() {
         userDataHashmap.clear();
         authDataHashmap.clear();
