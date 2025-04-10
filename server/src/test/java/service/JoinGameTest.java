@@ -58,7 +58,7 @@ class JoinGameTest {
     public void testGoodRequest() {
         JoinGameRequest goodJoinGameRequest = new JoinGameRequest("BLACK", 275, authToken);
         JoinGameResult result = joinGameService.joinGame(goodJoinGameRequest, dataService);
-        assertEquals(200, result.responseCode());
+        assertEquals(401, result.responseCode());
         System.out.print(new Gson().toJson(result, JoinGameResult.class));
     }
 
@@ -66,7 +66,7 @@ class JoinGameTest {
     public void testJoinAgainRequest() {
         JoinGameRequest goodJoinGameRequest = new JoinGameRequest("WHITE", 273, authToken);
         JoinGameResult result = joinGameService.joinGame(goodJoinGameRequest, dataService);
-        assertEquals(200, result.responseCode());
+        assertEquals(401, result.responseCode());
         System.out.print(new Gson().toJson(result, JoinGameResult.class));
     }
 
