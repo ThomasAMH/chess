@@ -175,7 +175,12 @@ public class ChessGame {
         }
 
         if(pawnFlag && endOfRowFlag) {
-            movingPiece = new ChessPiece(movingPiece.getTeamColor(), ChessPiece.PieceType.QUEEN);
+            if(proposedMove.getPromotionPiece() == null) {
+                movingPiece = new ChessPiece(movingPiece.getTeamColor(), ChessPiece.PieceType.QUEEN);
+            } else {
+                movingPiece = new ChessPiece(movingPiece.getTeamColor(), proposedMove.getPromotionPiece());
+            }
+
         }
 
         board.addPiece(endPosition, movingPiece);
