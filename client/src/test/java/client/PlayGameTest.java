@@ -20,7 +20,7 @@ public class PlayGameTest {
 
     @Test
     public void testMakeMove() {
-        Repl repl = new Repl("http://localhost:8080", new ChessGame());
+        Repl repl = new Repl("http://localhost:8080");
         repl.run();
         Assertions.assertTrue(true);
     }

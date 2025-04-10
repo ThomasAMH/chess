@@ -20,14 +20,14 @@ public class BoardDrawTest {
     @Test
     public void testDrawChessBoardWhite() {
         bd = new BoardDrawer(new ChessBoard());
-        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.WHITE, ChessGame.TeamColor.WHITE);
+        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.WHITE, ChessGame.TeamColor.WHITE, new ChessBoard());
         Assertions.assertTrue(true);
     }
 
     @Test
     public void testDrawChessBoardBlack() {
         bd = new BoardDrawer(new ChessBoard());
-        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.BLACK, ChessGame.TeamColor.BLACK);
+        bd.drawChessBoard("Tom", "Jenn", ChessGame.TeamColor.BLACK, ChessGame.TeamColor.BLACK, new ChessBoard());
         Assertions.assertTrue(true);
     }
 
