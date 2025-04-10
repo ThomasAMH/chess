@@ -68,6 +68,10 @@ public class WebSocketFacade extends Endpoint {
         sendGameStatusCommand(UserGameCommand.CommandType.CONNECT_PLAYER, token, gameId);
     }
 
+    public void observeGame(String token, int gameId) throws ResponseException {
+        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT_OBSERVER, token, gameId);
+    }
+
     public void leaveGame(String token, int gameId) throws ResponseException {
         sendGameStatusCommand(UserGameCommand.CommandType.LEAVE, token, gameId);
     }

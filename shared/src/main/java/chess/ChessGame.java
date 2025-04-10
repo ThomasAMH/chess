@@ -166,8 +166,16 @@ public class ChessGame {
         ChessPiece movingPiece = board.getPiece(startingPosition);
 
         //Address promotions
-        if(proposedMove.getPromotionPiece() != null) {
-            movingPiece = new ChessPiece(movingPiece.getTeamColor(), proposedMove.getPromotionPiece());
+        boolean pawnFlag = (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN);
+        boolean endOfRowFlag = false;
+        if(endPosition.getRow() == 8 && movingPiece.getTeamColor() == TeamColor.WHITE) {
+            endOfRowFlag = true;
+        } else if (endPosition.getRow() == 1 && movingPiece.getTeamColor() == TeamColor.BLACK) {
+            endOfRowFlag = true;
+        }
+
+        if(pawnFlag && endOfRowFlag) {
+            movingPiece = new ChessPiece(movingPiece.getTeamColor(), ChessPiece.PieceType.QUEEN);
         }
 
         board.addPiece(endPosition, movingPiece);

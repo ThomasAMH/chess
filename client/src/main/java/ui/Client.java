@@ -167,7 +167,7 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
         ws.makeMove(activeAuthTokens.get(activeUser), trueGameIndex, move);
-        redrawGameScreen();
+        // redrawGameScreen();
         return "Move executed successfully";
     }
 
@@ -344,7 +344,7 @@ public class Client {
 
         ws = new WebSocketFacade(serverUrl, notificationHandler, this);
         ws.joinGame(activeAuthTokens.get(activeUser), trueGameIndex);
-        printGameBoard();
+        // printGameBoard();
         state = State.PLAYING;
 
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
@@ -365,9 +365,11 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
         Integer trueGameIndex = validateGameNumber(exceptionString, params);
-        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, activeGame.getTeamTurn(), ChessGame.TeamColor.WHITE, activeGame.getBoard());
-        return SET_TEXT_COLOR_BLUE + "Observing game. Enjoy the show!";
+        ws = new WebSocketFacade(serverUrl, notificationHandler, this);
+        ws.observeGame(activeAuthTokens.get(activeUser), trueGameIndex);
+        // printGameBoard();
+        state = State.OBSERVING;
+        return SET_TEXT_COLOR_BLUE + "Observing selected game. Enjoy the show!";
     }
 
     public String help() {
