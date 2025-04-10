@@ -33,15 +33,15 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         switch (command.commandType) {
-            case CONNECT_PLAYER -> enter(command, session);
+            case CONNECT_PLAYER -> enterPlayer(command, session);
             case MAKE_MOVE -> makeMove(message, session);
-//            case CONNECT_OBSERVER -> enter(command, session);
-//            case LEAVE -> enter(command, session);
-//            case RESIGN -> enter(command, session);
+            case CONNECT_OBSERVER -> enterObserver(command, session);
+            case LEAVE -> leave(command, session);
+            case RESIGN -> resign(command, session);
         }
     }
 
-    private void enter(UserGameCommand command, Session session) throws IOException {
+    private void enterPlayer(UserGameCommand command, Session session) throws IOException {
         connections.add(session, command.authToken, command.gameID);
         String username;
         try {
@@ -50,11 +50,46 @@ public class WebSocketHandler {
             throw new IOException();
         }
         String message = String.format("%s has joined the game", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(command.authToken, notification, command.gameID);
-        String game = dataAccessDAO.gameData.getGameByID(command.gameID).gameJSON();
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
+        broadcastMessage(command, message);
+        returnGame(command, session);
+    }
+
+    private void enterObserver(UserGameCommand command, Session session) throws IOException {
+        connections.add(session, command.authToken, command.gameID);
+        String username;
+        try {
+            username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
+        } catch (DataAccessException e) {
+            throw new IOException();
+        }
+        String message = String.format("%s is observing the game", username);
+        broadcastMessage(command, message);
+        returnGame(command, session);
+    }
+
+
+    private void leave(UserGameCommand command, Session session) throws IOException {
+        connections.remove(command.authToken);
+        String username;
+        try {
+            username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
+        } catch (DataAccessException e) {
+            throw new IOException();
+        }
+        String message = String.format("%s has left the game", username);
+        broadcastMessage(command, message);
+    }
+
+    private void resign(UserGameCommand command, Session session) throws IOException {
+        connections.remove(command.authToken);
+        String username;
+        try {
+            username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
+        } catch (DataAccessException e) {
+            throw new IOException();
+        }
+        String message = String.format("%s has resigned from game", username);
+        broadcastMessage(command, message);
     }
 
     private void makeMove(String message, Session session) throws IOException {
@@ -89,14 +124,15 @@ public class WebSocketHandler {
         connections.broadcast(command.authToken, notification, command.gameID);
     }
 
+    private void broadcastMessage(UserGameCommand command, String message) throws IOException {
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(command.authToken, notification, command.gameID);
+    }
 
-
-
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new Notification(Notification.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
+    private void returnGame(UserGameCommand command, Session session) throws IOException {
+        String game = dataAccessDAO.gameData.getGameByID(command.gameID).gameJSON();
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
+    }
 
 }

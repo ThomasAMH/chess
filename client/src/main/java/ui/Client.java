@@ -158,7 +158,12 @@ public class Client {
         try {
             activeGame.makeMove(move);
         } catch(chess.InvalidMoveException e) {
-            exceptionString = SET_TEXT_COLOR_RED + "Error: Illegal move";
+            if(activeGame.gameState == ChessGame.GameState.CHECK) {
+                exceptionString = SET_TEXT_COLOR_RED + "Error: You're in check!";
+            } else if (activeGame.gameState == ChessGame.GameState.STALEMATE) {
+                exceptionString = SET_TEXT_COLOR_RED + "Error: You're in checkmate! Enter resign to accept defeat";
+            }
+
             throw new ResponseException(400, exceptionString);
         }
         ws.makeMove(activeAuthTokens.get(activeUser), trueGameIndex, move);
@@ -166,20 +171,22 @@ public class Client {
         return "Move executed successfully";
     }
 
-    private String resignFromGame() {
+    private String resignFromGame() throws ResponseException {
         state = State.OBSERVING;
+        ws.resignGame(activeAuthTokens.get(activeUser), trueGameIndex);
         return "You have resigned. Enter leave to return to the home menu";
     }
 
-    private String redrawGameScreen() {
-        System.out.print(ERASE_SCREEN);
+    public String redrawGameScreen() {
         printGameBoard();
         return "";
     }
 
-    private String leaveGameMode() {
+    private String leaveGameMode() throws ResponseException {
         System.out.print(ERASE_SCREEN);
         state = State.LOGGED_IN;
+        ws.leaveGame(activeAuthTokens.get(activeUser), trueGameIndex);
+        this.trueGameIndex = -1;
         return "Returned to home menu";
     }
 
@@ -343,7 +350,7 @@ public class Client {
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
     }
 
-    private void printGameBoard() {
+    public void printGameBoard() {
         BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
         bd.drawChessBoard(whiteUsername, blackusername, playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
     }

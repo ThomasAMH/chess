@@ -17,7 +17,7 @@ public class ChessGame {
     private TeamColor activePlayer;
     private HashMap<ChessPosition, Collection<ChessMove>> blackPieces;
     private HashMap<ChessPosition, Collection<ChessMove>> whitePieces;
-    private GameState gameState;
+    public GameState gameState;
 
     public ChessGame() {
         gameBoard = new ChessBoard();
