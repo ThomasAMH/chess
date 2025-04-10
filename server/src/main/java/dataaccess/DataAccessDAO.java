@@ -41,6 +41,8 @@ public abstract class DataAccessDAO {
     protected abstract String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color);
     protected abstract GameRecord daoGetGameByID(Integer gameID);
     protected abstract void daoUpdateGameByID(Integer gameID, String gameJson);
+    protected abstract void daoDeleteGameByID(Integer gameID);
+    protected abstract void daoRemoveUserFromGameByID(Integer gameID, String userName);
 
     public abstract void nukeEverything();
     public abstract void clearDatabase();
@@ -116,6 +118,16 @@ public abstract class DataAccessDAO {
         @Override
         public void setGameByID(Integer gameID, String gameJson) throws DataAccessException {
             daoUpdateGameByID(gameID, gameJson);
+        }
+
+        @Override
+        public void deleteGameByID(Integer gameID) throws DataAccessException {
+            daoDeleteGameByID(gameID);
+        }
+
+        @Override
+        public void removeUserFromGame(Integer gameID, String userName) {
+            daoRemoveUserFromGameByID(gameID, userName);
         }
 
         @Override

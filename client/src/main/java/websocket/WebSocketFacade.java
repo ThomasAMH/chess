@@ -46,7 +46,7 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     if (Objects.requireNonNull(notification.serverMessageType) == ServerMessage.ServerMessageType.LOAD_GAME) {
                         Gson gson = chessGameBuilder.create();
-                        ChessGame game = gson.fromJson(notification.message, ChessGame.class);
+                        ChessGame game = gson.fromJson(notification.game, ChessGame.class);
                         callingClient.setGame(game);
                         notificationHandler.notify(notification);
                     } else {

@@ -128,6 +128,16 @@ public class MemoryDAO extends DataAccessDAO {
     }
 
     @Override
+    protected void daoDeleteGameByID(Integer gameID) {
+
+    }
+
+    @Override
+    protected void daoRemoveUserFromGameByID(Integer gameID, String userName) {
+
+    }
+
+    @Override
     public void nukeEverything() {
         userDataHashmap.clear();
         authDataHashmap.clear();

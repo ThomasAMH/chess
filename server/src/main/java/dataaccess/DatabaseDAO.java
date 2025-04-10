@@ -115,12 +115,15 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, token);
                 try (var rs = ps.executeQuery()) {
-                    return rs.next();
+                    if(rs.next()) {
+                        return true;
+                    };
                 }
             }
         } catch (Exception e) {
             return false;
         }
+        return false;
     }
     @Override
     protected String daoGetUsernameFromAuthToken(String authToken) {
@@ -129,8 +132,11 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
-                    rs.next();
-                    return rs.getNString("username");
+                    if(rs.next()) {
+                        return rs.getNString("username");
+                    } else {
+                        return "";
+                    }
                 }
             }
         } catch (Exception e) {
@@ -330,6 +336,49 @@ public class DatabaseDAO extends DataAccessDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setString(1, gameJson);
                 ps.setInt(2, gameID);
+                ps.executeUpdate();
+            }  catch (Exception e) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    @Override
+    protected void daoDeleteGameByID(Integer gameID) {
+        String statement = statement = "DELETE FROM gamedata WHERE game_id=?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameID.toString());
+                ps.executeUpdate();
+            }  catch (Exception e) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    @Override
+    protected void daoRemoveUserFromGameByID(Integer gameID, String userName) {
+        String statement = "UPDATE gamedata SET white_username = null WHERE game_id = ? AND white_username = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameID.toString());
+                ps.setString(2, userName);
+                ps.executeUpdate();
+            }  catch (Exception e) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+        statement = "UPDATE gamedata SET black_username = null WHERE game_id = ? AND white_username = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, gameID.toString());
+                ps.setString(2, userName);
                 ps.executeUpdate();
             }  catch (Exception e) {
                 return;

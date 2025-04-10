@@ -5,7 +5,6 @@ import dbobjects.GameRecord;
 import model.GameData;
 import results.DataAccessResult;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 
 interface GameDAO {
@@ -17,4 +16,6 @@ interface GameDAO {
     DataAccessResult getUsernameByGameID(int gameID, ChessGame.TeamColor color) throws DataAccessException;
     GameRecord getGameByID(Integer gameID) throws DataAccessException;
     void setGameByID(Integer gameID, String gameJson) throws DataAccessException;
+    void deleteGameByID(Integer gameID) throws DataAccessException;
+    void removeUserFromGame(Integer gameID, String userName);
 }
