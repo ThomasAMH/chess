@@ -73,7 +73,8 @@ public class ChessGameTypeAdapter extends TypeAdapter<ChessGame> {
         }
     }
 
-    private HashMap<ChessPosition, Collection<ChessMove>> readPieceMaps(HashMap<String, ArrayList<LinkedTreeMap<String, LinkedTreeMap<String, Double>>>> stringMap) {
+    private HashMap<ChessPosition, Collection<ChessMove>> readPieceMaps(HashMap<String,
+            ArrayList<LinkedTreeMap<String, LinkedTreeMap<String, Double>>>> stringMap) {
         HashMap<ChessPosition, Collection<ChessMove>> returnObj = new HashMap<ChessPosition, Collection<ChessMove>>();
         for (Map.Entry<String, ArrayList<LinkedTreeMap<String, LinkedTreeMap<String, Double>>>> entry : stringMap.entrySet()) {
             ChessPosition key = ChessPosition.fromString(entry.getKey()); // Assuming fromString("e2") etc.

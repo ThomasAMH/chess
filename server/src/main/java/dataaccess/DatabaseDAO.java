@@ -286,20 +286,20 @@ public class DatabaseDAO extends DataAccessDAO {
     @Override
     protected String daoGetPlayerUsername(int gameID, ChessGame.TeamColor color) {
         String statement;
-        String col_name;
+        String colName;
         try (var conn = DatabaseManager.getConnection()) {
             if(color == ChessGame.TeamColor.WHITE) {
-                col_name = "white_username";
-                statement = "SELECT " +  col_name + " FROM gamedata WHERE game_id=?";
+                colName = "white_username";
+                statement = "SELECT " +  colName + " FROM gamedata WHERE game_id=?";
             } else {
-                col_name = "black_username";
-                statement = "SELECT " +  col_name + " FROM gamedata WHERE game_id=?";
+                colName = "black_username";
+                statement = "SELECT " +  colName + " FROM gamedata WHERE game_id=?";
             }
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     rs.next();
-                    return rs.getNString(col_name);
+                    return rs.getNString(colName);
                 }
             }
         } catch (Exception e) {
@@ -362,30 +362,26 @@ public class DatabaseDAO extends DataAccessDAO {
 
     @Override
     protected void daoRemoveUserFromGameByID(Integer gameID, String userName) {
+        ArrayList<String> statements = new ArrayList<String>();
         String statement = "UPDATE gamedata SET white_username = null WHERE game_id = ? AND white_username = ?";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, gameID.toString());
-                ps.setString(2, userName);
-                ps.executeUpdate();
-            }  catch (Exception e) {
-                return;
-            }
-        } catch (Exception e) {
-            return;
-        }
+        statements.add(statement);
         statement = "UPDATE gamedata SET black_username = null WHERE game_id = ? AND white_username = ?";
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, gameID.toString());
-                ps.setString(2, userName);
-                ps.executeUpdate();
-            }  catch (Exception e) {
+        statements.add(statement);
+
+        for(String sqlStatement: statements) {
+            try (var conn = DatabaseManager.getConnection()) {
+                try (var ps = conn.prepareStatement(sqlStatement)) {
+                    ps.setString(1, gameID.toString());
+                    ps.setString(2, userName);
+                    ps.executeUpdate();
+                } catch (Exception e) {
+                    return;
+                }
+            } catch (Exception e) {
                 return;
             }
-        } catch (Exception e) {
-            return;
         }
+
     }
 
     @Override

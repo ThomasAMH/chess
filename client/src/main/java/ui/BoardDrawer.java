@@ -22,7 +22,8 @@ public class BoardDrawer {
     }
 
 
-    public void drawChessBoard(String whiteUsername, String blackUsername, ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer, ChessBoard board) {
+    public void drawChessBoard(String whiteUsername, String blackUsername,
+                               ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer, ChessBoard board) {
         initializePiecesMaps();
 
         if(perspective == ChessGame.TeamColor.WHITE) {
