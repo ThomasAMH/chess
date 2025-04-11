@@ -1,11 +1,6 @@
 package ui;
 
 import chess.*;
-import dataaccess.DataAccessDAO;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseDAO;
-import dbobjects.GameRecord;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;

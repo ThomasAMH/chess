@@ -529,16 +529,8 @@ public class Client {
 
     private BoardDrawer makeBoardDrawer(int gameID) {
         DataAccessDAO dataAccessDAO;
-        String blackUsername;
-        String whiteUsername;
-        try {
-            dataAccessDAO = new DatabaseDAO();
-            blackUsername = dataAccessDAO.gameData.getUsernameByGameID(gameID, ChessGame.TeamColor.BLACK).data();
-            whiteUsername = dataAccessDAO.gameData.getUsernameByGameID(gameID, ChessGame.TeamColor.WHITE).data();
-        } catch (DataAccessException e) {
-            blackUsername = "Black";
-            whiteUsername = "White";
-        }
+        String blackUsername = "Black";
+        String whiteUsername = "White";
         return new BoardDrawer(activeGame.getBoard(), whiteUsername, blackUsername);
     }
 }
