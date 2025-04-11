@@ -2,11 +2,10 @@ package websocket.commands;
 
 public class UserGameCommand {
     public enum CommandType {
-        CONNECT_PLAYER,
+        CONNECT,
         MAKE_MOVE,
         LEAVE,
         RESIGN,
-        CONNECT_OBSERVER
     }
 
     public CommandType commandType;

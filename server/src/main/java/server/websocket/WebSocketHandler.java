@@ -11,6 +11,7 @@ import dbobjects.GameRecord;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.commands.JoinObserverCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -40,11 +41,22 @@ public class WebSocketHandler {
                 return;
             }
             switch (command.commandType) {
-                case CONNECT_PLAYER -> enterPlayer(command, session);
-                case MAKE_MOVE -> makeMove(message, session);
-                case CONNECT_OBSERVER -> enterObserver(command, session);
-                case LEAVE -> leave(command, session);
-                case RESIGN -> resign(command, session);
+                case CONNECT:
+                    if(command.getClass() == JoinObserverCommand.class) {
+                        enterObserver(command, session);
+                    } else {
+                        enterPlayer(command, session);
+                    }
+                    break;
+                case MAKE_MOVE:
+                    makeMove(message, session);
+                    break;
+                case LEAVE:
+                    leave(command, session);
+                    break;
+                case RESIGN:
+                    resign(command, session);
+                    break;
             }
         } catch (NullPointerException e) {
             sendErrorMessage("Problem encountered while accessing database", session);

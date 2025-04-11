@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.ResponseException;
 import ui.Client;
+import websocket.commands.JoinObserverCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
@@ -65,11 +66,11 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void joinGame(String token, int gameId) throws ResponseException {
-        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT_PLAYER, token, gameId);
+        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT, token, gameId);
     }
 
     public void observeGame(String token, int gameId) throws ResponseException {
-        sendGameStatusCommand(UserGameCommand.CommandType.CONNECT_OBSERVER, token, gameId);
+        sendGameStatusCommand(JoinObserverCommand.CommandType.CONNECT, token, gameId);
     }
 
     public void leaveGame(String token, int gameId) throws ResponseException {
