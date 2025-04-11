@@ -1,9 +1,6 @@
 package ui;
 
 import chess.*;
-import dataaccess.DataAccessDAO;
-import dataaccess.DataAccessException;
-import dataaccess.DatabaseDAO;
 import exceptions.ResponseException;
 import model.GameMetaData;
 import returns.ListGamesReturn;
@@ -528,7 +525,6 @@ public class Client {
     }
 
     private BoardDrawer makeBoardDrawer(int gameID) {
-        DataAccessDAO dataAccessDAO;
         String blackUsername = "Black";
         String whiteUsername = "White";
         return new BoardDrawer(activeGame.getBoard(), whiteUsername, blackUsername);
