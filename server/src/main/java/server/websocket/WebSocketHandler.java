@@ -129,7 +129,6 @@ public class WebSocketHandler {
     }
 
     private void resign(UserGameCommand command, Session session) throws IOException {
-        connections.remove(command.authToken);
         String username = "";
         try {
             username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
@@ -146,15 +145,15 @@ public class WebSocketHandler {
             return;
         }
 
-        String message = String.format("%s has resigned from game", username);
+        String message = String.format("%s has resigned from game. Type leave to leave.", username);
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
-        broadcastMessage(command, message);
-
-        message = "Enter leave to leave";
-        serverMessage = new ServerMessage(ServerMessage.ServerMessageType.RESIGN, message);
-        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
         connections.broadcast(serverMessage, command.gameID);
+        connections.remove(command.authToken);
+
+//        message = "Enter leave to leave";
+//        serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+//        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
+//        connections.broadcast(serverMessage, command.gameID);
     }
 
     private void makeMove(String message, Session session) throws IOException {
@@ -203,7 +202,6 @@ public class WebSocketHandler {
             sendErrorMessage("Problem encountered while accessing database.", session);
         }
 
-
         ServerMessage broadcastGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGameGson);
         connections.broadcast(broadcastGameMessage, command.gameID);
 
@@ -216,21 +214,17 @@ public class WebSocketHandler {
 
         String broadcastMsg = String.format("%s has moved: " + moveFromCoord + " -> " + moveToCoord, username);
         ServerMessage notification;
-
         String opponent = ((Objects.equals(username, blackUsername))) ? whiteUsername: blackUsername;
         if(chessGame.gameState == ChessGame.GameState.CHECK) {
             broadcastMsg = broadcastMsg + "; Check for " + opponent + "!";
-            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
-            connections.broadcast(notification, command.gameID);
-
         } else if (chessGame.gameState == ChessGame.GameState.CHECKMATE) {
             broadcastMsg = broadcastMsg + "; Checkmate for " + opponent + "!";
-            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
-            connections.broadcast(notification, command.gameID);
         } else {
-            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
-            connections.broadcast(notification, command.gameID);
+            broadcastMsg = broadcastMsg;
         }
+        notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
+        connections.exclusiveBroadcast(notification, command.gameID, command.authToken);
+
     }
 
     private void broadcastMessage(UserGameCommand command, String message) throws IOException {

@@ -1,19 +1,14 @@
 package ui;
-
 import chess.*;
 import exceptions.ResponseException;
 import model.GameMetaData;
 import returns.ListGamesReturn;
 import serverfacade.ServerFacade;
-
 import java.util.*;
-
 import requests.*;
 import results.*;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-
-
 import static ui.EscapeSequences.*;
 
 public class Client {
@@ -38,8 +33,6 @@ public class Client {
         this.notificationHandler = notificationHandler;
         this.resignFlag = false;
     }
-
-
     public String eval(String input) {
         try {
             var tokens = input.toLowerCase().split(" ");
@@ -57,7 +50,6 @@ public class Client {
             return ex.getMessage();
         }
     }
-
     private String handleResignOnlyRequests(String cmd, String[] params) throws ResponseException {
         if (cmd.equals("resign")) {
             resignFlag = true;
@@ -67,7 +59,6 @@ public class Client {
         }
         return "Defeat: end of game... Enter resign to accept defeat";
     }
-
     private String handleLoggedOutRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "register" -> register(params);
@@ -76,7 +67,6 @@ public class Client {
             default -> help();
         };
     }
-
     private String handleLoggedInRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "logout" -> logout();
@@ -88,7 +78,6 @@ public class Client {
             default -> help();
         };
     }
-
     private String handlePlayingRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "moves" -> showMoves(params);
@@ -99,7 +88,6 @@ public class Client {
             default -> help();
         };
     }
-
     private String handleObservingRequests(String cmd, String[] params) throws ResponseException {
         return switch (cmd) {
             case "redraw" -> redrawGameScreen();
@@ -107,7 +95,6 @@ public class Client {
             default -> help();
         };
     }
-
     private String makeMove(String... params) throws ResponseException {
         if(activeGame.getTeamTurn() != playerColor) {
             String exceptionString = SET_TEXT_COLOR_RED + "It's not your turn!";
@@ -190,7 +177,6 @@ public class Client {
         // redrawGameScreen();
         return "Move executed successfully";
     }
-
     private String resignFromGame() throws ResponseException {
         if(!resignFlag) {
             resignFlag = true;
@@ -200,12 +186,10 @@ public class Client {
         ws.resignGame(activeAuthTokens.get(activeUser), trueGameIndex);
         return "You have resigned. Enter leave to return to the home menu";
     }
-
     public String redrawGameScreen() {
         printGameBoard();
         return "";
     }
-
     private String leaveGameMode() throws ResponseException {
         System.out.print(ERASE_SCREEN);
         state = State.LOGGED_IN;
@@ -213,7 +197,6 @@ public class Client {
         this.trueGameIndex = -1;
         return "Returned to home menu";
     }
-
     private String showMoves(String... params) throws ResponseException {
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: c,r";
         if(params.length != 1) {
@@ -253,7 +236,6 @@ public class Client {
         }
         return "No moves to show for the piece at " + args[0] + "," + args[1];
     }
-
     public String register(String... params) throws ResponseException {
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <USERNAME> <PASSWORD> <EMAIL>";
         if(params.length < 3) {
@@ -270,7 +252,6 @@ public class Client {
         activeUser = result.username();
         return String.format(SET_TEXT_COLOR_BLUE + "\nYou signed in as %s.", activeUser);
     }
-
     public String login(String... params) throws ResponseException {
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <USERNAME> <PASSWORD>";
         if(params.length < 2) {
@@ -287,7 +268,6 @@ public class Client {
         activeUser = result.username();
         return String.format(SET_TEXT_COLOR_BLUE + "\nYou signed in as %s.", activeUser);
     }
-
     public String logout() throws ResponseException {
         if(state == State.LOGGED_OUT) {
             throw new ResponseException(400, "You're not logged in");
@@ -299,7 +279,6 @@ public class Client {
         activeAuthTokens.remove(activeUser);
         return String.format(SET_TEXT_COLOR_BLUE + "\nLogged out");
     }
-
     public String createGame(String... params) throws ResponseException {
         assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMENAME>";
@@ -314,7 +293,6 @@ public class Client {
 
         return String.format(SET_TEXT_COLOR_BLUE + "\nGame created: %s.", params[0]);
     }
-
     public String listGames() throws ResponseException {
         assertSignedIn();
         ListGamesRequest request = new ListGamesRequest(activeAuthTokens.get(activeUser));
@@ -339,7 +317,6 @@ public class Client {
 
         return SET_TEXT_COLOR_BLUE + "Join a game by running the play command and providing the game number and color";
     }
-
     public String playGame(String... params) throws ResponseException {
         assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMEID> <WHITE/BLACK>";
@@ -373,13 +350,11 @@ public class Client {
 
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
     }
-
     public void printGameBoard() {
         BoardDrawer bd = makeBoardDrawer(this.trueGameIndex);
 
         bd.drawChessBoard(playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
     }
-
     public String observeGame(String... params) throws ResponseException {
         assertSignedIn();
         String exceptionString = SET_TEXT_COLOR_RED + "Expected: <GAMEID>";
@@ -395,7 +370,6 @@ public class Client {
         state = State.OBSERVING;
         return SET_TEXT_COLOR_BLUE + "Observing selected game. Enjoy the show!";
     }
-
     public String help() {
         if (state == State.LOGGED_OUT) {
             return SET_TEXT_COLOR_YELLOW + """
@@ -433,7 +407,6 @@ public class Client {
                 - quit
                 """;
     }
-
     public void setGame(ChessGame game) {
         this.activeGame = game;
         if(activeGame.gameState == ChessGame.GameState.CHECKMATE) {
@@ -446,7 +419,6 @@ public class Client {
             }
         }
     }
-
     private void validateUserCoord(String... args) throws ResponseException {
         String exceptionString;
         String col;
@@ -463,7 +435,6 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
     }
-
     private Integer validateGameNumber(String exceptionString, String[] params) throws ResponseException {
         Integer trueGameIndex;
         try {
@@ -482,7 +453,6 @@ public class Client {
             throw new ResponseException(400, "You must sign in");
         }
     }
-
     private ChessPiece.PieceType getPromotePiece() {
         String tempMenu = """
                     Pawn promote! Enter a number to choose your new piece:
@@ -523,10 +493,8 @@ public class Client {
         }
         return null;
     }
-
     private BoardDrawer makeBoardDrawer(int gameID) {
-        String blackUsername = "Black";
-        String whiteUsername = "White";
+        String blackUsername = "Black"; String whiteUsername = "White";
         return new BoardDrawer(activeGame.getBoard(), whiteUsername, blackUsername);
     }
 }

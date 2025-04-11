@@ -12,7 +12,7 @@ public class ServerMessage {
         this.errorMessage = null;
         this.serverMessageType = type;
         switch(type) {
-            case NOTIFICATION, RESIGN:
+            case NOTIFICATION:
                 this.message = string;
                 break;
             case LOAD_GAME:
@@ -21,14 +21,12 @@ public class ServerMessage {
             case ERROR:
                 this.errorMessage = string;
                 break;
-
         }
     }
 
     public enum ServerMessageType {
         LOAD_GAME,
         ERROR,
-        NOTIFICATION,
-        RESIGN
+        NOTIFICATION
     }
 }

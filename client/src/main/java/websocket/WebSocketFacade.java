@@ -51,7 +51,7 @@ public class WebSocketFacade extends Endpoint {
                         ChessGame game = gson.fromJson(notification.game, ChessGame.class);
                         callingClient.setGame(game);
                         notificationHandler.notify(notification);
-                    } else if (Objects.requireNonNull(notification.serverMessageType) == ServerMessage.ServerMessageType.RESIGN) {
+                    } else if (notification.message.contains("resign")) {
                         callingClient.state = State.OBSERVING;
                         notificationHandler.notify(notification);
                     } else {

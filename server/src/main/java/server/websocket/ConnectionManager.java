@@ -39,4 +39,23 @@ public class ConnectionManager {
             remove(c.authToken);
         }
     }
+
+    public void exclusiveBroadcast(ServerMessage notification, Integer gameID, String excludeToken) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (!Objects.equals(gameData.get(c.authToken), gameID)) {
+                continue;
+            }
+            if (c.session.isOpen()) {
+                if(!Objects.equals(c.authToken, excludeToken)) {
+                    c.send(new Gson().toJson(notification, ServerMessage.class));
+                }
+            } else {
+                removeList.add(c);
+            }
+        }
+        for (var c : removeList) {
+            remove(c.authToken);
+        }
+    }
 }
