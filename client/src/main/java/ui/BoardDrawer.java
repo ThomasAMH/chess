@@ -14,13 +14,17 @@ public class BoardDrawer {
     HashMap<ChessPiece.PieceType, String> blackPieces;
     static final String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
     static final String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
-    final String whiteUsername;
-    final String blackUsername;
+    final ChessGame chessGame;
 
-    public BoardDrawer(ChessBoard board, String whiteUsername, String blackUsername) {
+    public BoardDrawer(ChessBoard board) {
         this.board = board;
-        this.whiteUsername = whiteUsername;
-        this.blackUsername = blackUsername;
+        this.chessGame = null;
+        initializePiecesMaps();
+    }
+
+    public BoardDrawer(ChessGame game) {
+        this.chessGame = game;
+        this.board = game.getBoard();
         initializePiecesMaps();
     }
 
@@ -79,7 +83,7 @@ public class BoardDrawer {
     public boolean showPieceMoves(int row, int col, ChessGame.TeamColor perspective) {
         ChessPosition pos = new ChessPosition(row, col);
         ChessPiece movingPiece = board.getPiece(pos);
-        Collection<ChessMove> moves = movingPiece.pieceMoves(board, pos);
+        Collection<ChessMove> moves = chessGame.validMoves(new ChessPosition(row, col));
         boolean printedMovesFlag = false;
 
         HashSet<ChessPosition> possibleSquares = new HashSet<ChessPosition>();

@@ -129,7 +129,7 @@ public class ChessGame {
      * @return boolean value if the move is for the active player AND on a legit piece AND a move from the move list
      * Assumes that only legit moves will be presented to player for selection from movelist
      */
-    private boolean isMoveLegal(ChessMove proposedMove) {
+    public boolean isMoveLegal(ChessMove proposedMove) {
         ChessPosition startingPosition = proposedMove.getStartPosition();
         ChessPosition endPosition = proposedMove.getEndPosition();
         ChessPiece movingPiece = gameBoard.getPiece(startingPosition);

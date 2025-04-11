@@ -228,7 +228,7 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
 
-        BoardDrawer bd = makeBoardDrawer(this.trueGameIndex);
+        BoardDrawer bd = new BoardDrawer(activeGame);
         boolean hasMoves = bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
 
         if(hasMoves) {
@@ -351,7 +351,7 @@ public class Client {
         return SET_TEXT_COLOR_BLUE + "Game joined successfully. Good luck!";
     }
     public void printGameBoard() {
-        BoardDrawer bd = makeBoardDrawer(this.trueGameIndex);
+        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
 
         bd.drawChessBoard(playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
     }
@@ -493,8 +493,5 @@ public class Client {
         }
         return null;
     }
-    private BoardDrawer makeBoardDrawer(int gameID) {
-        String blackUsername = "Black"; String whiteUsername = "White";
-        return new BoardDrawer(activeGame.getBoard(), whiteUsername, blackUsername);
-    }
+
 }

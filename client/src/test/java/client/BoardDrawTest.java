@@ -19,14 +19,14 @@ public class BoardDrawTest {
 
     @Test
     public void testDrawChessBoardWhite() {
-        bd = new BoardDrawer(new ChessBoard(), "Tom", "Jenn");
+        bd = new BoardDrawer(new ChessBoard());
         bd.drawChessBoard(ChessGame.TeamColor.WHITE, ChessGame.TeamColor.WHITE, new ChessBoard());
         Assertions.assertTrue(true);
     }
 
     @Test
     public void testDrawChessBoardBlack() {
-        bd = new BoardDrawer(new ChessBoard(), "Tom", "Jenn");
+        bd = new BoardDrawer(new ChessBoard());
         bd.drawChessBoard(ChessGame.TeamColor.BLACK, ChessGame.TeamColor.BLACK, new ChessBoard());
         Assertions.assertTrue(true);
     }
@@ -35,7 +35,7 @@ public class BoardDrawTest {
     public void testMoveOptions() {
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        bd = new BoardDrawer(board, "Tom", "Jenn");
+        bd = new BoardDrawer(board);
         boolean b = bd.showPieceMoves(2, 2, ChessGame.TeamColor.BLACK);
         Assertions.assertTrue(b);
 
