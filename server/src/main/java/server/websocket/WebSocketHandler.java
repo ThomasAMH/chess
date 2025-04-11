@@ -149,11 +149,6 @@ public class WebSocketHandler {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(serverMessage, command.gameID);
         connections.remove(command.authToken);
-
-//        message = "Enter leave to leave";
-//        serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-//        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
-//        connections.broadcast(serverMessage, command.gameID);
     }
 
     private void makeMove(String message, Session session) throws IOException {
