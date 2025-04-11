@@ -151,7 +151,9 @@ public class ChessGame {
 
         if(!teamMoveset.containsKey(startingPosition)) {return false;}
 
-        return teamMoveset.get(startingPosition).contains(proposedMove);
+        ChessMove proxyMove = new ChessMove(startingPosition, endPosition, null);
+
+        return teamMoveset.get(startingPosition).contains(proxyMove);
     }
 
     /**

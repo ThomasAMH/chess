@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exceptions.ResponseException;
 import ui.Client;
+import ui.State;
 import websocket.commands.JoinObserverCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -50,6 +51,9 @@ public class WebSocketFacade extends Endpoint {
                         ChessGame game = gson.fromJson(notification.game, ChessGame.class);
                         callingClient.setGame(game);
                         notificationHandler.notify(notification);
+                    } else if (Objects.requireNonNull(notification.serverMessageType) == ServerMessage.ServerMessageType.RESIGN) {
+                        callingClient.state = State.OBSERVING;
+                        notificationHandler.notify(notification);
                     } else {
                         notificationHandler.notify(notification);
                     }
@@ -70,7 +74,12 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void observeGame(String token, int gameId) throws ResponseException {
-        sendGameStatusCommand(JoinObserverCommand.CommandType.CONNECT, token, gameId);
+        try {
+            var command = new JoinObserverCommand(UserGameCommand.CommandType.CONNECT, token, gameId);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
     }
 
     public void leaveGame(String token, int gameId) throws ResponseException {
@@ -98,6 +107,4 @@ public class WebSocketFacade extends Endpoint {
             throw new ResponseException(500, ex.getMessage());
         }
     }
-
-
 }

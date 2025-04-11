@@ -38,12 +38,12 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    private void printPrompt() {
+    public static void printPrompt() {
         System.out.print(SET_TEXT_COLOR_GREEN + RESET_TEXT_ITALIC + "\n>>> ");
     }
 
-    private void printNotification(String text) {
-        System.out.print(SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA + text + '\n');
+    public static void printNotification(String text) {
+        System.out.print(SET_TEXT_ITALIC + SET_TEXT_COLOR_MAGENTA + text);
     }
 
     @Override

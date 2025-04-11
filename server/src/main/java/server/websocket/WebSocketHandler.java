@@ -11,6 +11,7 @@ import dbobjects.GameRecord;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import server.Server;
 import websocket.commands.JoinObserverCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
@@ -35,7 +36,13 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, DataAccessException {
         try {
-            UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+            UserGameCommand command;
+            if(message.contains("join")) {
+                command = new Gson().fromJson(message, JoinObserverCommand.class);
+            } else {
+                command = new Gson().fromJson(message, UserGameCommand.class);
+            }
+
             if(!validateAuthToken(command.authToken)) {
                 sendErrorMessage("Bad auth token", session);
                 return;
@@ -82,13 +89,12 @@ public class WebSocketHandler {
     }
 
     private void enterObserver(UserGameCommand command, Session session){
-
         String username;
         try {
             username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
             GameRecord testID = dataAccessDAO.gameData.getGameByID(command.gameID);
-//            String message = String.format("%s is observing the game", username);
-//            broadcastMessage(command, message);
+            String message = String.format("%s is observing the game", username);
+            broadcastMessage(command, message);
             returnGame(command, session);
         } catch (DataAccessException | IOException e) {
             sendErrorMessage("Problem encountered while accessing database.", session);
@@ -100,13 +106,26 @@ public class WebSocketHandler {
         connections.remove(command.authToken);
         String username;
         try {
+            String isGameActive = dataAccessDAO.gameData.isGameNumberValid(command.gameID).data();
+            if(Objects.equals(isGameActive, "false")) {
+                return;
+            }
+            GameRecord gameData = dataAccessDAO.gameData.getGameByID(command.gameID);
+            String blackUsername = gameData.blackUsername();
+            String whiteUsername = gameData.whiteUsername();
             username = dataAccessDAO.authData.getUserFromAuthToken(command.authToken).data();
-            dataAccessDAO.gameData.removeUserFromGame(command.gameID, username);
+            String message;
+            if(Objects.equals(username, blackUsername) || Objects.equals(username, whiteUsername)) {
+                message = String.format("%s has left the game", username);
+                broadcastMessage(command, message);
+                dataAccessDAO.gameData.removeUserFromGame(command.gameID, username);
+            } else {
+                message = String.format("%s is no longer observing", username);
+                broadcastMessage(command, message);
+            }
         } catch (DataAccessException e) {
             throw new IOException();
         }
-        String message = String.format("%s has left the game", username);
-        broadcastMessage(command, message);
     }
 
     private void resign(UserGameCommand command, Session session) throws IOException {
@@ -131,6 +150,11 @@ public class WebSocketHandler {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
         broadcastMessage(command, message);
+
+        message = "Enter leave to leave";
+        serverMessage = new ServerMessage(ServerMessage.ServerMessageType.RESIGN, message);
+        session.getRemote().sendString(new Gson().toJson(serverMessage, ServerMessage.class));
+        connections.broadcast(serverMessage, command.gameID);
     }
 
     private void makeMove(String message, Session session) throws IOException {
@@ -146,7 +170,6 @@ public class WebSocketHandler {
         String game = dataAccessDAO.gameData.getGameByID(command.gameID).gameJSON();
         Gson gson = chessGameBuilder.create();
         ChessGame chessGame = gson.fromJson(game, ChessGame.class);
-
 
         ChessGame.TeamColor activePlayerTeam = chessGame.getTeamTurn();
         GameRecord gameData = dataAccessDAO.gameData.getGameByID(command.gameID);
@@ -173,37 +196,46 @@ public class WebSocketHandler {
             return;
         }
         String chessGameGson = new Gson().toJson(chessGame, ChessGame.class);
+
         try {
             dataAccessDAO.gameData.setGameByID(command.gameID, chessGameGson);
         } catch(DataAccessException e) {
             sendErrorMessage("Problem encountered while accessing database.", session);
         }
 
+
         ServerMessage broadcastGameMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, chessGameGson);
-        connections.broadcastGame(broadcastGameMessage, command.gameID);
+        connections.broadcast(broadcastGameMessage, command.gameID);
+
+        String moveFromCoord, moveToCoord;
+        moveFromCoord = getColLetterFromInt(command.move.getStartPosition().getColumn()) +
+                String.valueOf(command.move.getStartPosition().getRow());
+        moveToCoord = getColLetterFromInt(command.move.getEndPosition().getColumn()) +
+                String.valueOf(command.move.getEndPosition().getRow());
 
 
-        String broadcastMsg = String.format("%s has moved", username);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
+        String broadcastMsg = String.format("%s has moved: " + moveFromCoord + " -> " + moveToCoord, username);
+        ServerMessage notification;
 
         String opponent = ((Objects.equals(username, blackUsername))) ? whiteUsername: blackUsername;
         if(chessGame.gameState == ChessGame.GameState.CHECK) {
-            broadcastMsg = "Check for " + opponent + "!";
+            broadcastMsg = broadcastMsg + "; Check for " + opponent + "!";
             notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
-            connections.broadcast(command.authToken, notification, command.gameID);
+            connections.broadcast(notification, command.gameID);
 
         } else if (chessGame.gameState == ChessGame.GameState.CHECKMATE) {
-            broadcastMsg = "Checkmate for " + opponent + "!";
+            broadcastMsg = broadcastMsg + "; Checkmate for " + opponent + "!";
             notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
-            connections.broadcast(command.authToken, notification, command.gameID);
+            connections.broadcast(notification, command.gameID);
         } else {
-            connections.broadcast(command.authToken, notification, command.gameID);
+            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, broadcastMsg);
+            connections.broadcast(notification, command.gameID);
         }
     }
 
     private void broadcastMessage(UserGameCommand command, String message) throws IOException {
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            connections.broadcast(command.authToken, notification, command.gameID);
+            connections.broadcast(notification, command.gameID);
     }
 
     private void returnGame(UserGameCommand command, Session session) throws IOException {
@@ -229,5 +261,9 @@ public class WebSocketHandler {
             return false;
         }
         return true;
+    }
+
+    private char getColLetterFromInt(int colInt) {
+        return (char) ('A' + (colInt - 1));
     }
 }

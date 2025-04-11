@@ -1,6 +1,10 @@
 package ui;
 
 import chess.*;
+import dataaccess.DataAccessDAO;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseDAO;
+import dbobjects.GameRecord;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,15 +19,18 @@ public class BoardDrawer {
     HashMap<ChessPiece.PieceType, String> blackPieces;
     static final String PIECE_COLOR = SET_TEXT_COLOR_BLUE;
     static final String AXIS_COLOR = SET_TEXT_COLOR_WHITE;
+    final String whiteUsername;
+    final String blackUsername;
 
-    public BoardDrawer(ChessBoard board) {
+    public BoardDrawer(ChessBoard board, String whiteUsername, String blackUsername) {
         this.board = board;
+        this.whiteUsername = whiteUsername;
+        this.blackUsername = blackUsername;
         initializePiecesMaps();
     }
 
 
-    public void drawChessBoard(String whiteUsername, String blackUsername,
-                               ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer, ChessBoard board) {
+    public void drawChessBoard(ChessGame.TeamColor perspective, ChessGame.TeamColor activePlayer, ChessBoard board) {
         initializePiecesMaps();
 
         if(perspective == ChessGame.TeamColor.WHITE) {

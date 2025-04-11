@@ -1,6 +1,9 @@
 package ui;
 
 import chess.*;
+import dataaccess.DataAccessDAO;
+import dataaccess.DataAccessException;
+import dataaccess.DatabaseDAO;
 import exceptions.ResponseException;
 import model.GameMetaData;
 import returns.ListGamesReturn;
@@ -19,16 +22,16 @@ import static ui.EscapeSequences.*;
 public class Client {
     private final ServerFacade server;
     private final String serverUrl;
-    private State state = State.LOGGED_OUT;
+    public State state = State.LOGGED_OUT;
     private static HashMap<String, String> activeAuthTokens = new HashMap<String, String>();
     private static String activeUser;
     private static HashMap<Integer, Integer> gameList;
-    private String whiteUsername, blackusername;
     private ChessGame.TeamColor playerColor;
     private ChessGame activeGame;
     private Integer trueGameIndex;
     private WebSocketFacade ws;
     private NotificationHandler notificationHandler;
+    private boolean resignFlag;
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         playerColor = ChessGame.TeamColor.WHITE;
@@ -36,14 +39,9 @@ public class Client {
         this.serverUrl = serverUrl;
         activeGame = new ChessGame();
         this.notificationHandler = notificationHandler;
+        this.resignFlag = false;
     }
 
-    // For testing
-    public Client(String serverUrl, ChessGame game) {
-        server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
-        this.activeGame = game;
-    }
 
     public String eval(String input) {
         try {
@@ -56,10 +54,21 @@ public class Client {
                 case State.LOGGED_IN -> handleLoggedInRequests(cmd, params);
                 case State.PLAYING -> handlePlayingRequests(cmd, params);
                 case State.OBSERVING -> handleObservingRequests(cmd, params);
+                case State.RESIGN_ONLY -> handleResignOnlyRequests(cmd, params);
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String handleResignOnlyRequests(String cmd, String[] params) throws ResponseException {
+        if (cmd.equals("resign")) {
+            resignFlag = true;
+            resignFromGame();
+        } else {
+            help();
+        }
+        return "Defeat: end of game... Enter resign to accept defeat";
     }
 
     private String handleLoggedOutRequests(String cmd, String[] params) throws ResponseException {
@@ -154,7 +163,21 @@ public class Client {
 
         ChessPosition startPos = new ChessPosition(row1, col1Int);
         ChessPosition endPos = new ChessPosition(row2, col2Int);
-        ChessMove move = new ChessMove(startPos, endPos, null);
+
+        // Evaluate promotion
+        ChessPiece movingPiece = activeGame.getBoard().getPiece(startPos);
+        ChessPiece.PieceType promotePieceType = null;
+        if((playerColor == ChessGame.TeamColor.WHITE) &&
+                (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) &&
+                (endPos.getRow() == 8)) {
+            promotePieceType = getPromotePiece();
+        } else if ((playerColor == ChessGame.TeamColor.BLACK) &&
+                (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) &&
+                (endPos.getRow() == 1)) {
+            promotePieceType = getPromotePiece();
+        }
+
+        ChessMove move = new ChessMove(startPos, endPos, promotePieceType);
         try {
             activeGame.makeMove(move);
         } catch(chess.InvalidMoveException e) {
@@ -172,6 +195,10 @@ public class Client {
     }
 
     private String resignFromGame() throws ResponseException {
+        if(!resignFlag) {
+            resignFlag = true;
+            return "You sure about that? Type resign again, if yes.";
+        }
         state = State.OBSERVING;
         ws.resignGame(activeAuthTokens.get(activeUser), trueGameIndex);
         return "You have resigned. Enter leave to return to the home menu";
@@ -221,8 +248,8 @@ public class Client {
             throw new ResponseException(400, exceptionString);
         }
 
-        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        boolean hasMoves = bd.showPieceMoves( row, colInt, activeGame.getTeamTurn());
+        BoardDrawer bd = makeBoardDrawer(this.trueGameIndex);
+        boolean hasMoves = bd.showPieceMoves(row, colInt, activeGame.getTeamTurn());
 
         if(hasMoves) {
             return "Showing moves for piece at " + args[0] + "," + args[1];
@@ -351,8 +378,9 @@ public class Client {
     }
 
     public void printGameBoard() {
-        BoardDrawer bd = new BoardDrawer(activeGame.getBoard());
-        bd.drawChessBoard(whiteUsername, blackusername, playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
+        BoardDrawer bd = makeBoardDrawer(this.trueGameIndex);
+
+        bd.drawChessBoard(playerColor, activeGame.getTeamTurn(), activeGame.getBoard());
     }
 
     public String observeGame(String... params) throws ResponseException {
@@ -364,10 +392,9 @@ public class Client {
         else if(params[0].isBlank()) {
             throw new ResponseException(400, exceptionString);
         }
-        Integer trueGameIndex = validateGameNumber(exceptionString, params);
+        this.trueGameIndex = validateGameNumber(exceptionString, params);
         ws = new WebSocketFacade(serverUrl, notificationHandler, this);
         ws.observeGame(activeAuthTokens.get(activeUser), trueGameIndex);
-        // printGameBoard();
         state = State.OBSERVING;
         return SET_TEXT_COLOR_BLUE + "Observing selected game. Enjoy the show!";
     }
@@ -412,6 +439,15 @@ public class Client {
 
     public void setGame(ChessGame game) {
         this.activeGame = game;
+        if(activeGame.gameState == ChessGame.GameState.CHECKMATE) {
+            if(activeGame.getTeamTurn() == playerColor) {
+                state = State.RESIGN_ONLY;
+            } else {
+                state = State.OBSERVING;
+                Repl.printNotification("Victory is yours!");
+                Repl.printPrompt();
+            }
+        }
     }
 
     private void validateUserCoord(String... args) throws ResponseException {
@@ -448,5 +484,61 @@ public class Client {
         if (state == State.LOGGED_OUT) {
             throw new ResponseException(400, "You must sign in");
         }
+    }
+
+    private ChessPiece.PieceType getPromotePiece() {
+        String tempMenu = """
+                    Pawn promote! Enter a number to choose your new piece:
+                        1. Queen
+                        2. Rook
+                        3. Bishop
+                        4. Knight
+                """;
+        Repl.printNotification(tempMenu);
+        Repl.printPrompt();
+
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        int userInt;
+        boolean validInputFlag = false;
+        while(!validInputFlag) {
+            try {
+                userInt = Integer.parseInt(line);
+                validInputFlag = true;
+                switch (userInt) {
+                    case 1:
+                        return ChessPiece.PieceType.QUEEN;
+                    case 2:
+                        return ChessPiece.PieceType.ROOK;
+                    case 3:
+                        return ChessPiece.PieceType.BISHOP;
+                    case 4:
+                        return ChessPiece.PieceType.KNIGHT;
+                    default:
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                Repl.printNotification("Invalid entry!");
+                Repl.printPrompt();
+                scanner = new Scanner(System.in);
+                line = scanner.nextLine();
+            }
+        }
+        return null;
+    }
+
+    private BoardDrawer makeBoardDrawer(int gameID) {
+        DataAccessDAO dataAccessDAO;
+        String blackUsername;
+        String whiteUsername;
+        try {
+            dataAccessDAO = new DatabaseDAO();
+            blackUsername = dataAccessDAO.gameData.getUsernameByGameID(gameID, ChessGame.TeamColor.BLACK).data();
+            whiteUsername = dataAccessDAO.gameData.getUsernameByGameID(gameID, ChessGame.TeamColor.WHITE).data();
+        } catch (DataAccessException e) {
+            blackUsername = "Black";
+            whiteUsername = "White";
+        }
+        return new BoardDrawer(activeGame.getBoard(), whiteUsername, blackUsername);
     }
 }
