@@ -153,7 +153,7 @@ public class ChessGame {
 
         ChessMove proxyMove = new ChessMove(startingPosition, endPosition, null);
 
-        return teamMoveset.get(startingPosition).contains(proxyMove);
+        return (teamMoveset.get(startingPosition).contains(proposedMove) || teamMoveset.get(startingPosition).contains(proxyMove));
     }
 
     /**
